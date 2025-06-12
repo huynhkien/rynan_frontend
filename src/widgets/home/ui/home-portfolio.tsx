@@ -87,8 +87,10 @@ export const HomePortfolio = () => {
                                     color: theme.palette.text.primary,
                                     textAlign: 'center',
                                     backgroundColor: theme.palette.text.secondary,
+                                    width: '350px',
                                     bottom: 30,
-                                    p: 2,
+                                    py: 3,
+                                    fontWeight: theme.typography.fontWeightBold,
                                     borderRadius: '15px',
                                     opacity: isHovered === index ? 0 : 1, 
                                     transition: 'opacity 0.3s ease'
@@ -137,6 +139,7 @@ export const HomePortfolio = () => {
                                         sx={{
                                             mb:4,
                                             position: 'relative',
+                                             fontWeight: theme.typography.fontWeightBold,
                                             '&::before': {
                                                 position: 'absolute',
                                                 content: '""',

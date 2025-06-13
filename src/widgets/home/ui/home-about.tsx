@@ -15,7 +15,9 @@ export const HomeAbout = () => {
     const theme = useTheme();
     const [isFlipped, setIsFlipped] = useState<number | null>(null);
     return (
-        <Box sx={{position: 'relative'}}>
+        <Box sx={{
+            position: 'relative',
+            }}>
             <Box
                 sx={{
                     position: 'absolute',

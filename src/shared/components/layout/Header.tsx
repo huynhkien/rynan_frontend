@@ -107,7 +107,7 @@ export const Header = () => {
           <Toolbar sx={{ py: 1 }}>
             {/* Logo */}
             <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
-              <Image src='/logo/SMART-AGRICULTURE_LOGO_BRIGHT-MODE-01.png' alt='Logo' width={180} height={70} style={{ width: '100%', height: 'auto' }}/>
+              <Image src='/logo/SMART-AGRICULTURE_LOGO_BRIGHT-MODE-01.png' alt='Logo' width={180} height={70}/>
             </Box>
 
             {/* Navigation Menu */}

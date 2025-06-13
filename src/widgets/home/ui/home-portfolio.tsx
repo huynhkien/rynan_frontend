@@ -23,7 +23,34 @@ export const HomePortfolio = () => {
         
     
     return (
-        <Box sx={{ position: 'relative', backgroundColor: theme.palette.primary.main }}>
+        <Box sx={{ 
+            position: 'relative', 
+            backgroundColor: theme.palette.primary.main,
+            '&:after': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                backgroundImage: 'url(/shape/windmill.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: { xs: 'none', md: 'block' },
+                width: '30%',
+                height: '100%'
+            },
+            '&:before': {
+                content: '""',
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                backgroundImage: 'url(/shape/7.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: { xs: 'none', md: 'block' },
+                width: '30%',
+                height: '100%'
+            }
+            }}>
             <Box
                 sx={{
                     position: 'absolute',

@@ -1,5 +1,5 @@
 'use client'
-import ProductCard from "@/widgets/product/ui/product-cart";
+import ProductCard from "@/widgets/product/ui/product-card";
 import { Box, Container, Tab, Tabs, Typography, useTheme } from "@mui/material"
 import { useState } from "react";
 
@@ -8,7 +8,7 @@ export const HomeProduct = () => {
     const [tabIndex, setTabIndex] = useState(0);
 
     return (
-        <Container sx={{color: theme.palette.text.primary }}>
+        <Container sx={{color: theme.palette.text.primary, pb:5}}>
             <Box sx={{ textAlign: "center", marginTop: "50px" }}>
                 <Typography variant="h4" fontWeight="bold" mt={1}>
                 Các Sản Phẩm Tại Cửa Hàng
@@ -33,8 +33,10 @@ export const HomeProduct = () => {
                 <Tab label="Sản Phẩm Mới" sx={{color: theme.palette.text.primary}} />
                 <Tab label="Lượt Mua" sx={{color: theme.palette.text.primary}} />
             </Tabs>
-            <Box sx={{ px: { xs: 2, md: 15 }, mt: 5, display: "flex", flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" }, gap: 3 }}>
-                <ProductCard/>
+            <Box sx={{ mt: 5, display: "flex", flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" }, gap: 3 }}>
+                {Array.from({ length: 12 }).map((_, index) => (
+                <ProductCard key={index} />
+                ))}
             </Box>
         </Container>
     )

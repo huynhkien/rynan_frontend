@@ -8,7 +8,7 @@ export const HomeProduct = () => {
     const [tabIndex, setTabIndex] = useState(0);
 
     return (
-        <Container sx={{color: theme.palette.text.primary, pb:5}}>
+        <Container sx={{color: theme.palette.text.primary, pb:7}}>
             <Box sx={{ textAlign: "center", marginTop: "50px" }}>
                 <Typography variant="h4" fontWeight="bold" mt={1}>
                 Các Sản Phẩm Tại Cửa Hàng

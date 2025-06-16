@@ -26,6 +26,7 @@ export const HomePortfolio = () => {
         <Box sx={{ 
             position: 'relative', 
             backgroundColor: theme.palette.primary.main,
+            py: 5,
             '&:after': {
                 content: '""',
                 position: 'absolute',
@@ -83,7 +84,7 @@ export const HomePortfolio = () => {
                     pb: 10
                 }}
             >
-                {content.map((el, index) => (
+                {content.map((el, index ) => (
                     <Box key={index}>
                         <Box
                             sx={{
@@ -98,7 +99,7 @@ export const HomePortfolio = () => {
                                 justifyContent: 'center',
                                 borderRadius: '10px',
                                 cursor: 'pointer',
-                                transition: 'all 0.3s ease', 
+                                transition: 'all 0.5s ease', 
                                 overflow: 'hidden', 
                                 '&:hover': {
                                     transform: 'scale(1.02)' 
@@ -140,9 +141,10 @@ export const HomePortfolio = () => {
                                     justifyContent: 'center',
                                     borderRadius: '10px',
                                     transform: isHovered === index ? 'translateY(0)' : 'translateY(100%)', // Slide từ dưới lên
-                                    transition: 'transform 0.4s ease-out',
+                                    transition: 'transform 0.7s ease-out',
                                     pointerEvents: isHovered === index ? 'auto' : 'none',
-                                    overflow: 'hidden' 
+                                    overflow: 'hidden',
+                                     zIndex: 10, 
                                 }}
                             >
                                 <Box
@@ -150,7 +152,7 @@ export const HomePortfolio = () => {
                                         display: 'flex',
                                         flexDirection: 'column',
                                         justifyContent: 'center',
-                                        width: '20vw',
+                                        width: '90%',
                                         height: '20vw',
                                         color: 'white',
                                         textAlign: 'center',

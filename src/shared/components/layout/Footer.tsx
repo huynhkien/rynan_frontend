@@ -55,7 +55,7 @@ export const Footer: React.FC = () => {
             sx={{
                 background: theme.palette.primary.main,
                 color: theme.palette.text.secondary,
-                py: 1,
+                py: 7,
                 position: 'relative',
                 '&:before': {
                 content: '""',

@@ -20,7 +20,7 @@ const images: string[] = [
 
 export const HomePartner: React.FC = () => {
   return (
-    <Box sx={{position: 'relative'}}>
+    <Box sx={{position: 'relative', py: 1}}>
         <Box
             sx={{
                 position: 'absolute',

@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import Image from 'next/image';
 
-const HomeBanner = () => {
+export const HomeBanner = () => {
   const theme = useTheme();
   return (
     <Box sx={{position: 'relative'}}>
@@ -99,5 +99,3 @@ const HomeBanner = () => {
     </Box>
   );
 };
-
-export default HomeBanner;

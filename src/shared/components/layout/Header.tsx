@@ -100,13 +100,15 @@ export const Header = () => {
         position="static" 
         sx={{ 
           backgroundColor: theme.palette.text.secondary,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          zIndex: 10,
+          py: 2,
         }}
       >
         <Container maxWidth="xl" sx={{py:1}}>
           <Toolbar sx={{ py: 1 }}>
             {/* Logo */}
-            <Box sx={{ display: 'flex', alignItems: 'center', mr: 4 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', mr: 4, zIndex:10 }}>
               <Image src='/logo/SMART-AGRICULTURE_LOGO_BRIGHT-MODE-01.png' alt='Logo' width={300} height={80}/>
             </Box>
 
@@ -169,7 +171,7 @@ export const Header = () => {
       <Box
         sx={{
           position: 'absolute',
-          bottom: -40,
+          bottom: -12,
           width: '100%',
           zIndex: 5
         }}
@@ -182,7 +184,7 @@ export const Header = () => {
           sizes="100vw"
           style={{
             width: '100%',
-            height: '50px', 
+            height: '60px', 
             objectFit: 'cover'
           }}
         />

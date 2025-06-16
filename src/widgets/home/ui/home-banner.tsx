@@ -10,7 +10,7 @@ const HomeBanner = () => {
       <Box
           sx={{
               position: 'absolute',
-              top: -30,
+              top: -35,
               width: '100%',
               zIndex: 5,
           }}
@@ -23,7 +23,7 @@ const HomeBanner = () => {
               sizes="110vw"
               style={{
                   width: '100%',
-                  height: '50px',
+                  height: '55px',
                   objectFit: 'cover'
               }}
           />

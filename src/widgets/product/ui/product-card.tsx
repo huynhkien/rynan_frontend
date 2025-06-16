@@ -13,7 +13,7 @@ const ProductCard = () => {
   return (
     <Card
       sx={{ 
-        width: '23.4%', 
+        width: '22%', 
         height: '400px', 
         borderRadius: '12px', 
         boxShadow: hovering ? 6 : 6,
@@ -33,7 +33,7 @@ const ProductCard = () => {
         >
           <Image
           height={220}
-          width={280}
+          width={250}
           src='/product/NPK 22-10-10+TE_800x600_XcD0ucElDl.png'
           alt='VETAMATE 210'/>
         </Box>

@@ -91,6 +91,9 @@ export const HomePartner: React.FC = () => {
                     alt='image'
                     width={300}
                     height={200}
+                    style={{
+                        borderRadius: '10px'
+                    }}
                 />
             </SwiperSlide>
             ))}

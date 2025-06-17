@@ -1,6 +1,4 @@
-import { HomeAbout, HomePartner, HomePortfolio, HomeProduct, HomeSlides } from '../../index';
-import HomeBanner from '../ui/home-banner';
-import HomeTestimonial from '../ui/home-testimonial';
+import {HomeTestimonial, HomeAbout, HomeBanner, HomePartner, HomePortfolio, HomeProduct, HomeSlides } from '../../index';
 import HomeWhyUs from '../ui/home-whyUs';
 
 export const HomeView = () => {

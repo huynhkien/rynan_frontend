@@ -14,3 +14,12 @@ export * from './product/ui/product-card';
 // about
 export * from './about/view/about-view';
 export * from './about/ui/about-welcome';
+
+// contact
+export * from './contact/view/contact-view';
+
+// product
+export * from './product/view/products-view';
+
+// login
+export * from './login/view/login-view';

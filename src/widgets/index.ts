@@ -11,3 +11,6 @@ export * from './home/ui/home-partner';
 
 // product
 export * from './product/ui/product-card';
+// about
+export * from './about/view/about-view';
+export * from './about/ui/about-welcome';

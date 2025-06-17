@@ -13,7 +13,7 @@ const ProductCard = () => {
   return (
     <Card
       sx={{ 
-        width: {xs: '40%', md: '22%'}, 
+        width: {xs: '40%', md: '250px'}, 
         height: {xs: '310px', md: '400px'}, 
         borderRadius: '12px', 
         boxShadow: hovering ? 6 : 6,

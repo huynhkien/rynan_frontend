@@ -13,8 +13,8 @@ const ProductCard = () => {
   return (
     <Card
       sx={{ 
-        width: '22%', 
-        height: '400px', 
+        width: {xs: '40%', md: '22%'}, 
+        height: {xs: '310px', md: '400px'}, 
         borderRadius: '12px', 
         boxShadow: hovering ? 6 : 6,
         transition: 'all 0.3s ease',
@@ -27,15 +27,15 @@ const ProductCard = () => {
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <Box
           sx={{
+            position: 'relative', width: '100%', height: 'auto', aspectRatio: '5/4' ,
             transition: 'transform 0.3s ease',
             transform: hovering ? 'scale(1.05)' : 'scale(1)'
           }}
         >
           <Image
-          height={220}
-          width={250}
-          src='/product/NPK 22-10-10+TE_800x600_XcD0ucElDl.png'
-          alt='VETAMATE 210'/>
+            fill
+            src='/product/NPK 22-10-10+TE_800x600_XcD0ucElDl.png'
+            alt='VETAMATE 210'/>
         </Box>
         {/* Giá */}
         <Box
@@ -48,7 +48,7 @@ const ProductCard = () => {
             fontWeight: 'bold',
             boxShadow: 2,
             backdropFilter: 'blur(10px)',
-            fontSize: '14px',
+            fontSize: {xs: '12px', md: '14px'},
             color: theme.palette.primary.main 
           }}
         >
@@ -124,7 +124,7 @@ const ProductCard = () => {
             color: theme.palette.text.secondary,
             padding: '4px 8px',
             borderRadius: '4px',
-            fontSize: theme.typography.body1.fontSize,
+            fontSize: {xs: '12px' , md: theme.typography.body1.fontSize},
             fontWeight: theme.typography.fontWeightBold
           }}
         >
@@ -134,13 +134,17 @@ const ProductCard = () => {
       {/* Thông tin */}
       <CardContent sx={{ p:1, height: '200px', display: 'flex', flexDirection: 'column' }}>
         <Typography 
-          variant='body2'  
+          sx={{
+            fontSize: {xs: '14px' , md: theme.typography.body1.fontSize},
+          }}
         >
           RYNAN® FLOWERMATE 210 - Hũ 150g
         </Typography>
         
         <Typography 
-          variant='body1' 
+          sx={{
+            fontSize: {xs: '12px' , md: theme.typography.body1.fontSize},
+          }}
         >
           Phân bón dùng cho lan hồ điệp giai đoạn phân hóa mầm
         </Typography>
@@ -151,7 +155,7 @@ const ProductCard = () => {
             sx={{ 
               backgroundColor: theme.palette.primary.main,
               color: theme.palette.text.secondary,
-              fontSize: `calc(${theme.typography.body1.fontSize} - 2px)`
+              fontSize: {xs: `calc(${theme.typography.body1.fontSize} - 4px)`, md: `calc(${theme.typography.body1.fontSize} - 2px)`}
             }}
           />
         </Box>
@@ -161,7 +165,7 @@ const ProductCard = () => {
           sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            gap: 1 
+            gap: 1 ,
           }}
         >
           <Box sx={{ display: 'flex', gap: 0.5 }}>

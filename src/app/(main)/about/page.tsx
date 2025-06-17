@@ -1,13 +1,14 @@
 import { Banner } from "@/shared/components/layout/Banner";
-import {Container } from "@mui/material";
+import { AboutView } from "@/widgets";
+import {Box } from "@mui/material";
 
 const About = () => {
   return (
     <>
         <Banner/>
-        <Container>
-            Chào mừng bạn đến với Rynan Smart Agriculture
-        </Container>
+        <Box>
+            <AboutView/>
+        </Box>
     </>
   );
 }

@@ -114,10 +114,10 @@ export const Header = () => {
 
             {/* Navigation Menu */}
             <Box sx={{ flexGrow: 1, display: {xs: 'none', md: 'flex'}, alignItems: 'center', justifyContent: 'center', gap: 3, color: theme.palette.primary.main }}>
-              <Typography>Trang Chủ</Typography>
-              <Typography>Sản Phẩm</Typography>
-              <Typography>Giới Thiệu</Typography>
-              <Typography>Liên Hệ</Typography>
+              <Typography component='a' href='/' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Trang Chủ</Typography>
+              <Typography component='a' href='/products' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Sản Phẩm</Typography>
+              <Typography component='a' href='/about' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Giới Thiệu</Typography>
+              <Typography component='a' href='/contact' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Liên Hệ</Typography>
             </Box>
 
             {/* Right Side Actions */}

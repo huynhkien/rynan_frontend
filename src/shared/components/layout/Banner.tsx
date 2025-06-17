@@ -2,8 +2,9 @@
 import React from 'react';
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import Image from 'next/image';
-
-export const Banner = () => {
+import { BannerProps } from '@/types/components/banner.types';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+export const Banner = ({category, breadcrumb}: BannerProps) => {
   const theme = useTheme();
   return (
     <Box sx={{position: 'relative'}}>
@@ -42,36 +43,41 @@ export const Banner = () => {
             zIndex: -1,
           }}
         />
-        <Container maxWidth="lg">
+        <Container maxWidth='lg'>
           <Box
             sx={{
-              textAlign: 'center',
+              textAlign: 'start',
               color: theme.palette.text.secondary,
               position: 'relative',
               zIndex: 1,
             }}
           >
             <Typography
-              variant="h2"
+              variant='h5'
               sx={{
                 fontWeight: 'bold',
                 textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
                 mb: 3,
               }}
             >
-              Nông nghiệp
+              {category}
             </Typography>
-            <Typography
-              variant="h3"
-              sx={{
-                fontWeight: 'bold',
-                lineHeight: 1.2,
-                textShadow: '2px 2px 4px rgba(0,0,0,0.7)',
-                mb: 2,
-              }}
-            >
-              Giải pháp bền vững và thiết thực nhất cho cuộc sống
-            </Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Typography variant='body2' component='a' href='/' sx={{ textDecoration: 'none', color: theme.palette.text.secondary }}>Trang chủ</Typography>
+              {breadcrumb.map((el, index) => (
+                <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ArrowForwardIosIcon fontSize='small' sx={{ mt: 1 }} />
+                  <Typography
+                    variant='body2'
+                    component='a'
+                    href={el?.url}
+                    sx={{ textDecoration: 'none', color: theme.palette.text.secondary }}
+                  >
+                    {el?.title}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
           </Box>
         </Container>
       </Box>
@@ -88,7 +94,7 @@ export const Banner = () => {
               alt='page-title-top'
               width={0}
               height={0}
-              sizes="110vw"
+              sizes='110vw'
               style={{
                   width: '100%',
                   height: '55px',

@@ -49,7 +49,7 @@ export const AboutWelcome = () => {
                     <Typography
                         variant='body1'
                         sx={{
-                            color: theme.palette.primary.main
+                            color: theme.palette.primary.light
                         }}
                     >
                         Chào mừng bạn đến với Rynan Smart Agriculture
@@ -58,7 +58,8 @@ export const AboutWelcome = () => {
                         variant='h4'
                         sx={{
                             fontWeight: theme.typography.fontWeightBold,
-                            py:1
+                            py:1,
+                            color: theme.palette.primary.main, 
                         }}>
                         Tiên phong trong lĩnh vực nông nghiệp sạch và công nghệ cao
                     </Typography>            

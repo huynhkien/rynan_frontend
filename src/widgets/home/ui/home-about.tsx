@@ -42,6 +42,7 @@ export const HomeAbout = () => {
             <Container
                 sx={{
                     display: 'flex',
+                    flexDirection: {xs: 'column', md: 'row'},
                     justifyContent: 'space-between',
                     width: '100%',
                     gap: 2,
@@ -51,7 +52,7 @@ export const HomeAbout = () => {
             >
                 <Box
                     sx={{
-                        width: '65%'
+                        width: {xs: '100%', md: '65%'}
                     }}
                 >
                     <Box>
@@ -99,7 +100,7 @@ export const HomeAbout = () => {
                     </Box>
                 </Box>
                     <Box
-                        sx={{width: '35%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer'}}
+                        sx={{width: {xs: '100%', md: '35%'}, display: {xs: 'none', md: 'flex'}, flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer'}}
                     >
                     {/* Box 1 */}
                     <Box

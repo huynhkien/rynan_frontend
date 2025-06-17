@@ -2,11 +2,12 @@ import React from 'react';
 import { Box, Typography, Avatar, Rating, Container} from '@mui/material';
 import theme from '@/shared/configs/theme';
 
-const HomeTestimonial = () => {
+export const HomeTestimonial = () => {
   return (
     <Box
       sx={{
         minHeight: '600px',
+        pt: {xs: 60},
         position: 'relative',
         '&::after': {
             content: '""',
@@ -29,7 +30,7 @@ const HomeTestimonial = () => {
           position: 'relative',
         }}
       >
-        <Box sx={{flex: '0 0 60%'}}>
+        <Box sx={{width: {xs: '100%', md: '60%'}}}>
             <Typography
                 sx={{
                     color: theme.palette.primary.main,
@@ -122,5 +123,3 @@ const HomeTestimonial = () => {
     </Box>
   );
 };
-
-export default HomeTestimonial;

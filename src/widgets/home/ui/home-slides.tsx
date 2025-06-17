@@ -40,7 +40,7 @@ export const HomeSlides: React.FC = () => {
   return (
     <Box sx={{ 
       width: '100%', 
-      height: '700px', 
+      height: {xs: '500px', md: '700px'}, 
       overflow: 'hidden', 
       position: 'relative',
       '@keyframes zoomIn': {
@@ -142,7 +142,7 @@ export const HomeSlides: React.FC = () => {
               className='zoom-image'
               sx={{
                 width: '100%',
-                height: '700px', 
+                height: {xs: '500px', md: '700px'}, 
                 overflow: 'hidden', 
                 backgroundImage: `url(${src})`,
                 backgroundSize: 'cover',
@@ -159,7 +159,7 @@ export const HomeSlides: React.FC = () => {
                   position: 'absolute',
                   top: '20%',
                   textAlign: 'start',
-                  marginLeft: 20,
+                  marginLeft: {xs: 0, md: 20},
                   color: 'white',
                   width: '80%',
                   maxWidth: '700px',

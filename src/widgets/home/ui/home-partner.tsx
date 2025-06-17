@@ -20,7 +20,7 @@ const images: string[] = [
 
 export const HomePartner: React.FC = () => {
   return (
-    <Box sx={{position: 'relative', py: 1}}>
+    <Box sx={{position: 'relative', py: {md: 1}}}>
         <Box
             sx={{
                 position: 'absolute',
@@ -80,21 +80,41 @@ export const HomePartner: React.FC = () => {
             disableOnInteraction: false,
             }}
             loop={true}
-            spaceBetween={0}
+            spaceBetween={10}
             slidesPerView={6}
+            breakpoints={{
+                0: {
+                slidesPerView: 1,
+                },
+                480: {
+                slidesPerView: 2,
+                },
+                676: {
+                slidesPerView: 3,
+                },
+                1024: {
+                slidesPerView: 4,
+                },
+                1280: {
+                slidesPerView: 6,
+                }
+            }}
             style={{ height: '100%' }} 
         >
             {images.map((src, index) => (
             <SwiperSlide key={index}>
-                <Image
-                    src={src}
-                    alt='image'
-                    width={300}
-                    height={200}
-                    style={{
-                        borderRadius: '10px'
-                    }}
-                />
+                <Box sx={{
+                    position: 'relative', width: '100%', height: 'auto', aspectRatio: '5/4' 
+                }}>
+                    <Image
+                        src={src}
+                        alt='image'
+                        fill
+                        style={{
+                            borderRadius: '10px'
+                        }}
+                    />
+                </Box>
             </SwiperSlide>
             ))}
         </Swiper>

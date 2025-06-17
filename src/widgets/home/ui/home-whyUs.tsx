@@ -123,8 +123,8 @@ const HomeWhyUs = () => {
             <Box sx={{ 
                 position: 'absolute', 
                 bottom: 50,
-                width: '80%',
-                right: 25
+                width: {xs: '90%', md: '80%'},
+                right: 25,
                 }}>
                 <Paper
                 elevation={0}
@@ -138,7 +138,7 @@ const HomeWhyUs = () => {
                 <Box
                     sx={{
                     display: 'flex',
-                    flexDirection: { xs: 'column', md: 'row' },
+                    flexDirection: { xs: 'row', md: 'row' },
                     gap: 4
                     }}
                 >

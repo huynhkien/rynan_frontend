@@ -1,5 +1,4 @@
 'use client'
-import React from 'react';
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import Image from 'next/image';
 
@@ -31,7 +30,7 @@ export const HomeBanner = () => {
       <Box
         sx={{
           position: 'relative',
-          height: '70vh',
+          height: {xs: '60vh', md: '70vh'},
           overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',

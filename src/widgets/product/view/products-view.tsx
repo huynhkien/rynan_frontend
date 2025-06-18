@@ -6,9 +6,9 @@ import ProductCard from "../ui/product-card"
 import { ProductFilterCategory } from "../ui/product-filter-category"
 import { ProductFilterRating } from "../ui/product-filter-rating"
 import { ProductSort } from "../ui/product-sort"
-import { ProductSortOption } from "@/shared/utils/contains"
 import { useCallback, useState } from "react"
 import { Pagination } from "@/shared/components/ui/Pagination"
+import { ProductSortOption } from "@/shared/constant/product-sort"
 
 export const ProductsView = () => {
     const [sort, setSort] = useState('');

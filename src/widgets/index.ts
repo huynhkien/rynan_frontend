@@ -20,6 +20,7 @@ export * from './contact/view/contact-view';
 
 // product
 export * from './product/view/products-view';
+export * from './product/view/product-detail-view';
 
 // login
 export * from './login/view/login-view';

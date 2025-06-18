@@ -66,7 +66,7 @@ export const Banner = ({category, breadcrumb}: BannerProps) => {
               <Typography variant='body2' component='a' href='/' sx={{ textDecoration: 'none', color: theme.palette.text.secondary }}>Trang chủ</Typography>
               {breadcrumb.map((el, index) => (
                 <Box key={index} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <ArrowForwardIosIcon fontSize='small' sx={{ mt: 1 }} />
+                  <ArrowForwardIosIcon fontSize='small' sx={{ mt: 1, fontSize: theme.typography.fontSize }} />
                   <Typography
                     variant='body2'
                     component='a'

@@ -1,9 +1,24 @@
-import { Box } from "@mui/material"
+import { Banner } from "@/shared/components/layout/Banner";
+import { ContactView } from "@/widgets";
+import {Box } from "@mui/material";
 
-export const Contact = () => {
-    return (
+const About = () => {
+  return (
+    <>
+        <Banner
+          category="Liên Hệ"
+          breadcrumb={[
+            {
+              title: 'Liên hệ',
+              url: '/about',
+            },
+          ]}
+        />
         <Box>
-            Trang liên hệ
+            <ContactView/>
         </Box>
-    )
+    </>
+  );
 }
+
+export default About;

@@ -1,18 +1,18 @@
-'use client'
-
 import { Footer, Header } from '@/shared/components'
+import { Box } from '@mui/material'
 import React from 'react'
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div 
-    >
-      <Header />
-      <main className="flex-1">
-        {children}
-      </main>
-      <Footer />
+    <>
+      <div>
+        <Header/>
+        <Box>
+          {children}
+        </Box>
+        <Footer/>
     </div>
+    </>
   )
 }
 

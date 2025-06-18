@@ -5,7 +5,15 @@ import {Box } from "@mui/material";
 const About = () => {
   return (
     <>
-        <Banner/>
+        <Banner
+          category="Giới Thiệu"
+          breadcrumb={[
+            {
+              title: 'Giới thiệu',
+              url: '/about',
+            },
+          ]}
+        />
         <Box>
             <AboutView/>
         </Box>

@@ -5,7 +5,7 @@ import {PlayArrow, CheckCircle, Verified, Nature} from '@mui/icons-material';
 import { ButtonContact } from '@/shared/components';
 import Image from 'next/image';
 
-const HomeWhyUs = () => {
+export const HomeWhyUs = () => {
   const theme = useTheme();
   return (
     <Box sx={{position: 'relative'}}>
@@ -241,5 +241,3 @@ const HomeWhyUs = () => {
     </Box>
   );
 };
-
-export default HomeWhyUs;

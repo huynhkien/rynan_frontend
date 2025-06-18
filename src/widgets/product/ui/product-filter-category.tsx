@@ -35,7 +35,7 @@ export const ProductFilterCategory = () => {
                 transform: 'translateX(5px)',
                 },
                 transition: 'all 0.3s ease',
-          }}>
+            }}>
             {el} (1)
             </Typography>
           ))}

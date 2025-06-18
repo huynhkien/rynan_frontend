@@ -19,6 +19,7 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const Header = () => {
   const theme = useTheme();
@@ -112,43 +113,52 @@ export const Header = () => {
               <Image src='/logo/SMART-AGRICULTURE_LOGO_BRIGHT-MODE-01.png' alt='Logo' width={300} height={80}/>
             </Box>
 
-            {/* Navigation Menu */}
+            {/* Thanh menu */}
             <Box sx={{ flexGrow: 1, display: {xs: 'none', md: 'flex'}, alignItems: 'center', justifyContent: 'center', gap: 3, color: theme.palette.primary.main }}>
-              <Typography component='a' href='/' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Trang Chủ</Typography>
-              <Typography component='a' href='/products' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Sản Phẩm</Typography>
-              <Typography component='a' href='/about' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Giới Thiệu</Typography>
-              <Typography component='a' href='/contact' sx={{ textDecoration: 'none', color: theme.palette.primary.main}}>Liên Hệ</Typography>
+              <Link href='/' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Trang Chủ</Link>
+              <Link href='/products' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Sản Phẩm</Link>
+              <Link href='/about' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Giới Thiệu</Link>
+              <Link href='/contact' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Liên Hệ</Link>
             </Box>
 
-            {/* Right Side Actions */}
+            {/* Thanh icon */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <IconButton
                 sx={{
                   display: {xs: 'none', md: 'flex'},
-                  color: '#2d5016',
-                  backgroundColor: '#f5f5f5',
+                  color: theme.palette.primary.light,
+                  
                   '&:hover': {
-                    backgroundColor: '#e0e0e0'
+                    backgroundColor: theme.palette.text.secondary
                   }
                 }}
               >
-                <Badge badgeContent={0} color="warning">
+                <Link href='/'
+                  style={{
+                    textDecoration: 'none',
+                    color: theme.palette.primary.main
+                  }}
+                >
                   <ShoppingCart />
-                </Badge>
+                </Link>
               </IconButton>
               <IconButton
                 sx={{
                   display: {xs: 'none', md: 'flex'},
-                  color: '#2d5016',
-                  backgroundColor: '#f5f5f5',
+                  color: theme.palette.primary.light,
                   '&:hover': {
-                    backgroundColor: '#e0e0e0'
+                    backgroundColor: theme.palette.text.secondary
                   }
                 }}
               >
-                <Badge badgeContent={0} color="warning">
+                <Link href='/login'
+                  style={{
+                    textDecoration: 'none',
+                    color: theme.palette.primary.main
+                  }}
+                >
                   <Person />
-                </Badge>
+                </Link>
               </IconButton>
               <IconButton
                 sx={{

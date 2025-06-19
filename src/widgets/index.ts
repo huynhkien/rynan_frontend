@@ -1,26 +1,32 @@
 // Home
-export * from './home/view/home-view';
-export * from './home/ui/home-slides';
-export * from './home/ui/home-portfolio';
-export * from './home/ui/home-about';
-export * from './home/ui/home-product';
-export * from './home/ui/home-banner';
-export * from './home/ui/home-whyUs';
-export * from './home/ui/home-testimonial';
-export * from './home/ui/home-partner';
+export * from './public/home/view/home-view';
+export * from './public/home/ui/home-slides';
+export * from './public/home/ui/home-portfolio';
+export * from './public/home/ui/home-about';
+export * from './public/home/ui/home-product';
+export * from './public/home/ui/home-banner';
+export * from './public/home/ui/home-whyUs';
+export * from './public/home/ui/home-testimonial';
+export * from './public/home/ui/home-partner';
 
 // product
-export * from './product/ui/product-card';
+export * from './public/product/ui/product-card';
 // about
-export * from './about/view/about-view';
-export * from './about/ui/about-welcome';
+export * from './public/about/view/about-view';
+export * from './public/about/ui/about-welcome';
 
 // contact
-export * from './contact/view/contact-view';
+export * from './public/contact/view/contact-view';
 
 // product
-export * from './product/view/products-view';
-export * from './product/view/product-detail-view';
+export * from './public/product/view/products-view';
+export * from './public/product/view/product-detail-view';
 
 // login
-export * from './login/view/login-view';
+export * from './public/login/view/login-view';
+
+// cart
+export * from './public/cart/view/cart-view';
+
+// checkout
+export * from './public/checkout/view/checkout-view';

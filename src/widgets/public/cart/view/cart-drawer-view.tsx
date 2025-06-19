@@ -64,6 +64,12 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const handleClose = () => {
         setOpen(false);
     };
+    const handleCheckOut = () => {
+      router.push('/checkout')
+    }
+    const handleCart = () => {
+      router.push('/cart')
+    }
 
     const DrawerList = (
         <Box sx={{ width: 450, height: '100%' }} role='presentation' position='relative'>
@@ -216,11 +222,13 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                 pb: 2
               }}
             >
-              <Button
+            <Button
                 name='Thanh Toán'
+                handleOnClick={handleCheckOut}
               />
               <Button
                 name='Xem chi tiết'
+                handleOnClick={handleCart}
               />
             </Box>
         </Box>

@@ -1,14 +1,10 @@
 import { HomeView } from "@/widgets";
 
-export const metadata = {
-    title: "Trang chủ",
-};
-
-const Main = () => {
+const Home = () => {
     return (
         <>
             <HomeView/>
         </>
     )
 }
-export default Main;
+export default Home;

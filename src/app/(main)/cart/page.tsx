@@ -1,10 +1,10 @@
-import { Box } from "@mui/material"
+import { CartView } from "@/widgets";
 
 const Cart = () => {
     return (
-        <Box>
-            Giỏ hàng
-        </Box>
+        <>
+            <CartView/>
+        </>
     )
 }
 export default Cart;

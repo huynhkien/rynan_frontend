@@ -7,8 +7,10 @@ import { Close } from '@mui/icons-material';
 import Image from 'next/image';
 import { CartDrawerProps } from '@/types/widgets/cart-drawer';
 import { Button } from '@/shared/components';
+import { useRouter } from 'next/navigation';
 
 export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
+    const theme = useTheme();
     const theme = useTheme();
     const orders = [
     {

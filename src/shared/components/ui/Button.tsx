@@ -10,7 +10,7 @@ export const Button = ({ name, handleOnClick }: ButtonProps) => {
             sx={{
                 color: theme.palette.text.secondary,
                 padding: 1.5,
-                background: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                background: theme.palette.primary.main,
                 boxShadow: '0 8px 16px rgba(0, 0, 0, 0.15)',
                 '&:hover': {
                     transform: 'translateY(-2px)',

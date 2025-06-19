@@ -12,7 +12,9 @@ const ProductCard = () => {
   const router = useRouter();
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
-
+  const handleProduct = () => {
+    router.push('/products/aaaa')
+  }
   return (
     <Card
       sx={{ 
@@ -29,6 +31,7 @@ const ProductCard = () => {
     >
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <Box
+          onClick={handleProduct}
           sx={{
             position: 'relative', width: '100%', height: 'auto', aspectRatio: '5/4' ,
             transition: 'transform 0.3s ease',

@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 
 export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const theme = useTheme();
-    const theme = useTheme();
+    const theme = useRouter();
     const orders = [
     {
       id: 1,

@@ -5,8 +5,11 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+
 
 const ProductCard = () => {
+  const router = useRouter();
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
 
@@ -84,7 +87,7 @@ const ProductCard = () => {
           
           <IconButton 
             component='a' 
-            href='/' 
+            href='/products/aaa' 
             sx={{ 
               boxShadow: 5,
               '&:hover': { 

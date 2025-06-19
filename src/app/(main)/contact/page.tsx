@@ -1,4 +1,4 @@
-import { Banner } from "@/shared/components/layout/Banner";
+import { Banner } from "@/shared/components/layout/public/Banner";
 import { ContactView } from "@/widgets";
 import {Box } from "@mui/material";
 

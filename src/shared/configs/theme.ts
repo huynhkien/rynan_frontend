@@ -30,7 +30,12 @@ const theme = createTheme({
     text: {
         primary: '#000000',
         secondary: '#ffffff'
+    },
+    background: {
+      default: 'rgba(209, 208, 208, 0.5)',
+      paper: '#ffffff'                  
     }
+
   },
   typography: {
     fontFamily: 'var(--font-utm-avo)',

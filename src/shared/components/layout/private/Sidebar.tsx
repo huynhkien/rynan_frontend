@@ -1,37 +1,7 @@
 'use client'
-
-import React, { useState } from 'react';
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Avatar,
-  Typography,
-  Box,
-  Badge,
-  Divider,
-  useTheme,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import {
-  Dashboard,
-  BarChart,
-  Help,
-  ExitToApp,
-  ChevronLeft,
-  ChevronRight,
-  Person,
-  Category,
-  Store,
-  RequestQuote,
-  CheckOutlined,
-  Warehouse,
-  Comment,
-  ContactEmergency
-} from '@mui/icons-material';
+import React from 'react';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip} from '@mui/material';
+import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -42,6 +12,10 @@ interface MenuItem {
   icon: React.ReactElement;
   path: string;
   badge?: number;
+}
+interface SidebarProps {
+  isCollapsed: boolean, 
+  setIsCollapsed: (isCollapsed: boolean) => void
 }
 
 const menuItems: MenuItem[] = [
@@ -62,10 +36,8 @@ const bottomItems: MenuItem[] = [
   { text: 'Đăng xuất', icon: <ExitToApp />, path: '/logout' },
 ];
 
-export const Sidebar: React.FC = () => {
+export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
   const theme = useTheme();
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
   };

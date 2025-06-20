@@ -1,7 +1,7 @@
 'use client'
 import { InputForm } from '@/shared/components/ui/InputForm';
-import { CheckoutInfoProps } from '@/types/widgets/checkoutInfo.types';
-import { InvalidFieldProps } from '@/types/widgets/contactForm.types';
+import { CheckoutInfoProps } from '@/types/widgets/checkout.types';
+import { InvalidFieldProps } from '@/types/widgets/contact.types';
 import { Email, LocationCity, Person, Phone } from '@mui/icons-material';
 import { Box, Typography, useTheme } from '@mui/material'
 import { useState } from 'react';

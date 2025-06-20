@@ -1,7 +1,7 @@
 'use client'
 import { InputForm } from "@/shared/components/ui/InputForm"
-import { InvalidFieldProps } from "@/types/widgets/contactForm.types";
-import { LoginFormProps } from "@/types/widgets/loginForm.types";
+import { InvalidFieldProps } from "@/types/widgets/contact.types";
+import { LoginFormProps } from "@/types/widgets/login.types";
 import {  Lock, Email, Person, Phone, Password } from "@mui/icons-material";
 import { Box, Container, Typography, useTheme, Divider} from "@mui/material"
 import { useState } from "react";

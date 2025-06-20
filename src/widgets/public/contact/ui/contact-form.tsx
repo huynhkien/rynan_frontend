@@ -1,7 +1,7 @@
 'use client'
 import { ButtonContact } from "@/shared/components";
 import { InputForm } from "@/shared/components/ui/InputForm"
-import { ContactFormProps, InvalidFieldProps } from "@/types/widgets/contactForm.types";
+import { ContactFormProps, InvalidFieldProps } from "@/types/widgets/contact.types";
 import { Email, LocationCity, Person, Phone } from "@mui/icons-material";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useState } from "react";

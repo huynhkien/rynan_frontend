@@ -5,7 +5,7 @@ import Drawer from '@mui/material/Drawer';
 import { Typography, useTheme, IconButton } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import Image from 'next/image';
-import { CartDrawerProps } from '@/types/widgets/cart-drawer';
+import { CartDrawerProps } from '@/types/widgets/cart';
 import { Button } from '@/shared/components';
 import { useRouter } from 'next/navigation';
 

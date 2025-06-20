@@ -5,7 +5,7 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import HomeIcon from '@mui/icons-material/Home';
 import { BreadcrumbProps } from '@/types/components/breadcrumb';
 
-export const Breadcrumb = ({breadcrumb}: BreadcrumbProps) => {
+export const Breadcrumb = ({breadcrumb, type}: BreadcrumbProps) => {
     const theme = useTheme();
     return (
         <Box
@@ -33,7 +33,7 @@ export const Breadcrumb = ({breadcrumb}: BreadcrumbProps) => {
                 }}
             >
                 <Link 
-                    href='/'
+                    href={type === 'Admin' ? '/admin' : '/'}
                     style={{ textDecoration: 'none' }}
                 >
                     <Box
@@ -54,7 +54,7 @@ export const Breadcrumb = ({breadcrumb}: BreadcrumbProps) => {
                             }
                         }}
                     >
-                        <HomeIcon sx={{ fontSize: 18 }} />
+                        <HomeIcon sx={{ fontSize: theme.typography.body2.fontSize }} />
                         <Typography 
                             variant='body1' 
                             sx={{ 

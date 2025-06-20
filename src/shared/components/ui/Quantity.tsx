@@ -1,7 +1,7 @@
 import { Box, IconButton, TextField, useTheme } from '@mui/material';
 import { Add, Remove } from '@mui/icons-material';
-import { QuantityProps } from '@/types/components/quantity.types';
 import { ChangeEvent } from 'react';
+import { QuantityProps } from '@/types/components/input.types';
 
 export const Quantity = ({ 
   quantity, 

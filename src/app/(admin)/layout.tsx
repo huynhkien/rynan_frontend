@@ -1,8 +1,10 @@
+'use client'
 import { Header } from '@/shared/components/layout/private/Header'
 import { Sidebar } from '@/shared/components/layout/private/Sidebar'
-import React from 'react'
+import React, { useState } from 'react'
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
+  const [isCollapsed, setIsCollapsed] = useState(false);
   return (
     <div
       style={{
@@ -10,13 +12,27 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
         width: '100%'
       }}
     >
-      <Sidebar/>
-      <div>
+      <div
+        style={{
+          width: isCollapsed ? '4.5%' : '15%'
+        }}
+      >
+        <Sidebar
+          isCollapsed={isCollapsed}
+          setIsCollapsed={setIsCollapsed}
+        />
+      </div>
+      <div
+        style={{
+          width: isCollapsed? '95.5%' : '85%',
+          transition: 'width 0.4s ease',
+          paddingRight: 10
+        }}
+      >
           <Header/>
         <div
           style={{
-            paddingTop: 70,
-            paddingLeft: 20
+            paddingTop: 75,
           }}
         >
           {children}

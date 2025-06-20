@@ -2,9 +2,9 @@
 import React from 'react';
 import { Box, Typography, Container, useTheme } from '@mui/material';
 import Image from 'next/image';
-import { BannerProps } from '@/types/components/banner.types';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-export const Banner = ({category, breadcrumb}: BannerProps) => {
+import { BannerBreadcrumbProps } from '@/types/components/breadcrumb';
+export const Banner = ({category, breadcrumb}: BannerBreadcrumbProps) => {
   const theme = useTheme();
   return (
     <Box sx={{position: 'relative'}}>
@@ -73,7 +73,7 @@ export const Banner = ({category, breadcrumb}: BannerProps) => {
                     href={el?.url}
                     sx={{ textDecoration: 'none', color: theme.palette.text.secondary }}
                   >
-                    {el?.title}
+                    {el?.name}
                   </Typography>
                 </Box>
               ))}

@@ -3,7 +3,8 @@ export interface breadcrumb {
     url: string
 }
 export interface BreadcrumbProps {
-    breadcrumb: breadcrumb[]
+    breadcrumb: breadcrumb[],
+    type?: string
 }
 
 

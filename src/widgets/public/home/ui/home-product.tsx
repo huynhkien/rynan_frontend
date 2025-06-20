@@ -31,7 +31,7 @@ export const HomeProduct = () => {
             >
                 <Tab label="Gợi Ý Hôm Nay" sx={{color: theme.palette.text.primary}} />
                 <Tab label="Sản Phẩm Mới" sx={{color: theme.palette.text.primary}} />
-                <Tab label="Lượt Mua" sx={{color: theme.palette.text.primary}} />
+                <Tab label="Mua Nhiều" sx={{color: theme.palette.text.primary}} />
             </Tabs>
             <Box sx={{ mt: 5, display: "flex", flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" }, gap: 5.5 }}>
                 {Array.from({ length: 12 }).map((_, index) => (

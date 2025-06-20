@@ -1,3 +1,4 @@
+// ------------Public--------------- //
 // Home
 export * from './public/home/view/home-view';
 export * from './public/home/ui/home-slides';
@@ -30,3 +31,6 @@ export * from './public/cart/view/cart-view';
 
 // checkout
 export * from './public/checkout/view/checkout-view';
+// ----------Admin----------- //
+// category management
+export * from './private/category-management/view/category-management-view';

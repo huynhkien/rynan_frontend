@@ -9,8 +9,8 @@ export const ProductDetailView = () => {
         <Banner
                 category='Chi tiết sản phẩm'
                 breadcrumb={[
-                    { title: 'Sản phẩm', url: '/products' },
-                    { title: 'Chi tiết sản phẩm', url: '/products/123' }
+                    { name: 'Sản phẩm', url: '/products' },
+                    { name: 'Chi tiết sản phẩm', url: '/products/123' }
                 ]}
             />
             <Container maxWidth='xl' sx={{py:5}}>

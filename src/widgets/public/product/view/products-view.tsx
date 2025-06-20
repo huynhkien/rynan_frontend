@@ -20,7 +20,7 @@ export const ProductsView = () => {
             <Banner
                 category='Sản phẩm'
                 breadcrumb={[{
-                    title: 'Sản phẩm',
+                    name: 'Sản phẩm',
                     url: '/products'
                 }]}
             />

@@ -9,7 +9,7 @@ export const CheckoutView = () => {
             <Banner
                 category='Thanh toán'
                 breadcrumb={[{
-                    title: 'Thanh toán',
+                    name: 'Thanh toán',
                     url: '/checkout'
                 }]}
             />

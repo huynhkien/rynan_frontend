@@ -8,7 +8,7 @@ export const CartView = () => {
             <Banner
                 category='Giỏ hàng'
                 breadcrumb={[
-                    {title: 'Giỏ hàng', url: '/cart'}
+                    {name: 'Giỏ hàng', url: '/cart'}
                 ]}
             />
             <Container maxWidth='xl'

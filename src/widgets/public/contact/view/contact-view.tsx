@@ -2,10 +2,20 @@ import { Box, Container } from "@mui/material"
 import { ContactForm } from "../ui/contact-form"
 import { ContactInfo } from "../ui/contact-info"
 import { ContactMap } from "../ui/contact-map"
+import { Banner } from "@/shared/components"
 
 export const ContactView = () => {
     return (
         <>
+             <Banner
+                category="Liên Hệ"
+                breadcrumb={[
+                    {
+                    name: 'Liên hệ',
+                    url: '/about',
+                    },
+                ]}
+                />
             <Box
                 sx={{
                     position: 'relative',

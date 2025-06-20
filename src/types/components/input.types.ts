@@ -1,3 +1,4 @@
+// Ô input
 export interface InputFormProps {
   id?: string;
   sx?: React.CSSProperties;
@@ -12,4 +13,10 @@ export interface InputFormProps {
   iconClass?: React.ReactNode;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+// Số lượng sản phẩm
+export interface QuantityProps {
+    quantity: number | string; 
+    handleQuantity: (number: string) => void;
+    handleChangeQuantity: (flag: string) => void;
 }

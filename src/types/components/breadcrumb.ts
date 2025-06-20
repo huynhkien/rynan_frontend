@@ -1,8 +1,13 @@
+export interface breadcrumb {
+    name: string,
+    url: string
+}
 export interface BreadcrumbProps {
-    breadcrumb: [
-        {
-            name: string,
-            url: string
-        }
-    ]
+    breadcrumb: breadcrumb[]
+}
+
+
+export interface BannerBreadcrumbProps {
+  category?: string;
+  breadcrumb: breadcrumb[];
 }

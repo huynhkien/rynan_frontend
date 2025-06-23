@@ -1,93 +1,128 @@
 'use client'
+import { createCategory } from "@/features/category/api/categoryApi";
+import CategoryFormInput from "@/features/category/components/CategoryFormInput";
+import { CategoryInputImage } from "@/features/category/components/CategoryInputImage";
+import { CategoryData, UpdateCategory } from "@/features/category/type/categoryType";
 import { Button } from "@/shared/components";
-import { InputForm } from "@/shared/components/ui/InputForm";
-import { InputImage } from "@/shared/components/ui/InputImage";
-import { UpdateCategory } from "@/types/widgets/category-management.types";
 import { Box, Typography, useTheme } from "@mui/material"
-import { useForm } from "react-hook-form";
+import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
+import { toast } from "react-toastify";
 
 export const CategoryManagementFormAddEdit = ({isUpdateCategory, setIsUpdateCategory} : UpdateCategory) => {
     const theme = useTheme();
-    const { register, handleSubmit, reset, formState: { errors } } = useForm();
-    const handleAddCategory = () => {
-        reset();
-        console.log('Thêm danh mục sản phẩm thành công');
-        setIsUpdateCategory(null);
+    const { register, handleSubmit,  formState: { errors }} = useForm<CategoryData>();
+
+    const handleAddCategory = async(data: CategoryData) => {
+        try{
+            const payload = {
+                name: data.name,
+                description: data.description,
+                thumb: data.thumb
+            }
+            console.log(payload)
+            const response = await createCategory(payload)
+            if(!response.success){
+                toast.error(response?.message);
+            }
+            setIsUpdateCategory(null)
+            toast.success(response.message)
+        }catch(error: unknown){
+            toast.error(`Lỗi: ${error}`)
+        }
     }
+
     return (
-        <Box>
+        <Box
+            sx={{
+                width: '100%'
+            }}
+        >
             <Box sx={{
                 backgroundColor: theme.palette.primary.light,
-                py:2,
+                py: 2,
                 textAlign: 'center',
                 color: theme.palette.text.secondary,
                 fontWeight: theme.typography.fontWeightBold
             }}>
-                <Typography variant='body2'>{isUpdateCategory ? 'Cập nhật danh mục' : 'Thêm mới danh mục sản'}</Typography>
+                <Typography variant='body2'>
+                    {isUpdateCategory ? 'Cập nhật danh mục' : 'Thêm mới danh mục sản phẩm'}
+                </Typography>
             </Box>
-                <form onSubmit={handleSubmit(handleAddCategory)}
-                    style={{
-                        padding: 10,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 10
+            
+            <form onSubmit={handleSubmit(handleAddCategory)}
+                style={{
+                    padding: 10,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 10
+                }}
+            >
+                <CategoryFormInput
+                    label='Tên danh mục'
+                    important
+                    placeholder='Thêm tên danh mục'
+                    register={register as UseFormRegister<CategoryData>}
+                    errors={errors as FieldErrors<CategoryData>}
+                    id='name'
+                    validate={{
+                        required: 'Tên danh mục không được để trống',
+                        minLength: {
+                            value: 2,
+                            message: 'Tên danh mục phải có ít nhất 2 ký tự'
+                        }
                     }}
-                >
-                    <InputForm
-                        label='Tên danh mục'
+                    sx={{
+                        width: '750px'
+                    }}
+                />
+                
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 1
+                }}>
+                    <CategoryFormInput
+                        label='Mô tả'
                         important
-                        placeholder='Thêm tên danh mục'
+                        placeholder='Nhập mô tả'
                         register={register}
                         errors={errors}
-                        id='name'
-                        validate = {{
-                            required: 'Thông tin thiếu'
+                        multiline
+                        rows={9}
+                        id='description'
+                        validate={{
+                            required: 'Mô tả không được để trống',
+                            minLength: {
+                                value: 10,
+                                message: 'Mô tả phải có ít nhất 10 ký tự'
+                            }
                         }}
                         sx={{
-                            width: '750px'
+                            width: '450px'
                         }}
                     />
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center'
+                    
+                    <Box sx={{
+                        width: '300px',
+                    }}>
+                        <CategoryInputImage
+                            id='thumb'
+                            validate={{
+                            required: 'Ảnh không được để trống',
                             }}
-                        >
-                            <InputForm
-                                label='Mô tả'
-                                important
-                                placeholder='Nhập mô tả'
-                                register={register}
-                                errors={errors}
-                                multiline
-                                rows={9}
-                                id='description'
-                                validate = {{
-                                    required: 'Thông tin thiếu'
-                                }}
-                                sx={{
-                                    width: '450px'
-                                }}
-                            />
-                            <Box
-                                sx={{
-                                    width: '300px',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <InputImage/>
-                            </Box>
-                        </Box>
-                        <Box
-                            sx={{
-                                pt: 3
-                            }}
-                        >
-                            <Button name='Thêm Danh mục'/>
-                        </Box>
-                </form>
+                            register={register}
+                            errors={errors}
+                        />
+                    </Box>
+                </Box>
+                
+                <Box sx={{ pt: 0.5 }}>
+                    <Button 
+                        name={isUpdateCategory ? 'Cập nhật danh mục' : 'Thêm danh mục'}
+                    />
+                </Box>
+            </form>
         </Box>
     )
 }

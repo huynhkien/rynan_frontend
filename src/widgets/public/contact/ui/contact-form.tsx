@@ -1,7 +1,7 @@
 'use client'
 import { ButtonContact } from "@/shared/components";
-import { InputForm } from "@/shared/components/ui/InputForm"
-import { ContactFormProps, InvalidFieldProps } from "@/types/widgets/contact.types";
+import { BaseInput } from "@/shared/components/ui/public/BaseInput";
+import { ContactFormProps, InvalidFieldProps } from "@/types/widgets/contact";
 import { Email, LocationCity, Person, Phone } from "@mui/icons-material";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useState } from "react";
@@ -48,7 +48,7 @@ export const ContactForm = () => {
                     gap: 3,
                     mb:3
                 }}>
-                    <InputForm
+                    <BaseInput
                         iconClass={<Person sx={{color: theme.palette.primary.main}} />}
                         value={payload.name || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
@@ -57,7 +57,7 @@ export const ContactForm = () => {
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     />
-                    <InputForm
+                    <BaseInput
                         iconClass={<Email sx={{color: theme.palette.primary.main}} />}
                         value={payload.email || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
@@ -72,7 +72,7 @@ export const ContactForm = () => {
                     gap: 3,
                     mb:2
                 }}>
-                    <InputForm
+                    <BaseInput
                         iconClass={<Phone sx={{color: theme.palette.primary.main}} />}
                         value={payload.phone || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
@@ -81,7 +81,7 @@ export const ContactForm = () => {
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     />
-                    <InputForm
+                    <BaseInput
                         iconClass={<LocationCity sx={{color: theme.palette.primary.main}} />}
                         value={payload.address || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
@@ -92,7 +92,7 @@ export const ContactForm = () => {
                     />
                 </Box>
                 <Box>
-                    <InputForm
+                    <BaseInput
                         value={payload.message || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
                         nameKey="message"

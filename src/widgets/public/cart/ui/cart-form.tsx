@@ -14,7 +14,7 @@ import {
   Box,
 } from '@mui/material';
 import { Delete } from '@mui/icons-material';
-import { Quantity } from '@/shared/components/ui/Quantity';
+import { Quantity } from '@/shared/components/ui/public/Quantity';
 import { Button } from '@/shared/components';
 import Image from 'next/image';
 

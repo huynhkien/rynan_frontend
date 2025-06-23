@@ -1,13 +1,13 @@
 'use client'
-import { InputForm } from "@/shared/components/ui/InputForm"
-import { InvalidFieldProps } from "@/types/widgets/contact.types";
-import { LoginFormProps } from "@/types/widgets/login.types";
+import { InvalidFieldProps } from "@/types/widgets/contact";
+import { LoginFormProps } from "@/types/widgets/login";
 import {  Lock, Email, Person, Phone, Password } from "@mui/icons-material";
 import { Box, Container, Typography, useTheme, Divider} from "@mui/material"
 import { useState } from "react";
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import {  Button } from "@/shared/components";
 import Link from "next/link";
+import { BaseInput } from "@/shared/components/ui/public/BaseInput";
 
 export const LoginForm = () => {
     const theme = useTheme();
@@ -83,7 +83,7 @@ export const LoginForm = () => {
                     gap: isRegister ? 2 : 3
                 }}>
                     {isRegister && (
-                        <InputForm
+                        <BaseInput
                             iconClass={<Person sx={{ color: theme.palette.primary.main }} />}
                             value={payload.name || ''}
                             setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -93,7 +93,7 @@ export const LoginForm = () => {
                             setInValidFields={setInValidFields}
                         />
                     )}
-                    <InputForm
+                    <BaseInput
                         iconClass={<Email sx={{ color: theme.palette.primary.main }} />}
                         value={payload.email || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -103,7 +103,7 @@ export const LoginForm = () => {
                         setInValidFields={setInValidFields}
                     />
                     {isRegister && (
-                        <InputForm
+                        <BaseInput
                             iconClass={<Phone sx={{ color: theme.palette.primary.main }} />}
                             value={payload.phone || ''}
                             setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -114,7 +114,7 @@ export const LoginForm = () => {
                         />
                     )}
                     
-                    <InputForm
+                    <BaseInput
                         iconClass={<Lock sx={{ color: theme.palette.primary.main }} />}
                         value={payload.password || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, password: value }))}
@@ -124,7 +124,7 @@ export const LoginForm = () => {
                         setInValidFields={setInValidFields}
                     />
                     {isRegister && (
-                        <InputForm
+                        <BaseInput
                             iconClass={<Password sx={{ color: theme.palette.primary.main }} />}
                             value={payload.confirmPassword || ''}
                             setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}

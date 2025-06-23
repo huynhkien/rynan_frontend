@@ -1,7 +1,7 @@
 'use client'
-import { InputForm } from '@/shared/components/ui/InputForm';
-import { CheckoutInfoProps } from '@/types/widgets/checkout.types';
-import { InvalidFieldProps } from '@/types/widgets/contact.types';
+import { BaseInput } from '@/shared/components/ui/public/BaseInput';
+import { CheckoutInfoProps } from '@/types/widgets/checkout';
+import { InvalidFieldProps } from '@/types/widgets/contact';
 import { Email, LocationCity, Person, Phone } from '@mui/icons-material';
 import { Box, Typography, useTheme } from '@mui/material'
 import { useState } from 'react';
@@ -58,7 +58,7 @@ export const CheckoutInfo = () => {
                         mt:2
                     }}
                 >
-                    <InputForm
+                    <BaseInput
                         iconClass={<Person sx={{ color: theme.palette.primary.main }} />}
                         value={payload.name || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -67,7 +67,7 @@ export const CheckoutInfo = () => {
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     />
-                    <InputForm
+                    <BaseInput
                         iconClass={<Email sx={{ color: theme.palette.primary.main }} />}
                         value={payload.email || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -78,7 +78,7 @@ export const CheckoutInfo = () => {
                     />
                 </Box>
                 <Box>
-                   <InputForm
+                   <BaseInput
                         iconClass={<Phone sx={{ color: theme.palette.primary.main }} />}
                         value={payload.phone || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -95,7 +95,7 @@ export const CheckoutInfo = () => {
                         gap: 2,
                     }}
                 >
-                   <InputForm
+                   <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.city || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -104,7 +104,7 @@ export const CheckoutInfo = () => {
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     /> 
-                    <InputForm
+                    <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.city || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -121,7 +121,7 @@ export const CheckoutInfo = () => {
                         gap: 2,
                     }}
                 >
-                   <InputForm
+                   <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.district || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -130,7 +130,7 @@ export const CheckoutInfo = () => {
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     /> 
-                    <InputForm
+                    <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.ward || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -141,7 +141,7 @@ export const CheckoutInfo = () => {
                     /> 
                 </Box>
                 <Box>
-                   <InputForm
+                   <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.street || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -152,7 +152,7 @@ export const CheckoutInfo = () => {
                     /> 
                 </Box>
                 <Box>
-                   <InputForm
+                   <BaseInput
                         iconClass={<LocationCity sx={{ color: theme.palette.primary.main }} />}
                         value={payload.address.zipCode || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
@@ -163,7 +163,7 @@ export const CheckoutInfo = () => {
                     /> 
                 </Box>
                 <Box>
-                   <InputForm
+                   <BaseInput
                         value={payload.message || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
                         nameKey='message'

@@ -1,6 +1,6 @@
 'use client';
 import { Button } from '@/shared/components';
-import { Quantity } from '@/shared/components/ui/Quantity';
+import { Quantity } from '@/shared/components/ui/public/Quantity';
 import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';

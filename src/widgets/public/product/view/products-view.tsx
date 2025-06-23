@@ -7,7 +7,7 @@ import { ProductFilterCategory } from "../ui/product-filter-category"
 import { ProductFilterRating } from "../ui/product-filter-rating"
 import { ProductSort } from "../ui/product-sort"
 import { useCallback, useState } from "react"
-import { Pagination } from "@/shared/components/ui/Pagination"
+import { Pagination } from "@/shared/components/ui/public/Pagination"
 import { ProductSortOption } from "@/shared/constant/common"
 
 export const ProductsView = () => {

@@ -1,30 +1,36 @@
-import { FieldErrors, UseFormRegister, RegisterOptions } from 'react-hook-form';
+import { SxProps, Theme } from "@mui/material";
+import { FieldErrors, Path, RegisterOptions, UseFormRegister } from "react-hook-form";
 
-interface FormValues {
-  [key: string]: string | number | boolean;
-}
-// Ô input
-export interface InputFormProps {
-  important?: boolean,
-  label?: string,
+// Ô input dành cho login, contact
+export interface BaseInputProps {
   id?: string;
-  sx?: React.CSSProperties;
-  value?: string;
-  disabled?: boolean,
-  setValue?: (value: string) => void;
-  nameKey?: string;
-  register?: UseFormRegister<FormValues>;
-  errors?: FieldErrors<FormValues>;
-  type?: string;
+  style?: string;
+  value: string;
   multiline?: boolean;
-  validate?: RegisterOptions;
-  defaultValue?: string;
-  rows?: number;
+  setValue: (value: string) => void;
+  nameKey: string;
+  rows?:number;
+  type?: string;
   invalidFields?: Array<{ name: string; message: string }>;
   setInValidFields?: React.Dispatch<React.SetStateAction<Array<{ name: string; message: string }>>>;
   iconClass?: React.ReactNode;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+}
+// Ô input dành cho react hook form
+export interface FormInputProps<TFormValues extends Record<string, unknown>> {
+  id: Path<TFormValues>;
+  label?: string;
+  important?: boolean;
+  register: UseFormRegister<TFormValues>;
+  errors: FieldErrors<TFormValues>;
+  validate?: RegisterOptions<TFormValues, Path<TFormValues>>;
+  placeholder?: string;
+  defaultValue?: string | number;
+  sx?: SxProps<Theme>;
+  type?: string;
+  multiline?: boolean;
+  rows?: number;
 }
 // Số lượng sản phẩm
 export interface QuantityProps {
@@ -34,7 +40,11 @@ export interface QuantityProps {
 }
 
 // Input image
-export interface InputImageProps {
+export interface InputImageProps<TFormValues extends Record<string, unknown>> {
+  id: Path<TFormValues>;
   label?: string;
+  register: UseFormRegister<TFormValues>;
+  validate?: RegisterOptions<TFormValues, Path<TFormValues>>;
+  errors: FieldErrors<TFormValues>;
   onImageChange?: (file: File | null) => void;
 }

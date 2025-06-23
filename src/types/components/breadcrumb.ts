@@ -1,10 +1,10 @@
 export interface breadcrumb {
-    name: string,
-    url: string
+    name: string;
+    url: string;
 }
 export interface BreadcrumbProps {
-    breadcrumb: breadcrumb[],
-    type?: string
+    breadcrumb: breadcrumb[];
+    type?: string;
 }
 
 

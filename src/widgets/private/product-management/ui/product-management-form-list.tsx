@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo, Fragment, useEffect } from 'react';
+import React, { useState, useMemo,  useEffect } from 'react';
 import {
   Paper,
   Table,
@@ -20,65 +20,67 @@ import {
   Typography,
   Box,
   Checkbox,
-  Dialog
 } from '@mui/material';
-import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
-import Image from 'next/image';
-import { CategoryManagementFormAddEdit } from './category-management-form-add-edit';
-import { deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
-import { Category } from '@/features/category/type/categoryType';
+import { Add,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
+import { Product } from '@/features/product/type/productType';
+import { deleteProduct, getAllProduct } from '@/features/product/api/productApi';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const headCells = [
+  { id: 'code', label: 'Mã sản phẩm', sortable: true },
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
-  { id: 'description', label: 'Mô tả', sortable: false },
-  { id: 'slug', label: 'Slug', sortable: true },
-  { id: 'image', label: 'Hình ảnh', sortable: false },
-  { id: 'actions', label: 'Thao tác', sortable: false }
+  { id: 'thumb', label: 'Ảnh', sortable: true },
+  { id: 'name_short', label: 'Tên ngắn', sortable: true },
+  { id: 'tags', label: 'Tags', sortable: true },
+  { id: 'specification', label: 'sản phẩm đóng gói', sortable: true },
+  { id: 'price_reference', label: 'Giá tham khảo', sortable: true },
+  { id: 'isActive', label: 'Trạng thái', sortable: true },
+  { id: 'actions', label: 'Thao tác', sortable: false },
+
 ];
 
 type SortOrder = 'asc' | 'desc';
 
-export const CategoryManagementFormList = () => {
+export const ProductManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [category, setCategory] = useState<Category[] | []>([]);
+    const [product, setProduct] = useState<Product[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [filterCategory, setFilterCategory] = useState('all');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    const [isAddCategory, setIsAddCategory] = useState<boolean>(false);
-    const [isUpdateCategory, setIsUpdateCategory] = useState<string | null>(null);
+    const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
-    const fetchAllCategory = async () => {
-        const response = await getAllCategory();
+    const fetchAllProduct = async () => {
+        const response = await getAllProduct();
         if(response.success) {
-          setCategory(response.data || []);
+          setProduct(response.data || []);
         }
       }
 
-    // hiển thị tất cả danh mục
+    // hiển thị tất cả sản phẩm
     useEffect(() => {
-      
-      fetchAllCategory();
+      fetchAllProduct();
     },[]);
-    // xóa danh mục
+    // xóa sản phẩm
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa danh mục không?');
-        const response = await deleteCategory(id);
+        window.confirm('Bạn có chắc muốn xóa sản phẩm không?');
+        const response = await deleteProduct(id);
         if(response.success) {
           toast.success(response.message);
-          fetchAllCategory();
+          fetchAllProduct();
           return;
         }else{
           toast.error(response.message);
-          fetchAllCategory();
+          fetchAllProduct();
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
-        fetchAllCategory();
+        fetchAllProduct();
       }
     };
 
@@ -98,10 +100,10 @@ export const CategoryManagementFormList = () => {
     };
     // click chọn tất cả
     const handleAllCheckbox = () => {
-        if(selectedItems.length === category.length){
+        if(selectedItems.length === product.length){
             setSelectedItems([]);
         }else{
-            setSelectedItems(category.map(el => el._id));
+            setSelectedItems(product.map(el => el._id));
         }
     }
     // click chọn từng item
@@ -115,47 +117,43 @@ export const CategoryManagementFormList = () => {
         });
     }
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === category.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= category.length;
+    const isAllSelected = selectedItems.length === product.length;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= product.length;
 
     const filteredAndSortedData = useMemo(() => {
-        const filtered = category.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.slug.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = filterCategory === 'all' || 
-                                (filterCategory === 'hoa' && item.name.toLowerCase().includes('hoa')) ||
-                                (filterCategory === 'cay' && item.name.toLowerCase().includes('cây')) ||
-                                (filterCategory === 'rau' && item.name.toLowerCase().includes('rau'));
-        
-        return matchesSearch && matchesCategory;
-        });
+    const filtered = product.filter(item => {
+      const matchesSearch =
+        item.name_vn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
+       
 
-    // Sắp xếp
+      const matchesAlpha =
+        filterAlpha === 'all' ||
+        item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
+        item.name_vn.toLowerCase().startsWith(filterAlpha.toLowerCase());
+
+      return matchesSearch && matchesAlpha;
+    });
+
+    // Sắp xếp theo field (nếu có)
     if (sortBy && headCells.find(cell => cell.id === sortBy)?.sortable) {
       filtered.sort((a, b) => {
         const aValue = a[sortBy as keyof typeof a];
         const bValue = b[sortBy as keyof typeof b];
-        
+
         if (typeof aValue === 'string' && typeof bValue === 'string') {
           const comparison = aValue.localeCompare(bValue, 'vi');
           return sortOrder === 'asc' ? comparison : -comparison;
         }
-        
+
         return 0;
       });
     }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, filterCategory, category]);
-    // xử lý thêm sản phẩm 
-    const handleShowAddUpdate = () => {
-        if(isAddCategory){
-            setIsAddCategory(prev => !prev)
-        }else{
-            setIsUpdateCategory(null)
-        }
-    }
+  }, [searchTerm, sortBy, sortOrder, product, filterAlpha]);
+
+   
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -168,14 +166,16 @@ return (
             }}>
           <Box>
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
-            Quản lý danh mục sản phẩm
+            Quản lý sản phẩm
           </Typography>
           </Box>
           <Box
             sx={{display: 'flex', gap: 2}}
           >
-            <Box onClick={() => setIsAddCategory(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
-                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm danh mục
+            <Box sx={{p: 1, backgroundColor: theme.palette.primary.main}}>
+                <Link href='/admin/product-management/add' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
+                    <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm sản phẩm
+                </Link>
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
@@ -216,25 +216,24 @@ return (
                 <FormControl fullWidth size='small' sx={{ 
                 '& .MuiInputLabel-root': { color: '#000' }, 
                 '& .MuiSelect-select': { color: '#000' }, 
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' }
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
+                width: '200px'
                 }}>
-                <InputLabel>Lọc theo loại</InputLabel>
+                <InputLabel>Lọc theo chữ cái</InputLabel>
                 <Select
-                    value={filterCategory}
-                    label='Lọc theo loại'
-                    onChange={(e) => setFilterCategory(e.target.value)}
+                    label='Lọc theo cữ cái'
                 >
-                    <MenuItem value='all'>Tất cả</MenuItem>
-                    <MenuItem value='hoa'>Hoa</MenuItem>
-                    <MenuItem value='cay'>Cây</MenuItem>
-                    <MenuItem value='rau'>Rau</MenuItem>
+                    <MenuItem value='all' onClick={() => setFilterAlpha('all')}>Tất cả</MenuItem>
+                    {alphabet.map((letter) => (
+                      <MenuItem key={letter} onClick={() => setFilterAlpha(letter)}>{letter}</MenuItem>
+                    ))}
                 </Select>
                 </FormControl>
             </Box>
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} danh mục
+              Hiển thị: {filteredAndSortedData.length} sản phẩm
             </Typography>
           </Box>
         </Box>
@@ -275,7 +274,8 @@ return (
                     key={index}
                     sx={{ 
                       color: theme.palette.text.secondary,
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      fontSize: theme.typography.body1.fontSize
                     }}
                   >
                     {headCell.sortable ? (
@@ -322,55 +322,77 @@ return (
                             />
                         </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
-                        <Typography variant='body2' noWrap>
-                          {item.name}
+                        <Typography variant='body1' noWrap>
+                          {item.code}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body2' sx={{ 
+                        <Typography variant='body1' sx={{ 
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical'
                         }}>
-                          {item.description}
+                          {item.name_vn}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body2'>
-                          {item.slug}
+                                                <Box
+                                                  sx={{
+                                                    position: 'relative',
+                                                    width: 50,
+                                                    height: 50,
+                                                    borderRadius: 1,
+                                                    overflow: 'hidden',
+                                                    backgroundColor: 'grey.200',
+                                                    flexShrink: 0
+                                                  }}
+                                                >
+                                                  <Image
+                                                    fill
+                                                    src={item.thumb? item.thumb.url : '/banner/banner-4.jpg'}
+                                                    alt={item.name_vn}
+                                                    style={{ objectFit: 'cover' }}
+                                                    onError={(e) => {
+                                                      e.currentTarget.style.display = 'none';
+                                                    }}
+                                                  />
+                                                </Box>
+                                            </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.name_short}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                          <Box
-                            sx={{
-                              position: 'relative',
-                              width: 50,
-                              height: 50,
-                              borderRadius: 1,
-                              overflow: 'hidden',
-                              backgroundColor: 'grey.200',
-                              flexShrink: 0
-                            }}
-                          >
-                            <Image
-                              fill
-                              src={item.thumb.url}
-                              alt={item.name}
-                              style={{ objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          </Box>
+                        <Typography variant='body1'>
+                          {item.tags}
+                        </Typography>
                       </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.specification}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.price_reference}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.isActive}
+                        </Typography>
+                      </TableCell>
+                      
+                      
+                      
                       <TableCell>
                         {/* Hành động */}
                             <IconButton 
-                                onClick={() => setIsUpdateCategory(item._id)} 
                                 color='success'
-                                aria-label={`Sửa ${item.name}`}
+                                aria-label={`Sửa ${item.name_vn}`}
                                 size='small'
                             >
                                 <Edit/>
@@ -378,7 +400,7 @@ return (
                             <IconButton 
                                 onClick={() => handleDelete(item._id)} 
                                 color='error'
-                                aria-label={`Xóa ${item.name}`}
+                                aria-label={`Xóa ${item.name_vn}`}
                                 size='small'
                             >
                                 <Delete />
@@ -404,26 +426,6 @@ return (
           }
         />
       </Paper>
-        <Fragment>
-            <Dialog
-                open={isAddCategory || isUpdateCategory !== null}
-                onClose={handleShowAddUpdate}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-                PaperProps={{
-                    style: {
-                        width: '40%',
-                        height: '55%',
-                        maxWidth: '1000px',
-                        position: 'relative',
-                        borderRadius: 0
-                    },
-                }}
-            >
-                <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-                <CategoryManagementFormAddEdit isUpdateCategory={isUpdateCategory} render={fetchAllCategory}/>
-            </Dialog>
-        </Fragment>
     </Box>
   );
 };

@@ -23,62 +23,67 @@ import {
   Dialog
 } from '@mui/material';
 import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
-import Image from 'next/image';
-import { CategoryManagementFormAddEdit } from './category-management-form-add-edit';
-import { deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
-import { Category } from '@/features/category/type/categoryType';
 import { toast } from 'react-toastify';
+import { SpecificationManagementFormAddEdit } from './specification-management-form-add-edit';
+import { Specification } from '@/features/specification/type/specificationType';
+import { deleteSpecification, getAllSpecification } from '@/features/specification/api/specificationApi';
 
 const headCells = [
-  { id: 'name', label: 'Tên sản phẩm', sortable: true },
+  { id: 'code', label: 'Mã quy cách', sortable: true },
+  { id: 'name', label: 'Tên quy cách', sortable: true },
+  { id: 'unit', label: 'Đơn vị tính', sortable: true },
+  { id: 'conversionQuantity', label: 'Số lượng quy đổi', sortable: true },
+  { id: 'packagingWeight', label: 'Khối lượng đóng gói', sortable: true },
+  { id: 'height', label: 'Chiều cao(cm)', sortable: true },
+  { id: 'length', label: 'Chiều dài(cm)', sortable: true },
+  { id: 'width', label: 'Chiều rộng(cm)', sortable: true },
   { id: 'description', label: 'Mô tả', sortable: false },
-  { id: 'slug', label: 'Slug', sortable: true },
-  { id: 'image', label: 'Hình ảnh', sortable: false },
   { id: 'actions', label: 'Thao tác', sortable: false }
+
 ];
 
 type SortOrder = 'asc' | 'desc';
 
-export const CategoryManagementFormList = () => {
+export const SpecificationManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [category, setCategory] = useState<Category[] | []>([]);
+    const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [filterCategory, setFilterCategory] = useState('all');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    const [isAddCategory, setIsAddCategory] = useState<boolean>(false);
-    const [isUpdateCategory, setIsUpdateCategory] = useState<string | null>(null);
+    const [isAddSpecification, setIsAddSpecification] = useState<boolean>(false);
+    const [isUpdateSpecification, setIsUpdateSpecification] = useState<string | null>(null);
+    const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
-    const fetchAllCategory = async () => {
-        const response = await getAllCategory();
+    const fetchAllSpecification = async () => {
+        const response = await getAllSpecification();
         if(response.success) {
-          setCategory(response.data || []);
+          setSpecification(response.data || []);
         }
       }
 
-    // hiển thị tất cả danh mục
+    // hiển thị tất cả quy cách
     useEffect(() => {
-      
-      fetchAllCategory();
+      fetchAllSpecification();
     },[]);
-    // xóa danh mục
+    // xóa quy cách
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa danh mục không?');
-        const response = await deleteCategory(id);
+        window.confirm('Bạn có chắc muốn xóa quy cách không?');
+        const response = await deleteSpecification(id);
         if(response.success) {
           toast.success(response.message);
-          fetchAllCategory();
+          fetchAllSpecification();
           return;
         }else{
           toast.error(response.message);
-          fetchAllCategory();
+          fetchAllSpecification();
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
-        fetchAllCategory();
+        fetchAllSpecification();
       }
     };
 
@@ -98,10 +103,10 @@ export const CategoryManagementFormList = () => {
     };
     // click chọn tất cả
     const handleAllCheckbox = () => {
-        if(selectedItems.length === category.length){
+        if(selectedItems.length === specification.length){
             setSelectedItems([]);
         }else{
-            setSelectedItems(category.map(el => el._id));
+            setSelectedItems(specification.map(el => el._id));
         }
     }
     // click chọn từng item
@@ -115,45 +120,53 @@ export const CategoryManagementFormList = () => {
         });
     }
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === category.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= category.length;
+    const isAllSelected = selectedItems.length === specification.length;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= specification.length;
 
     const filteredAndSortedData = useMemo(() => {
-        const filtered = category.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.slug.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = filterCategory === 'all' || 
-                                (filterCategory === 'hoa' && item.name.toLowerCase().includes('hoa')) ||
-                                (filterCategory === 'cay' && item.name.toLowerCase().includes('cây')) ||
-                                (filterCategory === 'rau' && item.name.toLowerCase().includes('rau'));
-        
-        return matchesSearch && matchesCategory;
-        });
+    const filtered = specification.filter(item => {
+      const matchesSearch =
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.conversionQuantity.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.packagingWeight.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.height.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.width.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.length.toLowerCase().includes(searchTerm.toLowerCase()) ;
 
-    // Sắp xếp
+      const matchesAlpha =
+        filterAlpha === 'all' ||
+        item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
+        item.name.toLowerCase().startsWith(filterAlpha.toLowerCase());
+
+      return matchesSearch && matchesAlpha;
+    });
+
+    // Sắp xếp theo field (nếu có)
     if (sortBy && headCells.find(cell => cell.id === sortBy)?.sortable) {
       filtered.sort((a, b) => {
         const aValue = a[sortBy as keyof typeof a];
         const bValue = b[sortBy as keyof typeof b];
-        
+
         if (typeof aValue === 'string' && typeof bValue === 'string') {
           const comparison = aValue.localeCompare(bValue, 'vi');
           return sortOrder === 'asc' ? comparison : -comparison;
         }
-        
+
         return 0;
       });
     }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, filterCategory, category]);
+  }, [searchTerm, sortBy, sortOrder, specification, filterAlpha]);
+
     // xử lý thêm sản phẩm 
     const handleShowAddUpdate = () => {
-        if(isAddCategory){
-            setIsAddCategory(prev => !prev)
+        if(isAddSpecification){
+            setIsAddSpecification(prev => !prev)
         }else{
-            setIsUpdateCategory(null)
+            setIsUpdateSpecification(null)
         }
     }
 return (
@@ -168,14 +181,14 @@ return (
             }}>
           <Box>
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
-            Quản lý danh mục sản phẩm
+            Quản lý quy cách sản phẩm
           </Typography>
           </Box>
           <Box
             sx={{display: 'flex', gap: 2}}
           >
-            <Box onClick={() => setIsAddCategory(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
-                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm danh mục
+            <Box onClick={() => setIsAddSpecification(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
+                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm quy cách
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
@@ -216,25 +229,24 @@ return (
                 <FormControl fullWidth size='small' sx={{ 
                 '& .MuiInputLabel-root': { color: '#000' }, 
                 '& .MuiSelect-select': { color: '#000' }, 
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' }
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
+                width: '200px'
                 }}>
-                <InputLabel>Lọc theo loại</InputLabel>
+                <InputLabel>Lọc theo chữ cái</InputLabel>
                 <Select
-                    value={filterCategory}
-                    label='Lọc theo loại'
-                    onChange={(e) => setFilterCategory(e.target.value)}
+                    label='Lọc theo cữ cái'
                 >
-                    <MenuItem value='all'>Tất cả</MenuItem>
-                    <MenuItem value='hoa'>Hoa</MenuItem>
-                    <MenuItem value='cay'>Cây</MenuItem>
-                    <MenuItem value='rau'>Rau</MenuItem>
+                    <MenuItem value='all' onClick={() => setFilterAlpha('all')}>Tất cả</MenuItem>
+                    {alphabet.map((letter) => (
+                      <MenuItem key={letter} onClick={() => setFilterAlpha(letter)}>{letter}</MenuItem>
+                    ))}
                 </Select>
                 </FormControl>
             </Box>
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} danh mục
+              Hiển thị: {filteredAndSortedData.length} quy cách
             </Typography>
           </Box>
         </Box>
@@ -275,7 +287,8 @@ return (
                     key={index}
                     sx={{ 
                       color: theme.palette.text.secondary,
-                      fontWeight: 'bold'
+                      fontWeight: 'bold',
+                      fontSize: theme.typography.body1.fontSize
                     }}
                   >
                     {headCell.sortable ? (
@@ -303,7 +316,7 @@ return (
               {filteredAndSortedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
-                    {searchTerm ? 'Không tìm thấy sản phẩm nào' : 'Danh sách trống'}
+                    {searchTerm ? 'Không tìm thấy quy cách nào' : 'Danh sách trống'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -322,53 +335,61 @@ return (
                             />
                         </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
-                        <Typography variant='body2' noWrap>
-                          {item.name}
+                        <Typography variant='body1' noWrap>
+                          {item.code}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body2' sx={{ 
+                        <Typography variant='body1' sx={{ 
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical'
                         }}>
+                          {item.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.unit}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.conversionQuantity}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.packagingWeight}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.height}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.length}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.width}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
                           {item.description}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body2'>
-                          {item.slug}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                          <Box
-                            sx={{
-                              position: 'relative',
-                              width: 50,
-                              height: 50,
-                              borderRadius: 1,
-                              overflow: 'hidden',
-                              backgroundColor: 'grey.200',
-                              flexShrink: 0
-                            }}
-                          >
-                            <Image
-                              fill
-                              src={item.thumb.url}
-                              alt={item.name}
-                              style={{ objectFit: 'cover' }}
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                              }}
-                            />
-                          </Box>
-                      </TableCell>
+                      
                       <TableCell>
                         {/* Hành động */}
                             <IconButton 
-                                onClick={() => setIsUpdateCategory(item._id)} 
+                                onClick={() => setIsUpdateSpecification(item._id)} 
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
@@ -406,14 +427,14 @@ return (
       </Paper>
         <Fragment>
             <Dialog
-                open={isAddCategory || isUpdateCategory !== null}
+                open={isAddSpecification || isUpdateSpecification !== null}
                 onClose={handleShowAddUpdate}
                 aria-labelledby="alert-dialog-title"
                 aria-describedby="alert-dialog-description"
                 PaperProps={{
                     style: {
                         width: '40%',
-                        height: '55%',
+                        height: '60%',
                         maxWidth: '1000px',
                         position: 'relative',
                         borderRadius: 0
@@ -421,7 +442,7 @@ return (
                 }}
             >
                 <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-                <CategoryManagementFormAddEdit isUpdateCategory={isUpdateCategory} render={fetchAllCategory}/>
+                <SpecificationManagementFormAddEdit isUpdateSpecification={isUpdateSpecification} render={fetchAllSpecification}/>
             </Dialog>
         </Fragment>
     </Box>

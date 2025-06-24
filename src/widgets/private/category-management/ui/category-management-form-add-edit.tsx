@@ -129,16 +129,14 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
                             message: 'Tên danh mục phải có ít nhất 2 ký tự'
                         }
                     }}
-                    sx={{
-                        width: '750px'
-                    }}
                 />
                 
                 <Box sx={{
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
-                    gap: 1
+                    gap: 1,
+                    width: '100%'
                 }}>
                     <CategoryFormInput
                         label='Mô tả'
@@ -157,12 +155,12 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
                             }
                         }}
                         sx={{
-                            width: '450px'
+                            width: '60%'
                         }}
                     />
                     
                     <Box sx={{
-                        width: '300px',
+                        width: '40%',
                     }}>
                         <CategoryInputImage
                             id='thumb'

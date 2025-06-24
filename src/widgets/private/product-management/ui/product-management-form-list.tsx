@@ -20,6 +20,7 @@ import {
   Typography,
   Box,
   Checkbox,
+  Chip,
 } from '@mui/material';
 import { Add,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
@@ -366,9 +367,17 @@ return (
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.tags}
-                        </Typography>
+                        <Box sx={{ mb: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                                {item.tags.map((el, index) => (
+                                  <Chip
+                                    key={index}
+                                    label={el.tag}
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                  />
+                                ))}
+                              </Box>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>

@@ -3,68 +3,24 @@
 
 import { getAllCategory } from "@/features/category/api/categoryApi";
 import { Category} from "@/features/category/type/categoryType";
-import { createProduct } from "@/features/product/api/productApi";
+import { createProduct, updateDescriptionProduct } from "@/features/product/api/productApi";
 import ProductFormInput from "@/features/product/components/ProductFormInput";
 import { ProductInputImage } from "@/features/product/components/ProductInputImage";
-import { ProductData } from "@/features/product/type/productType";
+import { ProductInputTags } from "@/features/product/components/ProductInputTags";
+import { MarkdownEditorProps, ProductData, ProductManagementFormAddInfoProps, } from "@/features/product/type/productType";
 import { getAllSpecification } from "@/features/specification/api/specificationApi";
 import { Specification } from "@/features/specification/type/specificationType";
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { isActive, Origin } from "@/shared/constant/common";
 import { Box, Paper, Tab, Tabs, Typography, useTheme } from "@mui/material"
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
+import { Editor } from '@tinymce/tinymce-react';
 import { toast } from "react-toastify";
 
-const ProductManagementFormAddInfo = () => {
-    const [category, setCategory] = useState<Category[] | []>([]);
-    const [specification, setSpecification] = useState<Specification[] | []>([]);
-    const [preview, setPreview] = useState<string | null>(null);
-    const { register, handleSubmit,  formState: { errors }, reset, control} = useForm<ProductData>();
-    // Hiển thị danh mục
-    const fetchCategory = async () => {
-        const response = await getAllCategory();
-        if(response.success) setCategory(response.data || [])
-    }
-    // Hiển thị quy cách
-    const fetchSpecification = async () => {
-        const response = await getAllSpecification();
-        if(response.success) setSpecification(response.data || [])
-    }
-    useEffect(() => {
-        fetchCategory();
-        fetchSpecification();
-    },[]);
-    // Thêm sản phẩm
-    const handleAddProduct = async (data: ProductData) => {
-        try {
-            const formData = new FormData();
-            formData.append("name_vn", data.name_vn); 
-            formData.append("name_eng", data.name_eng); 
-            formData.append("name_short", data.name_short); 
-            formData.append("category", data.category); 
-            formData.append("code", data.code);  
-            formData.append("origin", data.origin);  
-            formData.append("isActive", data.isActive);  
-            formData.append("tags", data.tags);  
-            formData.append("price_reference", data.price_reference?.toString() || "0");  
-            if (data.thumb && data.thumb.length > 0) {
-                formData.append("thumb", data.thumb[0]); 
-            }
-            const response = await createProduct(formData);
-            if (response.success === false) {
-                toast.error(response.message);
-                reset();
-                return;
-            }
-            toast.success(response.message);
-            reset();
-        } catch (error: unknown) {
-            toast.error(`Lỗi: ${error}`);
-            reset();
-        }
-    };
+const ProductManagementFormAddInfo = ({category, specification, preview, setPreview, handleAddProduct}: ProductManagementFormAddInfoProps) => {
+    const { register, setValue, handleSubmit, watch,  formState: { errors }, control} = useForm<ProductData>();
     return (
          <form onSubmit={handleSubmit(handleAddProduct)}
                 style={{
@@ -252,18 +208,20 @@ const ProductManagementFormAddInfo = () => {
                         justifyContent: 'space-between'
                     }}
                 >
-                    <ProductFormInput
+                    <ProductInputTags
                         label='Tags'
                         important
-                        placeholder='Thêm tags'
-                        register={register as UseFormRegister<ProductData>}
-                        errors={errors as FieldErrors<ProductData>}
+                        placeholder='Nhập tags: phan bon, thong minh,...'
+                        register={register}
+                        errors={errors}
+                        setValue={setValue}
+                        watch={watch}
                         id='tags'
-                        sx={{
-                            width: '60%'
+                        validate={{
+                            required: 'Vui lòng thêm ít nhất một tag',
                         }}
-                        
-                    />
+                        sx={{ width: '60%' }}
+                        />
                     <Box sx={{
                     width: '40%',
                 }}>
@@ -291,91 +249,193 @@ const ProductManagementFormAddInfo = () => {
             </form>
     )
 }
+
+
+const ProductManagementFormAddDescription = ({
+  value,
+  changeValue,
+  handleUpdate,
+}: MarkdownEditorProps) => {
+  return (
+    <>
+      <Editor
+        apiKey="pnfe737m5if1a86anesnyu9mngaaces9l9wi2mox76l56y9z"
+        value={value}
+        init={{
+          height: 500,
+          menubar: true,
+          plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount',
+          ],
+          toolbar:
+            'undo redo | blocks | bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | help',
+          content_style:
+            'body { font-family:UTM Avo; font-size:14px }',
+        }}
+        onEditorChange={(content) => changeValue(content)}
+      />
+      <Box
+        sx={{
+            pt: 2
+        }}
+      >
+        <Button 
+            name='Thêm bài viết'
+            handleOnClick={handleUpdate}
+        />
+      </Box>
+    </>
+  );
+};
+
 export const ProductManagementFormAdd = () => {
+    const {reset} = useForm<ProductData>();
     const theme = useTheme();
-    
-    const [tabIndex, setTabIndex] = useState<number>(0); 
-        const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
-            if (newValue >= 0 && newValue <= 1) {
-                setTabIndex(newValue);
-            } else {
-                setTabIndex(0);
-            }
-        };
-    
-        const getInfoTab = () => {
-            switch(tabIndex) {
-                case 0:
-                    return <ProductManagementFormAddInfo/>;
-                case 1: 
-                    return <ProductManagementFormAddInfo/>;
-                default:
-                    return <ProductManagementFormAddInfo/>;
-            }
+    const [payload, setPayload] = useState<{ description: string }>({
+        description: '',
+    });
+
+    const [category, setCategory] = useState<Category[] | []>([]);
+    const [specification, setSpecification] = useState<Specification[] | []>([]);
+    const [productId, setProductId] = useState<string | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
+    const [tabIndex, setTabIndex] = useState<number>(0);
+
+    // Hàm thay đổi giá trị bài viết mô tả
+    const changeValue = useCallback((value: string) => {
+        setPayload(prev => ({ ...prev, description: value }));
+    }, []);
+
+    // Hàm cập nhật bài viết mô tả
+    const handleUpdate = async () => {
+        if (!productId) {
+            toast.error('Chưa có sản phẩm để cập nhật mô tả');
+            return;
         }
 
-    
+        const response = await updateDescriptionProduct({
+            description: payload.description,
+            id: productId,
+        });
+
+        if (response.success) {
+            toast.success(response.message);
+            setPayload({description: ''});
+        } else {
+            toast.error(response.message);
+            setPayload({description: ''});
+        }
+    };
+
+    // Gọi API danh mục và quy cách
+    const fetchCategory = async () => {
+        const response = await getAllCategory();
+        if (response.success) setCategory(response.data || []);
+    };
+
+    const fetchSpecification = async () => {
+        const response = await getAllSpecification();
+        if (response.success) setSpecification(response.data || []);
+    };
+
+    useEffect(() => {
+        fetchCategory();
+        fetchSpecification();
+    }, []);
+
+    useEffect(() => {
+        console.log('productId:', productId);
+    }, [productId]);
+
+    // Hàm thêm sản phẩm
+    const handleAddProduct = async (data: ProductData) => {
+        try {
+            const formData = new FormData();
+            formData.append("name_vn", data.name_vn);
+            formData.append("name_eng", data.name_eng);
+            formData.append("name_short", data.name_short);
+            formData.append("category", data.category);
+            formData.append("code", data.code);
+            formData.append("origin", data.origin);
+            formData.append("isActive", data.isActive);
+            formData.append("specification", data.specification);
+            formData.append("tags", JSON.stringify(data.tags));
+            formData.append("price_reference", data.price_reference?.toString() || "0");
+            if (data.thumb && data.thumb.length > 0) {
+                formData.append("thumb", data.thumb[0]);
+            }
+
+            const response = await createProduct(formData);
+            if (!response.success) {
+                toast.error(response.message);
+                return;
+            }
+
+            toast.success(response.message);
+            setPreview(null);
+            reset();
+            setProductId(response.data._id);
+        } catch (error: unknown) {
+            toast.error(`Lỗi: ${error}`);
+            setPreview(null);
+            reset();
+        }
+    };
+
+    // Tab handler
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabIndex(newValue);
+    };
+
+    const getInfoTab = () => {
+        switch (tabIndex) {
+            case 0:
+                return (
+                    <ProductManagementFormAddInfo
+                        category={category}
+                        specification={specification}
+                        preview={preview}
+                        setPreview={setPreview}
+                        handleAddProduct={handleAddProduct}
+                    />
+                );
+            case 1:
+                return (
+                    <ProductManagementFormAddDescription
+                        value={payload.description}
+                        changeValue={changeValue}
+                        handleUpdate={handleUpdate}
+                    />
+                );
+            default:
+                return null;
+        }
+    };
+
     return (
-        <Paper
-            sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}
-        >
-            <Box
-            sx={{
-                py: 2
-            }}>
-          <Box>
-            <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
-            Quản lý sản phẩm
-          </Typography>
-          </Box>
-          <Box
-          sx={{
-            borderBottom: `1px solid ${theme.palette.background.default} `, 
-          }}
-          >
-            <Tabs
-                value={tabIndex}
-                onChange={handleTabChange}
-                sx={{
-                    width: { xs: '100%', md: '30%' },
-                    display: 'flex',
-                    borderRadius: '5px',
-                    py: 2,
-                    
-                    
-                }}
-                variant="fullWidth"
-                indicatorColor="primary"
-                textColor="primary"
-            >
-                <Tab 
-                    label='Thông tin sản phẩm' 
-                    sx={{
-                        fontSize: theme.typography.body1.fontSize,
-                        color: theme.palette.text.primary,
-                        '&.Mui-selected': {
-                            color: theme.palette.text.secondary,
-                            backgroundColor: theme.palette.primary.light,
-                        }
-                    }} 
-                />
-                <Tab 
-                    label='Bài Viết' 
-                    sx={{
-                        fontSize: theme.typography.body1.fontSize,
-                        color: theme.palette.text.primary,
-                        '&.Mui-selected': {
-                            color: theme.palette.text.secondary,
-                            backgroundColor: theme.palette.primary.light,
-                        }
-                    }} 
-                />
-            </Tabs>
-          </Box>
-        </Box>
-        <Box>
-            {getInfoTab()}
-        </Box>
+        <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+            <Box sx={{ py: 2 }}>
+                <Typography variant='h6' sx={{ color: theme.palette.primary.main }}>
+                    Quản lý sản phẩm
+                </Typography>
+
+                <Tabs
+                    value={tabIndex}
+                    onChange={handleTabChange}
+                    sx={{ width: { xs: '100%', md: '30%' }, py: 2 }}
+                    variant="fullWidth"
+                    indicatorColor="primary"
+                    textColor="primary"
+                >
+                    <Tab label='Thông tin sản phẩm' />
+                    <Tab label='Bài Viết' />
+                </Tabs>
+            </Box>
+            <Box>{getInfoTab()}</Box>
         </Paper>
-    )
-}
+    );
+};

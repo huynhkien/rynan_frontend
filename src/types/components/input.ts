@@ -47,4 +47,6 @@ export interface InputImageProps<TFormValues extends Record<string, unknown>> {
   validate?: RegisterOptions<TFormValues, Path<TFormValues>>;
   errors: FieldErrors<TFormValues>;
   onImageChange?: (file: File | null) => void;
+  preview: string | null;
+  setPreview: (preview: string | null) => void;
 }

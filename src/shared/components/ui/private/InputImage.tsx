@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useRef} from 'react';
 import {
   Box,
   IconButton,
@@ -14,22 +14,37 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { InputImageProps } from '@/types/components/input';
 import { FieldError } from 'react-hook-form';
 
-export const InputImage = <TFormValues extends Record<string, unknown>>({ onImageChange, id, register, validate, errors }: InputImageProps<TFormValues>) => {
+export const InputImage = <TFormValues extends Record<string, unknown>>({ 
+  onImageChange, 
+  id, 
+  register, 
+  validate, 
+  errors,
+  preview,
+  setPreview
+ 
+}: InputImageProps<TFormValues> & { defaultValue?: string }) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  
+
+
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     if (file) {
       const objectUrl = URL.createObjectURL(file);
       setPreview(objectUrl);
       onImageChange?.(file);
+    } else {
+      setPreview(null);
+      onImageChange?.(null);
     }
   };
-
 
   const handleClick = () => {
     fileInputRef.current?.click();
   };
+
   const handleRemoveImage = () => {
     setPreview(null);
     onImageChange?.(null);
@@ -37,8 +52,13 @@ export const InputImage = <TFormValues extends Record<string, unknown>>({ onImag
       fileInputRef.current.value = '';
     }
   };
+
   const fieldError = errors[id] as FieldError | undefined;
   const errorMessage = fieldError?.message;
+  const validationRules = {
+    ...validate,
+    required: preview ? false : validate?.required,
+  };
 
   return (
     <Stack spacing={1} alignItems='center'>
@@ -49,10 +69,9 @@ export const InputImage = <TFormValues extends Record<string, unknown>>({ onImag
           inputRef={fileInputRef}
           error={!!fieldError}
           {...register(id, {
-            ...validate,
+            ...validationRules,
             onChange: handleFileChange,
           })}
-
           helperText={errorMessage || ''}
           inputProps={{
             accept: 'image/*',
@@ -137,4 +156,3 @@ export const InputImage = <TFormValues extends Record<string, unknown>>({ onImag
     </Stack>
   );
 };
-

@@ -1,5 +1,5 @@
 'use client'
-import React, { useCallback, useState, useMemo, Fragment } from 'react';
+import React, { useState, useMemo, Fragment, useEffect } from 'react';
 import {
   Paper,
   Table,
@@ -25,100 +25,9 @@ import {
 import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
 import Image from 'next/image';
 import { CategoryManagementFormAddEdit } from './category-management-form-add-edit';
-
-const category = [
-  {
-    id: 1,
-    thumb: '/banner/banner-1.jpg',
-    name: 'Phân bón dành cho hoa lan giai đoạn nảy mầm',
-    description: 'Phân bón rất hữu ích cho sự phát triển ban đầu của hoa lan.',
-    slug: 'phan-bon-danh-cho-hoa-lan-giai-doan-nay-mam'
-  },
-  {
-    id: 2,
-    thumb: '/banner/banner-2.jpg',
-    name: 'Phân bón cho cây ăn quả lâu năm',
-    description: 'Giúp cây ăn quả phát triển mạnh và ra trái đều.',
-    slug: 'phan-bon-cho-cay-an-qua-lau-nam'
-  },
-  {
-    id: 3,
-    thumb: '/banner/banner-3.jpg',
-    name: 'Phân bón cho rau sạch tại nhà',
-    description: 'An toàn, hiệu quả cho rau trồng trong gia đình.',
-    slug: 'phan-bon-cho-rau-sach-tai-nha'
-  },
-  {
-    id: 4,
-    thumb: '/banner/banner-4.jpg',
-    name: 'Phân hữu cơ sinh học',
-    description: 'Giàu dinh dưỡng, cải tạo đất hiệu quả.',
-    slug: 'phan-huu-co-sinh-hoc'
-  },
-  {
-    id: 5,
-    thumb: '/banner/banner-5.jpg',
-    name: 'Phân bón lá cao cấp',
-    description: 'Hấp thụ nhanh, tăng sức đề kháng cho cây trồng.',
-    slug: 'phan-bon-la-cao-cap'
-  },
-  {
-    id: 6,
-    thumb: '/banner/banner-6.png',
-    name: 'Phân bón dành cho hoa hồng',
-    description: 'Kích thích ra hoa và giữ màu sắc tươi lâu.',
-    slug: 'phan-bon-danh-cho-hoa-hong'
-  },
-  {
-    id: 7,
-    thumb: '/banner/banner-7.png',
-    name: 'Phân bón cho cây cảnh bonsai',
-    description: 'Giúp cây phát triển chậm mà chắc.',
-    slug: 'phan-bon-cho-cay-canh-bonsai'
-  },
-  {
-    id: 8,
-    thumb: '/banner/banner-8.jpg',
-    name: 'Phân bón vi lượng tổng hợp',
-    description: 'Bổ sung đầy đủ các nguyên tố vi lượng.',
-    slug: 'phan-bon-vi-luong-tong-hop'
-  },
-  {
-    id: 9,
-    thumb: '/banner/banner-1.jpg',
-    name: 'Phân bón kích rễ siêu tốc',
-    description: 'Giúp cây nhanh ra rễ và khỏe mạnh.',
-    slug: 'phan-bon-kich-re-sieu-toc'
-  },
-  {
-    id: 10,
-    thumb: '/banner/banner-2.jpg',
-    name: 'Phân bón dành cho cây cam',
-    description: 'Chuyên dụng cho cây có múi.',
-    slug: 'phan-bon-danh-cho-cay-cam'
-  },
-  {
-    id: 11,
-    thumb: '/banner/banner-2.jpg',
-    name: 'Phân bón dành cho cây cam',
-    description: 'Chuyên dụng cho cây có múi.',
-    slug: 'phan-bon-danh-cho-cay-cam'
-  },
-  {
-    id: 12,
-    thumb: '/banner/banner-2.jpg',
-    name: 'Phân bón dành cho cây cam',
-    description: 'Chuyên dụng cho cây có múi.',
-    slug: 'phan-bon-danh-cho-cay-cam'
-  },
-  {
-    id: 13,
-    thumb: '/banner/banner-2.jpg',
-    name: 'Phân bón dành cho cây cam',
-    description: 'Chuyên dụng cho cây có múi.',
-    slug: 'phan-bon-danh-cho-cay-cam'
-  }
-];
+import { deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
+import { Category } from '@/features/category/type/categoryType';
+import { toast } from 'react-toastify';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -133,18 +42,45 @@ type SortOrder = 'asc' | 'desc';
 export const CategoryManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [category, setCategory] = useState<Category[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [filterCategory, setFilterCategory] = useState('all');
-    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [isAddCategory, setIsAddCategory] = useState<boolean>(false);
-    const [isUpdateCategory, setIsUpdateCategory] = useState<number | null>(null);
+    const [isUpdateCategory, setIsUpdateCategory] = useState<string | null>(null);
     const theme = useTheme();
+    const fetchAllCategory = async () => {
+        const response = await getAllCategory();
+        if(response.success) {
+          setCategory(response.data || []);
+        }
+      }
 
-    const handleDelete = useCallback((id: number) => {
-        alert(`Xóa sản phẩm khỏi danh sách ${id}`)
-    }, []);
+    // hiển thị tất cả danh mục
+    useEffect(() => {
+      
+      fetchAllCategory();
+    },[]);
+    // xóa danh mục
+    const handleDelete = async(id: string) => {
+      try{
+        window.confirm('Bạn có chắc muốn xóa danh mục không?');
+        const response = await deleteCategory(id);
+        if(response.success) {
+          toast.success(response.message);
+          fetchAllCategory();
+          return;
+        }else{
+          toast.error(response.message);
+          fetchAllCategory();
+        }
+      }catch(error: unknown){
+        toast.error(`Lỗi: ${error}`);
+        fetchAllCategory();
+      }
+    };
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -165,11 +101,11 @@ export const CategoryManagementFormList = () => {
         if(selectedItems.length === category.length){
             setSelectedItems([]);
         }else{
-            setSelectedItems(category.map(el => el.id));
+            setSelectedItems(category.map(el => el._id));
         }
     }
     // click chọn từng item
-    const handleCheckbox = (id: number) => {
+    const handleCheckbox = (id: string) => {
         setSelectedItems(prev => {
             if(prev.includes(id)){
                 return prev.filter(item => item !== id)
@@ -211,7 +147,7 @@ export const CategoryManagementFormList = () => {
     }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, filterCategory]);
+    }, [searchTerm, sortBy, sortOrder, filterCategory, category]);
     // xử lý thêm sản phẩm 
     const handleShowAddUpdate = () => {
         if(isAddCategory){
@@ -298,7 +234,7 @@ return (
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} sản phẩm
+              Hiển thị: {filteredAndSortedData.length} danh mục
             </Typography>
           </Box>
         </Box>
@@ -374,12 +310,12 @@ return (
                 filteredAndSortedData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
-                    <TableRow key={item.id} hover>
+                    <TableRow key={item._id} hover>
                         <TableCell padding='checkbox'>
                             <Checkbox
                                 color='primary'
-                                checked={selectedItems.includes(item.id)}
-                                onChange={() => handleCheckbox(item.id)}
+                                checked={selectedItems.includes(item._id)}
+                                onChange={() => handleCheckbox(item._id)}
                                 inputProps={{
                                 'aria-label': 'select all desserts',
                                 }}
@@ -420,7 +356,7 @@ return (
                           >
                             <Image
                               fill
-                              src={item.thumb}
+                              src='/banner/banner-4.jpg'
                               alt={item.name}
                               style={{ objectFit: 'cover' }}
                               onError={(e) => {
@@ -432,7 +368,7 @@ return (
                       <TableCell>
                         {/* Hành động */}
                             <IconButton 
-                                onClick={() => setIsUpdateCategory(item.id)} 
+                                onClick={() => setIsUpdateCategory(item._id)} 
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
@@ -440,7 +376,7 @@ return (
                                 <Edit/>
                             </IconButton>
                             <IconButton 
-                                onClick={() => handleDelete(item.id)} 
+                                onClick={() => handleDelete(item._id)} 
                                 color='error'
                                 aria-label={`Xóa ${item.name}`}
                                 size='small'
@@ -485,7 +421,7 @@ return (
                 }}
             >
                 <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-                <CategoryManagementFormAddEdit isUpdateCategory={isUpdateCategory} setIsUpdateCategory={setIsUpdateCategory}/>
+                <CategoryManagementFormAddEdit isUpdateCategory={isUpdateCategory} render={fetchAllCategory}/>
             </Dialog>
         </Fragment>
     </Box>

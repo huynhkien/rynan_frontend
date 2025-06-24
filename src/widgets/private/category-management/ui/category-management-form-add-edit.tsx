@@ -1,33 +1,91 @@
 'use client'
-import { createCategory } from "@/features/category/api/categoryApi";
+import { createCategory, getCategoryById, updateCategory } from "@/features/category/api/categoryApi";
 import CategoryFormInput from "@/features/category/components/CategoryFormInput";
 import { CategoryInputImage } from "@/features/category/components/CategoryInputImage";
 import { CategoryData, UpdateCategory } from "@/features/category/type/categoryType";
 import { Button } from "@/shared/components";
 import { Box, Typography, useTheme } from "@mui/material"
+import { useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 
-export const CategoryManagementFormAddEdit = ({isUpdateCategory, setIsUpdateCategory} : UpdateCategory) => {
+export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : UpdateCategory) => {
     const theme = useTheme();
-    const { register, handleSubmit,  formState: { errors }} = useForm<CategoryData>();
+    const [preview, setPreview] = useState<string | null>(null);
+    const { register, handleSubmit,  formState: { errors }, reset} = useForm<CategoryData>();
 
-    const handleAddCategory = async(data: CategoryData) => {
-        try{
-            const payload = {
-                name: data.name,
-                description: data.description,
-                thumb: data.thumb
+    // Thêm danh mục
+    const handleAddCategory = async (data: CategoryData) => {
+        try {
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("description", data.description);
+            if (data.thumb && data.thumb.length > 0) {
+                formData.append("thumb", data.thumb[0]); 
             }
-            console.log(payload)
-            const response = await createCategory(payload)
-            if(!response.success){
+            for (const [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+            }
+            const response = await createCategory(formData);
+            if (!response.success) {
                 toast.error(response?.message);
+                reset();
+                render();
+                setPreview(null);
+                return;
             }
-            setIsUpdateCategory(null)
-            toast.success(response.message)
-        }catch(error: unknown){
-            toast.error(`Lỗi: ${error}`)
+            toast.success(response.message);
+            reset();
+            render();
+            setPreview(null);
+        } catch (error: unknown) {
+            toast.error(`Lỗi: ${error}`);
+            reset();
+            setPreview(null);
+            render();
+        }
+    };
+    // Cập nhật danh mục sản phẩm
+    useEffect(() => {
+    const fetchCategory = async() => {
+        if(!isUpdateCategory) return;
+        try {
+            const response = await getCategoryById(isUpdateCategory);
+            if(response.success && response.data) {
+                reset({
+                    name: response.data.name || '',
+                    description: response.data.description || '',
+                });
+                setPreview(response.data.thumb?.url || '');
+            }
+        } catch (error) {
+            console.error('Error fetching category:', error);
+        }
+    };
+    
+    fetchCategory();
+}, [isUpdateCategory, reset]);
+    const handleUpdateCategory = async (data: CategoryData) => {
+        try {
+            const formData = new FormData();
+            formData.append("name", data.name);
+            formData.append("description", data.description);
+            if (data.thumb && data.thumb.length > 0) {
+                formData.append("thumb", data.thumb[0]); 
+            }
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
+            if(!isUpdateCategory) return;
+            const response = await updateCategory(formData, isUpdateCategory);
+            if (!response.success) {
+                toast.error(response?.message);
+                return;
+            }
+            toast.success(response.message);
+            render();
+        } catch (error: unknown) {
+            toast.error(`Lỗi: ${error}`);
         }
     }
 
@@ -49,7 +107,7 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, setIsUpdateCate
                 </Typography>
             </Box>
             
-            <form onSubmit={handleSubmit(handleAddCategory)}
+            <form onSubmit={handleSubmit(isUpdateCategory ? handleUpdateCategory: handleAddCategory)}
                 style={{
                     padding: 10,
                     display: 'flex',
@@ -113,6 +171,9 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, setIsUpdateCate
                             }}
                             register={register}
                             errors={errors}
+                            preview={preview}
+                            setPreview={setPreview}
+                            
                         />
                     </Box>
                 </Box>

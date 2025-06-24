@@ -1,4 +1,8 @@
+import { Category } from "@/features/category/type/categoryType";
+import { Specification } from "@/features/specification/type/specificationType";
 import { FormInputProps, InputImageProps } from "@/types/components/input";
+import { SxProps, Theme } from "@mui/material";
+import { FieldErrors, Path, RegisterOptions, UseFormRegister, UseFormSetValue, UseFormWatch } from "react-hook-form";
 
 export type Order = 'asc' | 'desc';
 export interface UpdateProduct{
@@ -9,7 +13,9 @@ interface ProductThumb{
     url: string;
     public_id?: string;
 }
-
+interface ProductTags{
+    tag: string;
+}
 export interface Product {
     _id: string;
     code: string,
@@ -20,7 +26,7 @@ export interface Product {
     description: string;
     category: string;
     sold: string;
-    tags: string;
+    tags: ProductTags[];
     price_reference: number;
     specification: string;
     origin: string;
@@ -52,7 +58,40 @@ export interface ProductResponse{
 }
 export interface ProductResponseById{
     success: boolean;
+    message?: string,
     data: Product;
 }
+export interface ProductTagsInputProps {
+  label: string;
+  important?: boolean;
+  placeholder?: string;
+  register: UseFormRegister<ProductData>;
+  errors: FieldErrors<ProductData>;
+  setValue: UseFormSetValue<ProductData>;
+  watch: UseFormWatch<ProductData>;
+  id: Path<ProductData>;
+  validate?: RegisterOptions<ProductData, Path<ProductData>>;
+  sx?: SxProps<Theme>;
+}
+
 export type ProductFormInputProps = FormInputProps<ProductData>;
 export type ProductImageInputProps = InputImageProps<ProductData>;
+
+
+// 
+export interface MarkdownEditorProps {
+  value: string;
+  changeValue: (value: string) => void;
+  handleUpdate: () => void;
+ 
+}
+
+// 
+export interface ProductManagementFormAddInfoProps{
+    category: Category[];
+    specification: Specification[];
+    preview: string | null;
+    setPreview: (preview: string | null) => void;
+    handleAddProduct: (data: ProductData) => void;
+
+}

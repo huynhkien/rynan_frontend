@@ -1,8 +1,8 @@
 import React from 'react';
-import { CategoryData, CategoryFormInputProps } from '@/features/category/type/categoryType';
+import { CategoryData, CategoryImageInputProps } from '@/features/category/type/categoryType';
 import { InputImage } from '@/shared/components/ui/private/InputImage';
 
-export const CategoryInputImage: React.FC<CategoryFormInputProps> = (props) => {
+export const CategoryInputImage: React.FC<CategoryImageInputProps> = (props) => {
   return <InputImage<CategoryData> {...props} />;
 };
 

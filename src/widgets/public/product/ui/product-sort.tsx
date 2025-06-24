@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, MenuItem, SelectChangeEvent, Box, Typography } from '@mui/material';
-import { ProductSortProps } from '@/types/widgets/productSort.types';
+import { ProductSortProps } from '@/types/widgets/product';
 
 export const ProductSort: React.FC<ProductSortProps> = ({ value, changeValue, options }) => {
   const handleChange = (event: SelectChangeEvent<string | number>) => {

@@ -2,10 +2,10 @@
 import { useRef, useEffect, useState, Fragment } from 'react';
 import { Box, Dialog, TextField, Typography, useTheme } from '@mui/material';
 import { Cancel, Star, StarBorder } from '@mui/icons-material';
-import { ProductDetailRatingVoteProps } from '@/types/widgets/productDetailRating';
 import theme from '@/shared/configs/theme';
 import { Button } from '@/shared/components';
 import { VoteStar } from '@/shared/constant/common';
+import { ProductDetailRatingVoteProps } from '@/types/widgets/product';
 
 
 // Hiển thị lượt đánh giá

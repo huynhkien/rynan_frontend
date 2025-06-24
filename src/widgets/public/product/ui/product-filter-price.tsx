@@ -10,10 +10,10 @@ import {
   Button,
   useTheme,
 } from '@mui/material';
-import { PriceFilterProps, PriceRange } from '@/types/widgets/productFilterPrice';
+import { ProductPriceFilterProps, ProductPriceRange } from '@/types/widgets/product';
 
 
-export const ProductFilterPrice: React.FC<PriceFilterProps> = ({
+export const ProductFilterPrice: React.FC<ProductPriceFilterProps> = ({
   initialMin = 0,
   initialMax = 637,
   minRange = 0,
@@ -32,7 +32,7 @@ export const ProductFilterPrice: React.FC<PriceFilterProps> = ({
   }, []);
 
   const handleFilter = useCallback(() => {
-    const newRange: PriceRange = {
+    const newRange: ProductPriceRange = {
       min: priceRange[0],
       max: priceRange[1],
     };

@@ -1,34 +1,51 @@
 'use client'
-import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip} from '@mui/material';
-import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
+import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore, AttachMoney, Inventory, ManageAccounts } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
 
 // Types
+interface SubMenuItem {
+  text: string;
+  icon: React.ReactElement;
+  path: string;
+}
+
 interface MenuItem {
   text: string;
   icon: React.ReactElement;
   path: string;
   badge?: number;
+  subItems?: SubMenuItem[];
 }
+
 interface SidebarProps {
   isCollapsed: boolean, 
   setIsCollapsed: (isCollapsed: boolean) => void
 }
 
 const menuItems: MenuItem[] = [
-  { text: 'Dashboard', icon: <Dashboard />, path: '/product' },
-  { text: 'Danh mục', icon: <Category />, path: '/product' },
-  { text: 'Sản phẩm', icon: <Store />, path: '/product' },
-  { text: 'Thống kê', icon: <BarChart />, path: '/product' },
-  { text: 'Liên hệ', icon: <ContactEmergency />, path: '/product' },
-  { text: 'Bình luận', icon: <Comment />, path: '/product' },
-  { text: 'Người dùng', icon: <Person />, path: '/product' },
-  { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/order' },
-  { text: 'Kho hàng', icon: <Warehouse />, path: '/order' },
-  { text: 'Báo giá', icon: <RequestQuote />, path: '/quote', badge: 5 },
+  { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
+  { text: 'Danh mục', icon: <Category />, path: '/admin/category-management' },
+  { 
+    text: 'Sản phẩm', 
+    icon: <Store />, 
+    path: '/',
+    subItems: [
+      { text: 'Quản lý giá', icon: <AttachMoney />, path: '/product/pricing' },
+      { text: 'Quy cách đóng gói', icon: <Inventory />, path: '/admin/product-management/specification' },
+      { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
+    ]
+  },
+  { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
+  { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
+  { text: 'Bình luận', icon: <Comment />, path: '/admin' },
+  { text: 'Người dùng', icon: <Person />, path: '/admin' },
+  { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin' },
+  { text: 'Kho hàng', icon: <Warehouse />, path: '/admin' },
+  { text: 'Báo giá', icon: <RequestQuote />, path: '/admin', badge: 5 },
 ];
 
 const bottomItems: MenuItem[] = [
@@ -38,8 +55,17 @@ const bottomItems: MenuItem[] = [
 
 export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
   const theme = useTheme();
+  const [openSubMenus, setOpenSubMenus] = useState<{[key: string]: boolean}>({});
+
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
+  };
+
+  const toggleSubMenu = (itemText: string) => {
+    setOpenSubMenus(prev => ({
+      ...prev,
+      [itemText]: !prev[itemText]
+    }));
   };
 
   const renderHeader = (): React.ReactElement => (
@@ -121,14 +147,16 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
     </Box>
   );
 
-  const renderMenuItem = (item: MenuItem, index: number): React.ReactElement => {
+  const renderSubMenuItem = (subItem: SubMenuItem, parentIndex: number, subIndex: number): React.ReactElement => {
+    const key = `${parentIndex}-${subIndex}`;
     const listItem = (
       <ListItem 
-        key={index} 
+        key={key}
         sx={{
           mb: 0.5,
           borderRadius: 2,
           mx: 1,
+          ml: isCollapsed ? 1 : 3,
           justifyContent: isCollapsed ? 'center' : 'flex-start',
           px: isCollapsed ? 1 : 2,
           '&:hover': {
@@ -137,7 +165,7 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
         }}
       >
         <Link 
-          href={item.path} 
+          href={subItem.path} 
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -152,34 +180,147 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
             minWidth: isCollapsed ? 'auto' : 40,
             justifyContent: 'center'
           }}>
-            {item.badge ? (
-              <Badge badgeContent={item.badge} color='error'>
-                {item.icon}
-              </Badge>
-            ) : (
-              item.icon
-            )}
+            {subItem.icon}
           </ListItemIcon>
           {!isCollapsed && (
             <ListItemText 
-              primary={item.text} 
+              primary={subItem.text} 
               primaryTypographyProps={{
-                fontWeight: 500
+                fontWeight: 400,
+                fontSize: '0.875rem'
               }}
             />
           )}
         </Link>
       </ListItem>
     );
+
     if (isCollapsed) {
       return (
-        <Tooltip key={index} title={item.text} placement='right'>
+        <Tooltip key={key} title={subItem.text} placement='right'>
           {listItem}
         </Tooltip>
       );
     }
 
     return listItem;
+  };
+
+  const renderMenuItem = (item: MenuItem, index: number): React.ReactElement => {
+    const hasSubItems = item.subItems && item.subItems.length > 0;
+    const isSubMenuOpen = openSubMenus[item.text];
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (hasSubItems && !isCollapsed) {
+        e.preventDefault();
+        toggleSubMenu(item.text);
+      }
+    };
+
+    const listItem = (
+      <ListItem 
+        key={index} 
+        onClick={handleClick}
+        sx={{
+          mb: 0.5,
+          borderRadius: 2,
+          mx: 1,
+          justifyContent: isCollapsed ? 'center' : 'flex-start',
+          px: isCollapsed ? 1 : 2,
+          cursor: hasSubItems && !isCollapsed ? 'pointer' : 'default',
+          '&:hover': {
+            bgcolor: 'rgba(255,255,255,0.1)',
+          },
+        }}
+      >
+        {hasSubItems && !isCollapsed ? (
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            width: '100%',
+            justifyContent: 'space-between'
+          }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <ListItemIcon sx={{ 
+                color: 'inherit', 
+                minWidth: 40,
+                justifyContent: 'center'
+              }}>
+                {item.badge ? (
+                  <Badge badgeContent={item.badge} color='error'>
+                    {item.icon}
+                  </Badge>
+                ) : (
+                  item.icon
+                )}
+              </ListItemIcon>
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{
+                  fontWeight: 500
+                }}
+              />
+            </Box>
+            {isSubMenuOpen ? <ExpandLess /> : <ExpandMore />}
+          </Box>
+        ) : (
+          <Link 
+            href={item.path} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              textDecoration: 'none', 
+              color: 'inherit', 
+              width: '100%',
+              justifyContent: isCollapsed ? 'center' : 'flex-start'
+            }}
+          >
+            <ListItemIcon sx={{ 
+              color: 'inherit', 
+              minWidth: isCollapsed ? 'auto' : 40,
+              justifyContent: 'center'
+            }}>
+              {item.badge ? (
+                <Badge badgeContent={item.badge} color='error'>
+                  {item.icon}
+                </Badge>
+              ) : (
+                item.icon
+              )}
+            </ListItemIcon>
+            {!isCollapsed && (
+              <ListItemText 
+                primary={item.text} 
+                primaryTypographyProps={{
+                  fontWeight: 500
+                }}
+              />
+            )}
+          </Link>
+        )}
+      </ListItem>
+    );
+
+    const wrappedItem = isCollapsed ? (
+      <Tooltip key={index} title={item.text} placement='right'>
+        {listItem}
+      </Tooltip>
+    ) : listItem;
+
+    return (
+      <React.Fragment key={index}>
+        {wrappedItem}
+        {hasSubItems && !isCollapsed && (
+          <Collapse in={isSubMenuOpen} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {item.subItems!.map((subItem, subIndex) => 
+                renderSubMenuItem(subItem, index, subIndex)
+              )}
+            </List>
+          </Collapse>
+        )}
+      </React.Fragment>
+    );
   };
 
   const renderMainMenu = (): React.ReactElement => (
@@ -219,6 +360,23 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
           border: 'none',
           transition: 'width 0.3s ease',
           overflowX: 'hidden',
+          overflowY: 'auto',
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'rgba(255,255,255,0.05)',
+            borderRadius: '3px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'rgba(255,255,255,0.2)',
+            borderRadius: '3px',
+            '&:hover': {
+              background: 'rgba(255,255,255,0.3)',
+            },
+          },
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'rgba(255,255,255,0.2) rgba(255,255,255,0.05)',
         }
       }}
     >

@@ -61,3 +61,16 @@ export const COLLAPSED_WIDTH = 72;
 
 // kích thước header
 export const HEADER_HEIGHT = 64;
+
+// Thông tin nhà sản xuất
+export const Origin = [{
+    _id: 'Rynan Smart Agriculture',
+    name: 'Rynan Smart Agriculture',
+}]
+export const isActive = [{
+    _id: 'Đang bán',
+    name: 'Đang bán',
+},{
+    _id: 'Ngừng bán',
+    name: 'Ngừng bán'
+}]

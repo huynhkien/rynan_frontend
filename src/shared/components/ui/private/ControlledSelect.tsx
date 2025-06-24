@@ -1,38 +1,9 @@
-// types/components/select.ts
-export interface OptionPrivate {
-  _id: string;
-  name: string;
-}
-
-export interface SelectPrivateProps {
-  value: string | number;
-  changeValue: (value: string | number) => void;
-  options: OptionPrivate[];
-  label?: string;
-  important?: boolean;
-  placeholder?: string; 
-  sx?: SxProps<Theme>;
-}
-
-export interface ControlledSelectProps<T extends FieldValues> extends Omit<SelectPrivateProps, 'value' | 'changeValue'> {
-  name: Path<T>;
-  control: Control<T>;
-  rules?: RegisterOptions<T>;
-}
-
 import React from 'react';
-import { Controller, FieldValues, Control, RegisterOptions, Path } from 'react-hook-form';
-import { 
-  Select as SelectItem, 
-  MenuItem, 
-  SelectChangeEvent, 
-  Box, 
-  Typography,
-  SxProps,
-  Theme
-} from '@mui/material';
+import { Controller, FieldValues } from 'react-hook-form';
+import { Select as SelectItem, MenuItem, SelectChangeEvent, Box, Typography} from '@mui/material';
+import { ControlledSelectProps, SelectPrivateProps } from '@/types/components/select';
 
-const Select: React.FC<SelectPrivateProps> = ({ 
+const Select = ({ 
   value, 
   changeValue, 
   options, 
@@ -40,7 +11,7 @@ const Select: React.FC<SelectPrivateProps> = ({
   important,
   placeholder = "Lựa chọn",
   sx
-}) => {
+}: SelectPrivateProps) => {
   const handleChange = (event: SelectChangeEvent<string | number>) => {
     changeValue(event.target.value);
   };
@@ -59,14 +30,13 @@ const Select: React.FC<SelectPrivateProps> = ({
         onChange={handleChange}
         displayEmpty
         renderValue={(selected) => {
-          if (!selected) {
-            return <span style={{ color: '#999' }}>{placeholder}</span>;
-          }
-          return selected;
+          if (!selected) return <span style={{ color: '#999' }}>{placeholder}</span>;
+          const selectedOption = options.find(opt => opt._id === selected);
+          return selectedOption?.name || placeholder;
         }}
       >
         {options.map((el) => (
-          <MenuItem key={el._id} value={el.name}>
+          <MenuItem key={el._id} value={el._id}>
             {el.name}
           </MenuItem>
         ))}

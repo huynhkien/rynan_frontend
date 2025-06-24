@@ -3,10 +3,6 @@ import { Env } from "./env";
 
 const axiosInstance = axios.create({
   baseURL: Env.API_URL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  }
 });
 
 axiosInstance.interceptors.request.use(

@@ -14,6 +14,7 @@ interface ProductThumb{
     public_id?: string;
 }
 interface ProductTags{
+    _id?: string;
     tag: string;
 }
 export interface Product {
@@ -45,7 +46,7 @@ export interface ProductData extends Record<string, unknown> {
     category: string;
     sold: string;
     isActive: string;
-    tags: string;
+    tags: ProductTags[];
     price_reference: number;
     specification: string;
     origin: string;
@@ -80,14 +81,24 @@ export type ProductImageInputProps = InputImageProps<ProductData>;
 
 // 
 export interface MarkdownEditorProps {
-  value: string;
-  changeValue: (value: string) => void;
-  handleUpdate: () => void;
+    id?: string;
+    value: string;
+    changeValue: (value: string) => void;
+    handleUpdate: () => void;
  
 }
 
 // 
 export interface ProductManagementFormAddInfoProps{
+    category: Category[];
+    specification: Specification[];
+    preview: string | null;
+    setPreview: (preview: string | null) => void;
+    handleAddProduct: (data: ProductData) => void;
+
+}
+export interface ProductManagementFormEditInfoProps{
+    id: string
     category: Category[];
     specification: Specification[];
     preview: string | null;

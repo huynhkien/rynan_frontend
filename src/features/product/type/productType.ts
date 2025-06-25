@@ -62,21 +62,21 @@ export interface ProductPrice extends Record<string, unknown> {
     productId?: string;
     priceType: string;
     price: number;                       
-    startDate: Date;                   
-    endDate: Date;                     
+    startDate: Date | string;                   
+    endDate: Date | string;                     
     note: string;                  
 }
 export interface PriceProduct {
     _id: string;
     priceType: string;
     price: number;                       
-    startDate: Date;                   
-    endDate: Date;                     
+    startDate: Date | string;                   
+    endDate: Date | string;                     
     note: string;
 }
 export interface ProductPriceData {
     id: string,
-    prices: PriceProduct[];
+    product: Product;
     render: () => void;
 }
 export interface ProductResponse{

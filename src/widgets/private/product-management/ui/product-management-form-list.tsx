@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo,  useEffect } from 'react';
+import React, { useState, useMemo,  useEffect, Fragment } from 'react';
 import {
   Paper,
   Table,
@@ -21,16 +21,19 @@ import {
   Box,
   Checkbox,
   Chip,
+  Dialog,
 } from '@mui/material';
-import { Add,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,  AttachMoney,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { Product } from '@/features/product/type/productType';
+import { PriceProduct, Product,} from '@/features/product/type/productType';
 import { deleteProduct, getAllProduct } from '@/features/product/api/productApi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
 import { Specification } from '@/features/specification/type/specificationType';
 import { isActive } from '@/shared/constant/common';
+import { PriceManagementFormAdd } from '../../price-management/ui/price-management-form-add';
+import { PriceManagementFormList } from '../../price-management/ui/price-management-form-list';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -54,6 +57,9 @@ export const ProductManagementFormList = () => {
     const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
+    const [isShowPriceProduct, setIsShowPriceProduct] = useState<string | null>(null);
+    const [isDataPriceProduct, setIsDataPriceProduct] = useState<PriceProduct[] | []>([]);
+    const [isAddPriceProduct, setIsAddPriceProduct] = useState<boolean>(false);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
@@ -181,6 +187,14 @@ export const ProductManagementFormList = () => {
       return filtered;
     }, [searchTerm, sortBy, sortOrder, product, filterAlpha, filterActive]);
 
+   // xử lý thêm giá sản phẩm 
+    const handleShowAddUpdate = () => {
+        if(isAddPriceProduct){
+            setIsAddPriceProduct(prev => !prev)
+        }else{
+            setIsShowPriceProduct(null)
+        }
+    }
    
 return (
     <Box sx={{ width: '100%' }}>
@@ -205,6 +219,9 @@ return (
                     <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm sản phẩm
                 </Link>
             </Box>
+            <Box onClick={() => setIsAddPriceProduct(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
+                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm giá sản phẩm
+             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
@@ -464,6 +481,16 @@ return (
                             >
                                 <Delete />
                             </IconButton>
+                            <IconButton 
+                                onClick={() => {
+                                  setIsShowPriceProduct(item._id);
+                                  setIsDataPriceProduct(item.prices || []);
+                                }}
+                                color='warning'
+                                size='small'
+                            >
+                              <AttachMoney/>
+                            </IconButton>
                       </TableCell>
                     </TableRow>
                   ))
@@ -485,6 +512,27 @@ return (
           }
         />
       </Paper>
+      <Fragment>
+        <Dialog
+            open={isAddPriceProduct ||  isShowPriceProduct !== null}
+            onClose={handleShowAddUpdate}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            PaperProps={{
+                style: {
+                    width: '50%',
+                    height: '60%',
+                    maxWidth: '1000px',
+                    position: 'relative',
+                    borderRadius: 0
+                },
+            }}
+        >
+            <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
+            {isShowPriceProduct && <PriceManagementFormList id={isShowPriceProduct} prices={isDataPriceProduct} render={fetchAllProduct}/>}
+            {isAddPriceProduct && <PriceManagementFormAdd/>}
+        </Dialog>
+      </Fragment>
     </Box>
   );
 };

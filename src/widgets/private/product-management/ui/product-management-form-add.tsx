@@ -420,7 +420,7 @@ export const ProductManagementFormAdd = () => {
         <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
             <Box sx={{ py: 2 }}>
                 <Typography variant='h6' sx={{ color: theme.palette.primary.main }}>
-                    Quản lý sản phẩm
+                    Thêm sản phẩm
                 </Typography>
 
                 <Tabs

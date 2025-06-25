@@ -44,6 +44,7 @@ export const PriceManagementFormAdd = () => {
                 id: productId
             });
             toast.success(response.message);
+            reset();
             
         } catch (error) {
             toast.error(`Lỗi: ${error}`);

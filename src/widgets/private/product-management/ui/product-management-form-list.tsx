@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo,  useEffect, Fragment } from 'react';
+import React, { useState, useMemo,  useEffect, Fragment, useCallback } from 'react';
 import {
   Paper,
   Table,
@@ -25,8 +25,8 @@ import {
 } from '@mui/material';
 import { Add,  AttachMoney,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { PriceProduct, Product,} from '@/features/product/type/productType';
-import { deleteProduct, getAllProduct } from '@/features/product/api/productApi';
+import { Product,} from '@/features/product/type/productType';
+import { deleteProduct, getAllProduct, getProductById } from '@/features/product/api/productApi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
@@ -54,11 +54,11 @@ export const ProductManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [product, setProduct] = useState<Product[] | []>([]);
+    const [productPriceData, setProductPriceData] = useState<Product | null>(null);
     const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [isShowPriceProduct, setIsShowPriceProduct] = useState<string | null>(null);
-    const [isDataPriceProduct, setIsDataPriceProduct] = useState<PriceProduct[] | []>([]);
     const [isAddPriceProduct, setIsAddPriceProduct] = useState<boolean>(false);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -74,6 +74,16 @@ export const ProductManagementFormList = () => {
           setProduct(response.data || []);
         }
       }
+    // HIển thị sản phẩm
+    const fetchProduct = useCallback(async () => {
+      if(!isShowPriceProduct) return;
+      const response = await getProductById(isShowPriceProduct);
+      if(response.success) setProductPriceData(response.data);
+    }, [isShowPriceProduct]);
+
+    useEffect(() => {
+      fetchProduct();
+    }, [fetchProduct]);
     // Hiển thị quy cách đóng gói
     const fetchAllSpecification = async () => {
       const response = await getAllSpecification();
@@ -83,6 +93,7 @@ export const ProductManagementFormList = () => {
       fetchAllProduct();
       fetchAllSpecification();
     },[]);
+    
     
     // xóa sản phẩm
     const handleDelete = async(id: string) => {
@@ -484,7 +495,6 @@ return (
                             <IconButton 
                                 onClick={() => {
                                   setIsShowPriceProduct(item._id);
-                                  setIsDataPriceProduct(item.prices || []);
                                 }}
                                 color='warning'
                                 size='small'
@@ -529,7 +539,7 @@ return (
             }}
         >
             <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            {isShowPriceProduct && <PriceManagementFormList id={isShowPriceProduct} prices={isDataPriceProduct} render={fetchAllProduct}/>}
+            {(isShowPriceProduct && productPriceData) && <PriceManagementFormList id={isShowPriceProduct} product={productPriceData} render={fetchProduct}/>}
             {isAddPriceProduct && <PriceManagementFormAdd/>}
         </Dialog>
       </Fragment>

@@ -44,7 +44,7 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const PriceManagementFormList = ({id, prices, render}: ProductPriceData) => {
+export const PriceManagementFormList = ({id, product, render}: ProductPriceData) => {
     const { register,   formState: { errors },  control, reset, handleSubmit} = useForm<ProductPrice>();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -90,7 +90,7 @@ export const PriceManagementFormList = ({id, prices, render}: ProductPriceData) 
     };
 
     const filteredAndSortedData = useMemo(() => {
-    const filtered = prices.filter(item => {
+    const filtered = product.prices.filter(item => {
       const matchesSearch =
         item.priceType.toLowerCase().includes(searchTerm.toLowerCase());
         
@@ -118,7 +118,7 @@ export const PriceManagementFormList = ({id, prices, render}: ProductPriceData) 
     }
 
     return filtered;
-  }, [searchTerm, sortBy, sortOrder, prices, filterAlpha]);
+  }, [searchTerm, sortBy, sortOrder, product, filterAlpha]);
       // Cập nhật thông tin giá sản phẩm
     useEffect(() => {
       const fetchProduct = async() => {

@@ -1,9 +1,9 @@
-import { ProductManagementAddView } from "@/widgets/private/product-management/view/product-management-add-view"
+import { ProductManagementEditView } from "@/widgets/private/product-management/view/product-management-update-view";
 
 const ProductManagementEdit = () => {
     return (
         <>
-            <ProductManagementAddView/>
+            <ProductManagementEditView/>
         </>
     )
 }

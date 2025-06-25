@@ -6,7 +6,7 @@ import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { PriceType } from "@/shared/constant/common";
 import { Box, Typography, useTheme } from "@mui/material"
-import { useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -14,6 +14,7 @@ export const PriceManagementFormAdd = () => {
     const theme = useTheme();
     const { register, handleSubmit,  formState: { errors }, reset, control, watch} = useForm<ProductPrice>();
     const [product, setProduct] = useState<Product[] | []>([]);
+    const productId = watch('productId') as string
     // Hiển thị thông tin sản phẩm
     const fetchAllProduct = async() => {
         const response = await getAllProduct();
@@ -22,12 +23,9 @@ export const PriceManagementFormAdd = () => {
     useEffect(() => {
         fetchAllProduct();
     },[]);
-    // Lấy id của sản phẩm
     
-
     // Thêm giá tiền
     const handleAddPriceProduct = async (data: ProductPrice) => {
-        const productId = watch('productId') as string
         if (!productId) {
             toast.error('Vui lòng chọn sản phẩm');
             return;
@@ -46,6 +44,7 @@ export const PriceManagementFormAdd = () => {
                 id: productId
             });
             toast.success(response.message);
+            
         } catch (error) {
             toast.error(`Lỗi: ${error}`);
             reset();
@@ -152,7 +151,7 @@ export const PriceManagementFormAdd = () => {
                         important
                         register={register as UseFormRegister<ProductPrice>}
                         errors={errors as FieldErrors<ProductPrice>}
-                        id='packagingWeight'
+                        id='startDate'
                         sx={{
                             width: '50%'
                         }}
@@ -163,7 +162,7 @@ export const PriceManagementFormAdd = () => {
                         important
                         register={register as UseFormRegister<ProductPrice>}
                         errors={errors as FieldErrors<ProductPrice>}
-                        id='height'
+                        id='endDate'
                         sx={{
                             width: '50%'
                         }}

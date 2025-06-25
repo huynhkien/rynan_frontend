@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo} from 'react';
+import React, { useState, useMemo, useEffect} from 'react';
 import moment from 'moment';
 
 import {
@@ -21,16 +21,16 @@ import {
   TableSortLabel,
   Typography,
   Box,
-  Button,
 } from '@mui/material';
 import { Delete, Edit, } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { deletePriceProduct } from '@/features/product/api/productApi';
+import { deletePriceProduct, getProductById, updatePriceProduct } from '@/features/product/api/productApi';
 import {  ProductPrice, ProductPriceData } from '@/features/product/type/productType';
 import { PriceType } from '@/shared/constant/common';
 import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
 import { ControlledSelect } from '@/shared/components/ui/private/ControlledSelect';
 import ProductInputPrice from '@/features/product/components/ProductInputPrice';
+import { Button } from '@/shared/components';
 
 const headCells = [
   { id: 'typePrice', label: 'Loại giá', sortable: true },
@@ -45,7 +45,7 @@ const headCells = [
 type SortOrder = 'asc' | 'desc';
 
 export const PriceManagementFormList = ({id, prices, render}: ProductPriceData) => {
-    const { register,   formState: { errors },  control} = useForm<ProductPrice>();
+    const { register,   formState: { errors },  control, reset, handleSubmit} = useForm<ProductPrice>();
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchTerm, setSearchTerm] = useState('');
@@ -119,30 +119,55 @@ export const PriceManagementFormList = ({id, prices, render}: ProductPriceData) 
 
     return filtered;
   }, [searchTerm, sortBy, sortOrder, prices, filterAlpha]);
-    //   Cập nhật thông tin giá sản phẩm
-//     useEffect(() => {
-//       const fetchProduct = async() => {
-//           if(!id) return;
-//           try {
-//               const response = await getProductById(id);
-//               const priceData = response.data.prices.find((el) => el._id === isUpdatePriceProduct);
-//               if(response.success && response.data) {
-//                   reset({
-//                       priceType: priceData?.priceType || '',
-//                       price: priceData?.price || 0,
-//                       startDate: priceData?.startDate?.split("T")[0] || null,
-//                       endDate: priceData?.endDate?.split("T")[0] || null,
-//                       note: priceData?.note || '',
-//                   });
+      // Cập nhật thông tin giá sản phẩm
+    useEffect(() => {
+      const fetchProduct = async() => {
+          if(!id) return;
+          try {
+              const response = await getProductById(id);
+              const priceData = response.data.prices.find((el) => el._id === isUpdatePriceProduct);
+              console.log(response.data);
+              if(response.success && response.data) {
+                  reset({
+                      priceType: priceData?.priceType || '',
+                      price: priceData?.price || 0,
+                      startDate: priceData?.startDate ? moment(priceData.startDate).format('YYYY-MM-DD') : '',
+                      endDate: priceData?.endDate ? moment(priceData.endDate).format('YYYY-MM-DD') : '',
+                      note: priceData?.note || '',
+                  });
                   
-//               }
-//           } catch (error) {
-//               console.error('Error fetching category:', error);
-//           }
-//       };
+              }
+          } catch (error) {
+              console.error('Error fetching category:', error);
+          }
+      };
       
-//       fetchProduct();
-//   }, [id, reset, isUpdatePriceProduct]);
+      fetchProduct();
+  }, [id, reset, isUpdatePriceProduct]);
+  const handleUpdatePriceProduct = async (data: ProductPrice) => {
+          if (!isUpdatePriceProduct) {
+            toast.error("Không tìm thấy ID giá cần cập nhật");
+            return;
+          }
+          try {
+              const priceData = {
+                  priceType: data.priceType || '',
+                  price: data.price || 0,
+                  startDate: data.startDate || '',
+                  endDate: data.endDate  || '',
+                  note: data.note || ''
+              };
+              const response = await updatePriceProduct({
+                  prices: priceData ,
+                  id: id,
+                  rid: isUpdatePriceProduct,
+              });
+              toast.success(response.message);
+              render();
+          } catch (error) {
+              toast.error(`Lỗi: ${error}`);
+          }
+      };
 
 return (
     <Box sx={{ width: '100%' }}>
@@ -355,7 +380,7 @@ return (
                         Cập nhật giá tiền sản phẩm
                     </Typography>
                 </Box>
-                <form
+                <form onSubmit={handleSubmit(handleUpdatePriceProduct)}
                     style={{
                         padding: 10,
                         display: 'flex',
@@ -364,86 +389,87 @@ return (
                         backgroundColor: theme.palette.background.default
                     }}
             >
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        gap: 1
-                    }}
-                >
-                    <ControlledSelect
-                        label='Chọn loại giá'
-                        important
-                        sx={{
-                            width: '50%'
-                        }}
-                        name='priceType'
-                        control={control}
-                        options={PriceType}
-                        rules={{
-                        required: 'Vui lòng chọn loại giá',
-                        validate: (value) => {
-                            if (value === 'electronics') return 'Không được chọn điện tử';
-                            return true;
-                        }
-                        }}
-                    />
-                    <ProductInputPrice
-                        label='Giá tiền'
-                        type='number'
-                        important
-                        placeholder='Thêm giá tiền'
-                        register={register as UseFormRegister<ProductPrice>}
-                        errors={errors as FieldErrors<ProductPrice>}
-                        id='price'
-                        sx={{
-                            width: '100%'
-                        }}
-                    />
-                </Box>
-                <Box
-                    sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        gap: 1
-                    }}
-                >
-                    <ProductInputPrice
-                        label='Ngày bắt đầu'
-                        type='date'
-                        important
-                        register={register as UseFormRegister<ProductPrice>}
-                        errors={errors as FieldErrors<ProductPrice>}
-                        id='packagingWeight'
-                        sx={{
-                            width: '50%'
-                        }}
-                    />
-                    <ProductInputPrice
-                        label='Ngày kết thúc'
-                        type='date'
-                        important
-                        register={register as UseFormRegister<ProductPrice>}
-                        errors={errors as FieldErrors<ProductPrice>}
-                        id='height'
-                        sx={{
-                            width: '50%'
-                        }}
-                    />
-                    <ProductInputPrice
-                        label='Ghi chú(nếu có)'
-                        important
-                        placeholder='Thêm ghi chú'
-                        register={register as UseFormRegister<ProductPrice>}
-                        errors={errors as FieldErrors<ProductPrice>}
-                        id='note'
-                    />
-                </Box>    
-                <Box sx={{ mt: 3 }}>
-                    <Button 
-                        name='Thêm giá tiền'
-                    />
-                </Box>
+                  <Box
+                      sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          gap: 1
+                      }}
+                  >
+                      <ControlledSelect
+                          label='Chọn loại giá'
+                          important
+                          sx={{
+                              width: '50%'
+                          }}
+                          name='priceType'
+                          control={control}
+                          options={PriceType}
+                          rules={{
+                          required: 'Vui lòng chọn loại giá',
+                          validate: (value) => {
+                              if (value === 'electronics') return 'Không được chọn điện tử';
+                              return true;
+                          }
+                          }}
+                      />
+                      <ProductInputPrice
+                          label='Giá tiền'
+                          type='number'
+                          important
+                          placeholder='Thêm giá tiền'
+                          register={register as UseFormRegister<ProductPrice>}
+                          errors={errors as FieldErrors<ProductPrice>}
+                          id='price'
+                          sx={{
+                              width: '100%'
+                          }}
+                      />
+                  </Box>
+                  <Box
+                      sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          gap: 1
+                      }}
+                  >
+                      <ProductInputPrice
+                          label='Ngày bắt đầu'
+                          type='date'
+                          important
+                          register={register as UseFormRegister<ProductPrice>}
+                          errors={errors as FieldErrors<ProductPrice>}
+                          id='startDate'
+                          sx={{
+                              width: '50%'
+                          }}
+                      />
+                      <ProductInputPrice
+                          label='Ngày kết thúc'
+                          type='date'
+                          important
+                          register={register as UseFormRegister<ProductPrice>}
+                          errors={errors as FieldErrors<ProductPrice>}
+                          id='endDate'
+                          sx={{
+                              width: '50%'
+                          }}
+                      />
+                      <ProductInputPrice
+                          label='Ghi chú(nếu có)'
+                          important
+                          placeholder='Thêm ghi chú'
+                          register={register as UseFormRegister<ProductPrice>}
+                          errors={errors as FieldErrors<ProductPrice>}
+                          id='note'
+                      />
+                  </Box>    
+                  <Box sx={{ mt: 1, width: '100%' }}>
+                      <Button 
+                          name='Cập nhật giá tiền'
+                         
+                      />
+                  </Box>
                 </form>
             </Box>
         )

@@ -295,7 +295,7 @@ const ProductManagementFormUpdateDescription = ({
   return (
     <>
       <Editor
-        apiKey="pnfe737m5if1a86anesnyu9mngaaces9l9wi2mox76l56y9z"
+        apiKey="6gmu62t9gmyhx5y2q16o4q6ac269ubj6ul5gd8106pux71jo"
         value={value}
         init={{
           height: 500,

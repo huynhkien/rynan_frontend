@@ -28,6 +28,9 @@ import { Product } from '@/features/product/type/productType';
 import { deleteProduct, getAllProduct } from '@/features/product/api/productApi';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { Specification } from '@/features/specification/type/specificationType';
+import { isActive } from '@/shared/constant/common';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -35,7 +38,7 @@ const headCells = [
   { id: 'thumb', label: 'Ảnh', sortable: true },
   { id: 'name_short', label: 'Tên ngắn', sortable: true },
   { id: 'tags', label: 'Tags', sortable: true },
-  { id: 'specification', label: 'sản phẩm đóng gói', sortable: true },
+  { id: 'specification', label: 'Quy cách đóng gói', sortable: true },
   { id: 'price_reference', label: 'Giá tham khảo', sortable: true },
   { id: 'isActive', label: 'Trạng thái', sortable: true },
   { id: 'actions', label: 'Thao tác', sortable: false },
@@ -48,36 +51,46 @@ export const ProductManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [product, setProduct] = useState<Product[] | []>([]);
+    const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const [filterActive, setFilterActive] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    
+    // hiển thị tất cả sản phẩm
     const fetchAllProduct = async () => {
         const response = await getAllProduct();
         if(response.success) {
           setProduct(response.data || []);
         }
       }
-
-    // hiển thị tất cả sản phẩm
+    // Hiển thị quy cách đóng gói
+    const fetchAllSpecification = async () => {
+      const response = await getAllSpecification();
+      if(response.success) setSpecification(response.data || [])
+    }
     useEffect(() => {
       fetchAllProduct();
+      fetchAllSpecification();
     },[]);
+    
     // xóa sản phẩm
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa sản phẩm không?');
-        const response = await deleteProduct(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllProduct();
-          return;
-        }else{
-          toast.error(response.message);
-          fetchAllProduct();
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+          const response = await deleteProduct(id);
+          if(response.success) {
+            toast.success(response.message);
+            fetchAllProduct();
+            return;
+          }else{
+            toast.error(response.message);
+            fetchAllProduct();
+          }
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
@@ -99,6 +112,7 @@ export const ProductManagementFormList = () => {
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(property);
     };
+    
     // click chọn tất cả
     const handleAllCheckbox = () => {
         if(selectedItems.length === product.length){
@@ -107,6 +121,7 @@ export const ProductManagementFormList = () => {
             setSelectedItems(product.map(el => el._id));
         }
     }
+    
     // click chọn từng item
     const handleCheckbox = (id: string) => {
         setSelectedItems(prev => {
@@ -117,42 +132,54 @@ export const ProductManagementFormList = () => {
             }
         });
     }
+    
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === product.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= product.length;
+    const isAllSelected = selectedItems.length === product.length && product.length > 0;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length < product.length;
 
     const filteredAndSortedData = useMemo(() => {
-    const filtered = product.filter(item => {
-      const matchesSearch =
-        item.name_vn.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
-       
+      const filtered = product.filter(item => {
+        // Fix lỗi logic tìm kiếm - thiếu || và thêm dấu chấm phẩy
+        const matchesSearch =
+          item.name_vn.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.name_short.toLowerCase().includes(searchTerm.toLowerCase());
+         
+        const matchesAlpha =
+          filterAlpha === 'all' ||
+          item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
+          item.name_vn.toLowerCase().startsWith(filterAlpha.toLowerCase());
+          
+        // Fix lỗi lọc theo trạng thái - so sánh chính xác
+        const matchesActive =
+          filterActive === 'all' ||
+          item.isActive === filterActive;
 
-      const matchesAlpha =
-        filterAlpha === 'all' ||
-        item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-        item.name_vn.toLowerCase().startsWith(filterAlpha.toLowerCase());
-
-      return matchesSearch && matchesAlpha;
-    });
-
-    // Sắp xếp theo field (nếu có)
-    if (sortBy && headCells.find(cell => cell.id === sortBy)?.sortable) {
-      filtered.sort((a, b) => {
-        const aValue = a[sortBy as keyof typeof a];
-        const bValue = b[sortBy as keyof typeof b];
-
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          const comparison = aValue.localeCompare(bValue, 'vi');
-          return sortOrder === 'asc' ? comparison : -comparison;
-        }
-
-        return 0;
+        return matchesSearch && matchesAlpha && matchesActive;
       });
-    }
 
-    return filtered;
-  }, [searchTerm, sortBy, sortOrder, product, filterAlpha]);
+      // Sắp xếp theo field (nếu có)
+      if (sortBy && headCells.find(cell => cell.id === sortBy)?.sortable) {
+        filtered.sort((a, b) => {
+          const aValue = a[sortBy as keyof typeof a];
+          const bValue = b[sortBy as keyof typeof b];
+
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            const comparison = aValue.localeCompare(bValue, 'vi');
+            return sortOrder === 'asc' ? comparison : -comparison;
+          }
+          
+          // Xử lý trường hợp number
+          if (typeof aValue === 'number' && typeof bValue === 'number') {
+            return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+          }
+
+          return 0;
+        });
+      }
+
+      return filtered;
+    }, [searchTerm, sortBy, sortOrder, product, filterAlpha, filterActive]);
 
    
 return (
@@ -222,11 +249,33 @@ return (
                 }}>
                 <InputLabel>Lọc theo chữ cái</InputLabel>
                 <Select
-                    label='Lọc theo cữ cái'
+                    value={filterAlpha}
+                    label='Lọc theo chữ cái'
+                    onChange={(e) => setFilterAlpha(e.target.value)}
                 >
-                    <MenuItem value='all' onClick={() => setFilterAlpha('all')}>Tất cả</MenuItem>
+                    <MenuItem value='all'>Tất cả</MenuItem>
                     {alphabet.map((letter) => (
-                      <MenuItem key={letter} onClick={() => setFilterAlpha(letter)}>{letter}</MenuItem>
+                      <MenuItem key={letter} value={letter}>{letter}</MenuItem>
+                    ))}
+                </Select>
+                </FormControl>
+            </Box>
+            <Box>
+                <FormControl fullWidth size='small' sx={{ 
+                '& .MuiInputLabel-root': { color: '#000' }, 
+                '& .MuiSelect-select': { color: '#000' }, 
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
+                width: '200px'
+                }}>
+                <InputLabel>Lọc theo trạng thái</InputLabel>
+                <Select
+                    value={filterActive}
+                    label='Lọc theo trạng thái'
+                    onChange={(e) => setFilterActive(e.target.value)}
+                >
+                    <MenuItem value='all'>Tất cả</MenuItem>
+                    {isActive.map((item) => (
+                      <MenuItem key={item._id} value={item._id}>{item.name}</MenuItem>
                     ))}
                 </Select>
                 </FormControl>
@@ -266,7 +315,8 @@ return (
                         'aria-label': 'select all desserts',
                         }}
                         checked={isAllSelected}
-                        onClick={handleAllCheckbox}
+                        indeterminate={isIndeterminate}
+                        onChange={handleAllCheckbox}
                     />
                 </TableCell>
 
@@ -303,8 +353,8 @@ return (
             <TableBody>
               {filteredAndSortedData.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
-                    {searchTerm ? 'Không tìm thấy sản phẩm nào' : 'Danh sách trống'}
+                  <TableCell colSpan={10} align='center' sx={{ py: 4 }}>
+                    {searchTerm || filterAlpha !== 'all' || filterActive !== 'all' ? 'Không tìm thấy sản phẩm nào' : 'Danh sách trống'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -339,28 +389,28 @@ return (
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                                                <Box
-                                                  sx={{
-                                                    position: 'relative',
-                                                    width: 50,
-                                                    height: 50,
-                                                    borderRadius: 1,
-                                                    overflow: 'hidden',
-                                                    backgroundColor: 'grey.200',
-                                                    flexShrink: 0
-                                                  }}
-                                                >
-                                                  <Image
-                                                    fill
-                                                    src={item.thumb? item.thumb.url : '/banner/banner-4.jpg'}
-                                                    alt={item.name_vn}
-                                                    style={{ objectFit: 'cover' }}
-                                                    onError={(e) => {
-                                                      e.currentTarget.style.display = 'none';
-                                                    }}
-                                                  />
-                                                </Box>
-                                            </TableCell>
+                        <Box
+                          sx={{
+                            position: 'relative',
+                            width: 50,
+                            height: 50,
+                            borderRadius: 1,
+                            overflow: 'hidden',
+                            backgroundColor: 'grey.200',
+                            flexShrink: 0
+                          }}
+                        >
+                          <Image
+                            fill
+                            src={item.thumb? item.thumb.url : '/banner/banner-4.jpg'}
+                            alt={item.name_vn}
+                            style={{ objectFit: 'cover' }}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </Box>
+                      </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
                           {item.name_short}
@@ -381,21 +431,19 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.specification}
+                          {specification.find((el) => el._id === item.specification)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.price_reference}
+                          {item.price_reference.toLocaleString()} VNĐ
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.isActive}
+                          {isActive.find(status => status._id === item.isActive)?.name || item.isActive}
                         </Typography>
                       </TableCell>
-                      
-                      
                       
                       <TableCell>
                         {/* Hành động */}
@@ -404,7 +452,9 @@ return (
                                 aria-label={`Sửa ${item.name_vn}`}
                                 size='small'
                             >
-                                <Edit/>
+                                <Link href={`/admin/product-management/edit/${item._id}`} style={{color: theme.palette.success.main}}>
+                                  <Edit/>
+                                </Link>
                             </IconButton>
                             <IconButton 
                                 onClick={() => handleDelete(item._id)} 

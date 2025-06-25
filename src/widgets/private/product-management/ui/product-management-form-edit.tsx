@@ -3,11 +3,11 @@
 
 import { getAllCategory } from "@/features/category/api/categoryApi";
 import { Category} from "@/features/category/type/categoryType";
-import { createProduct, updateDescriptionProduct } from "@/features/product/api/productApi";
+import { getProductById, updateDescriptionProduct, updateProduct } from "@/features/product/api/productApi";
 import ProductFormInput from "@/features/product/components/ProductFormInput";
 import { ProductInputImage } from "@/features/product/components/ProductInputImage";
 import { ProductInputTags } from "@/features/product/components/ProductInputTags";
-import { MarkdownEditorProps, ProductData, ProductManagementFormAddInfoProps, } from "@/features/product/type/productType";
+import { MarkdownEditorProps,  ProductData, ProductManagementFormEditInfoProps, } from "@/features/product/type/productType";
 import { getAllSpecification } from "@/features/specification/api/specificationApi";
 import { Specification } from "@/features/specification/type/specificationType";
 import { Button } from "@/shared/components";
@@ -18,9 +18,34 @@ import { useCallback, useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { Editor } from '@tinymce/tinymce-react';
 import { toast } from "react-toastify";
+import { useParams } from "next/navigation";
 
-const ProductManagementFormAddInfo = ({category, specification, preview, setPreview, handleAddProduct}: ProductManagementFormAddInfoProps) => {
-    const { register, setValue, handleSubmit, watch,  formState: { errors }, control} = useForm<ProductData>();
+const ProductManagementFormUpdateInfo = ({category, specification, preview, setPreview, handleAddProduct, id}: ProductManagementFormEditInfoProps) => {
+    const { register, setValue, handleSubmit, watch,  formState: { errors }, control, reset} = useForm<ProductData>();
+
+    useEffect(() => {
+        const fetchProduct = async () => {
+            if(!id) return;
+            const response = await getProductById(id);
+            if(response.success) {
+                reset({
+                    code: response.data.code || '',
+                    name_vn: response.data.name_vn || '',
+                    name_eng: response.data.name_eng || '',
+                    name_short: response.data.name_short || '',
+                    price_reference: response.data.price_reference || 0,
+                    category: response.data.category || '',
+                    specification: response.data.specification || '',
+                    origin: response.data.origin || '',
+                    isActive: response.data.isActive || '',
+                    tags: response.data.tags || [],
+                });
+                setPreview(response.data.thumb.url);
+            }
+        }
+        fetchProduct();
+        
+    },[id, reset, setPreview]);
     return (
          <form onSubmit={handleSubmit(handleAddProduct)}
                 style={{
@@ -251,11 +276,22 @@ const ProductManagementFormAddInfo = ({category, specification, preview, setPrev
 }
 
 
-const ProductManagementFormAddDescription = ({
+const ProductManagementFormUpdateDescription = ({
   value,
+  id,
   changeValue,
   handleUpdate,
 }: MarkdownEditorProps) => {
+    useEffect(() => {
+    const fetchProduct = async () => {
+        if (!id) return;
+        const response = await getProductById(id);
+        if (response.success && response.data?.description) {
+        changeValue(response.data.description); 
+        }
+    };
+    fetchProduct();
+    }, [id, changeValue]);
   return (
     <>
       <Editor
@@ -292,8 +328,9 @@ const ProductManagementFormAddDescription = ({
   );
 };
 
-export const ProductManagementFormAdd = () => {
-    const {reset} = useForm<ProductData>();
+export const ProductManagementFormEdit = () => {
+    const params = useParams();
+    const id = params.id as string;
     const theme = useTheme();
     const [payload, setPayload] = useState<{ description: string }>({
         description: '',
@@ -301,7 +338,6 @@ export const ProductManagementFormAdd = () => {
 
     const [category, setCategory] = useState<Category[] | []>([]);
     const [specification, setSpecification] = useState<Specification[] | []>([]);
-    const [productId, setProductId] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState<number>(0);
 
@@ -312,22 +348,20 @@ export const ProductManagementFormAdd = () => {
 
     // Hàm cập nhật bài viết mô tả
     const handleUpdate = async () => {
-        if (!productId) {
+        if (!id) {
             toast.error('Chưa có sản phẩm để cập nhật mô tả');
             return;
         }
 
         const response = await updateDescriptionProduct({
             description: payload.description,
-            id: productId,
+            id: id,
         });
 
         if (response.success) {
             toast.success(response.message);
-            setPayload({description: ''});
         } else {
             toast.error(response.message);
-            setPayload({description: ''});
         }
     };
 
@@ -347,12 +381,8 @@ export const ProductManagementFormAdd = () => {
         fetchSpecification();
     }, []);
 
-    useEffect(() => {
-        console.log('productId:', productId);
-    }, [productId]);
-
     // Hàm thêm sản phẩm
-    const handleAddProduct = async (data: ProductData) => {
+    const handleUpdateProduct = async (data: ProductData) => {
         try {
             const formData = new FormData();
             formData.append("name_vn", data.name_vn);
@@ -368,8 +398,11 @@ export const ProductManagementFormAdd = () => {
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]);
             }
+            for (const [key, value] of formData.entries()) {
+                console.log(`${key}:`, value);
+            }
 
-            const response = await createProduct(formData);
+            const response = await updateProduct(formData, id);
             if (!response.success) {
                 toast.error(response.message);
                 return;
@@ -377,12 +410,9 @@ export const ProductManagementFormAdd = () => {
 
             toast.success(response.message);
             setPreview(null);
-            reset();
-            setProductId(response.data._id);
         } catch (error: unknown) {
             toast.error(`Lỗi: ${error}`);
             setPreview(null);
-            reset();
         }
     };
 
@@ -395,20 +425,22 @@ export const ProductManagementFormAdd = () => {
         switch (tabIndex) {
             case 0:
                 return (
-                    <ProductManagementFormAddInfo
+                    <ProductManagementFormUpdateInfo
                         category={category}
                         specification={specification}
                         preview={preview}
                         setPreview={setPreview}
-                        handleAddProduct={handleAddProduct}
+                        handleAddProduct={handleUpdateProduct}
+                        id={id}
                     />
                 );
             case 1:
                 return (
-                    <ProductManagementFormAddDescription
+                    <ProductManagementFormUpdateDescription
                         value={payload.description}
                         changeValue={changeValue}
                         handleUpdate={handleUpdate}
+                        id={id}
                     />
                 );
             default:
@@ -420,7 +452,7 @@ export const ProductManagementFormAdd = () => {
         <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
             <Box sx={{ py: 2 }}>
                 <Typography variant='h6' sx={{ color: theme.palette.primary.main }}>
-                    Quản lý sản phẩm
+                    Cập nhật sản phẩm
                 </Typography>
 
                 <Tabs

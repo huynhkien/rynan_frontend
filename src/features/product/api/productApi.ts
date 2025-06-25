@@ -15,12 +15,37 @@ export const updateProduct = async (data: FormData, id: string): Promise<Product
     withCredentials: true,
 });
 // Cập nhật bai viet
-// ✅ Thay đổi định nghĩa
 export const updateDescriptionProduct = async ({description, id}: {description: string; id: string;}): Promise<ProductResponse> =>
   axiosInstance.put(ProductEndpoints.UPDATE_DESCRIPTION(id), { description }, {
     withCredentials: true,
   });
-
+// Thêm giá tiền
+export const addPriceProduct = async ({prices, id}: {prices: {
+        priceType: string;
+        price: number;
+        startDate: Date;
+        endDate: Date;
+        note?: string;
+    }; id: string;}): Promise<ProductResponse> =>
+  axiosInstance.put(ProductEndpoints.ADD_PRICE(id), { prices }, {
+    withCredentials: true,
+  });
+// Cập nhật giá tiền
+export const updatePriceProduct = async ({prices, id, rid}: {prices: {
+        priceType: string;
+        price: number;
+        startDate: Date;
+        endDate: Date;
+        note?: string;
+    }; id: string; rid: string}): Promise<ProductResponse> =>
+  axiosInstance.put(ProductEndpoints.UPDATE_PRICE_PRODUCT(id, rid), { prices }, {
+    withCredentials: true,
+  });
+// Xóa giá tiền
+export const deletePriceProduct = async ({id, rid}: {id: string; rid: string}): Promise<ProductResponse> =>
+  axiosInstance.delete(ProductEndpoints.DELETE_PRICE_PRODUCT(id, rid), {
+    withCredentials: true,
+  });
 // Hiển thị tất cả bai viet
 export const getAllProduct = async(): Promise<ProductResponse> => 
     axiosInstance.get(ProductEndpoints.GET_ALL);

@@ -9,6 +9,10 @@ export interface UpdateProduct{
     isUpdateProduct: string | null,
     render: () => void
 }
+export interface UpdatePriceProduct{
+    isUpdatePriceProduct: string | null,
+    render: () => void
+}
 interface ProductThumb{
     url: string;
     public_id?: string;
@@ -35,7 +39,9 @@ export interface Product {
     isActive: string;
     updatedAt: string;
     createdAt: string;
+    prices: PriceProduct[];
 }
+
 export interface ProductData extends Record<string, unknown> {
     name_vn: string;
     name_eng: string;
@@ -50,8 +56,29 @@ export interface ProductData extends Record<string, unknown> {
     price_reference: number;
     specification: string;
     origin: string;
+    
 }
-
+export interface ProductPrice extends Record<string, unknown> {
+    productId?: string;
+    priceType: string;
+    price: number;                       
+    startDate: Date;                   
+    endDate: Date;                     
+    note: string;                  
+}
+export interface PriceProduct {
+    _id: string;
+    priceType: string;
+    price: number;                       
+    startDate: Date;                   
+    endDate: Date;                     
+    note: string;
+}
+export interface ProductPriceData {
+    id: string,
+    prices: PriceProduct[];
+    render: () => void;
+}
 export interface ProductResponse{
     success: boolean, 
     message?: string,
@@ -76,6 +103,7 @@ export interface ProductTagsInputProps {
 }
 
 export type ProductFormInputProps = FormInputProps<ProductData>;
+export type ProductPriceInputProps = FormInputProps<ProductPrice>;
 export type ProductImageInputProps = InputImageProps<ProductData>;
 
 

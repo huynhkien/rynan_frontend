@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore, AttachMoney, Inventory, ManageAccounts } from '@mui/icons-material';
+import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -34,7 +34,6 @@ const menuItems: MenuItem[] = [
     icon: <Store />, 
     path: '/',
     subItems: [
-      { text: 'Quản lý giá', icon: <AttachMoney />, path: '/product/pricing' },
       { text: 'Quy cách đóng gói', icon: <Inventory />, path: '/admin/product-management/specification' },
       { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
     ]

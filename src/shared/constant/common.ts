@@ -74,3 +74,38 @@ export const isActive = [{
     _id: 'Ngừng bán',
     name: 'Ngừng bán'
 }]
+// Các loại giá của một sản phẩm
+export const PriceType = [
+    {
+        _id: 'dealerPrice',
+        name: 'Giá đại lý'
+    },
+    {
+        _id: 'storePrice',
+        name: 'Giá cửa hàng'
+    },
+    {
+        _id: 'retailPrice',
+        name: 'Giá bán lẻ'
+    },
+    {
+        _id: 'promotionPrice',
+        name: 'Giá khuyến mãi'
+    },
+    {
+        _id: 'internalPrice',
+        name: 'Giá nội bộ'
+    },
+    {
+        _id: 'listedPrice',
+        name: 'Giá niêm yết'
+    },
+    {
+        _id: 'offeringPrice',
+        name: 'Giá chào bán'
+    },
+    {
+        _id: 'referencePrice',
+        name: 'Giá lẽ tham khảo'
+    },
+]

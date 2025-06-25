@@ -23,8 +23,8 @@ export const updateDescriptionProduct = async ({description, id}: {description: 
 export const addPriceProduct = async ({prices, id}: {prices: {
         priceType: string;
         price: number;
-        startDate: Date;
-        endDate: Date;
+        startDate: Date | string;
+        endDate: Date | string;
         note?: string;
     }; id: string;}): Promise<ProductResponse> =>
   axiosInstance.put(ProductEndpoints.ADD_PRICE(id), { prices }, {
@@ -34,8 +34,8 @@ export const addPriceProduct = async ({prices, id}: {prices: {
 export const updatePriceProduct = async ({prices, id, rid}: {prices: {
         priceType: string;
         price: number;
-        startDate: Date;
-        endDate: Date;
+        startDate: Date | string;
+        endDate: Date | string;
         note?: string;
     }; id: string; rid: string}): Promise<ProductResponse> =>
   axiosInstance.put(ProductEndpoints.UPDATE_PRICE_PRODUCT(id, rid), { prices }, {

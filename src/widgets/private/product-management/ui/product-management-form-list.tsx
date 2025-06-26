@@ -39,7 +39,6 @@ const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
   { id: 'thumb', label: 'Ảnh', sortable: true },
-  { id: 'name_short', label: 'Tên ngắn', sortable: true },
   { id: 'tags', label: 'Tags', sortable: true },
   { id: 'specification', label: 'Quy cách đóng gói', sortable: true },
   { id: 'price_reference', label: 'Giá tham khảo', sortable: true },
@@ -438,11 +437,6 @@ return (
                             }}
                           />
                         </Box>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.name_short}
-                        </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Box sx={{ mb: 1, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ProductDetailTabDescription } from './product-detail-tab-description';
 import { ProductDetailTabRating } from './product-detail-tab-rating';
 
-export const ProductDetailTab = () => {
+export const ProductDetailTab = ({slug}: {slug: string}) => {
     const theme = useTheme();
     const [tabIndex, setTabIndex] = useState<number>(0); 
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -18,11 +18,11 @@ export const ProductDetailTab = () => {
     const getInfoTab = () => {
         switch(tabIndex) {
             case 0:
-                return <ProductDetailTabDescription/>;
+                return <ProductDetailTabDescription slug={slug}/>;
             case 1: 
                 return <ProductDetailTabRating/>;
             default:
-                return <ProductDetailTabDescription/>;
+                return <ProductDetailTabDescription slug={slug}/>;
         }
     }
 

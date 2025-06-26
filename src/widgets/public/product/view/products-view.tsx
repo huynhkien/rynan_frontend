@@ -6,15 +6,25 @@ import ProductCard from "../ui/product-card"
 import { ProductFilterCategory } from "../ui/product-filter-category"
 import { ProductFilterRating } from "../ui/product-filter-rating"
 import { ProductSort } from "../ui/product-sort"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Pagination } from "@/shared/components/ui/public/Pagination"
 import { ProductSortOption } from "@/shared/constant/common"
+import { getAllProduct } from "@/features/product/api/productApi"
+import { Product } from "@/features/product/type/productType"
 
 export const ProductsView = () => {
     const [sort, setSort] = useState('');
+    const [product, setProduct] = useState<Product[] | []>([]);
+    const fetchProduct = async() => {
+        const response = await getAllProduct();
+        if(response.success) setProduct(response.data || []);
+    }
+    useEffect(() => {
+        fetchProduct();
+    })
     const handleSortChange = useCallback((value: string | number) => {
-    setSort(value.toString()); 
-  }, []);
+        setSort(value.toString()); 
+    }, []);
     return (
         <>
             <Banner
@@ -63,8 +73,8 @@ export const ProductsView = () => {
                         flexWrap: 'wrap',
                         gap: 9,
                         }}>
-                            {Array(12).fill(0).map((_, index) => (
-                                <ProductCard key={index} />
+                            {product.map((item, index) => (
+                                <ProductCard data={item} key={index}  />
                             ))}
                     </Box>
                     <Box

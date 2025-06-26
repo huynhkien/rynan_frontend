@@ -1,25 +1,55 @@
 'use client';
+import { getCategory } from '@/features/category/store/asyncActions';
+import { GetProductBySlug } from '@/features/product/api/productApi';
+import { Product } from '@/features/product/type/productType';
+import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { Specification } from '@/features/specification/type/specificationType';
 import { Button } from '@/shared/components';
 import { Quantity } from '@/shared/components/ui/public/Quantity';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 
-export const ProductDetailInfo = () => {
+export const ProductDetailInfo = ({slug}: {slug: string}) => {
     const theme = useTheme();
-    const images = [
-        '/banner/banner-1.jpg',
-        '/banner/banner-2.jpg',
-        '/banner/banner-3.jpg',
-    ];
-
-    const [selectedImage, setSelectedImage] = useState<string>(images[0]);
+    const dispatch = useAppDispatch();
+    const [productSlug, setProductSlug] = useState<Product | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string>('');
     const [quantity, setQuantity] = useState<number | string>(1);
+    const [specification, setSpecification] = useState<Specification[] | []>([]);
+    const {categories} = useAppSelector((state) => state.category);
+    
+    const fetchSpecification = async() => {
+        const response = await getAllSpecification();
+        if(response.success) setSpecification(response.data || []);
+    }
+    useEffect(() => {
+        fetchSpecification();
+    },[]);
+    useEffect(() => {
+        dispatch(getCategory());
+    }, [dispatch]);
     // Xử lý khi phóng to ảnh
     const [showZoom, setShowZoom] = useState<boolean>(false);
     const [zoomPosition, setZoomPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
     const imageRef = useRef<HTMLDivElement>(null);
+
+    //  Hiển thị thông tin sản phẩm
+    useEffect(() => {
+        const fetchProductBySlug = async() => {
+            const response = await GetProductBySlug(slug);
+            if(response.success) {
+                setProductSlug(response.data);
+                // Set ảnh mặc định khi load được data
+                if(response.data?.thumb?.url) {
+                    setSelectedImage(response.data.thumb.url);
+                }
+            }
+        }
+        fetchProductBySlug();
+    },[slug]);
 
     const handleQuantity = useCallback((value: string) => {
         if (value === '') {
@@ -78,6 +108,19 @@ export const ProductDetailInfo = () => {
         setShowZoom(false);
     };
 
+    const handleImageSelect = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+    };
+
+    // Kiểm tra nếu chưa có data thì không render
+    if (!productSlug) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+                <Typography>Đang tải...</Typography>
+            </Box>
+        );
+    }
+
     return (
         <Box
             sx={{
@@ -104,17 +147,20 @@ export const ProductDetailInfo = () => {
                         onMouseEnter={handleMouseEnter}
                         onMouseLeave={handleMouseLeave}
                     >
-                        <Image
-                            src={selectedImage}
-                            fill
-                            alt='VETAMATE 210'
-                            style={{ objectFit: 'cover' }}
-                        />
+                        {selectedImage && (
+                            <Image
+                                src={selectedImage}
+                                fill
+                                alt={productSlug.name_vn || 'Product image'}
+                                style={{  }}
+                                priority
+                            />
+                        )}
                     </Box>
                 </Card>
 
                 {/* Ô phóng to */}
-                {showZoom && (
+                {showZoom && selectedImage && (
                     <Box
                         sx={{
                             position: 'absolute',
@@ -146,24 +192,24 @@ export const ProductDetailInfo = () => {
                 )}
 
                 {/* Danh sách ảnh nhỏ */}
-                <Box sx={{ display: 'flex', mt: 2, gap: 1 }}>
-                    {images.map((img, index) => (
+                <Box sx={{ display: 'flex', mt: 2, gap: 1, flexWrap: 'wrap' }}>
+                    {/* Ảnh chính */}
+                    {productSlug.thumb?.url && (
                         <Card
-                            key={index}
                             sx={{
                                 width: 100, 
-                                border: selectedImage === img ? 
+                                border: selectedImage === productSlug.thumb.url ? 
                                     `2px solid ${theme.palette.primary.dark}` : 
                                     `1px solid ${theme.palette.text.secondary}`,
                                 cursor: 'pointer',
-                                opacity: selectedImage === img ? 1 : 0.7,
+                                opacity: selectedImage === productSlug.thumb.url ? 1 : 0.7,
                                 transition: 'all 0.2s ease',
                                 '&:hover': {
                                     opacity: 1,
                                     transform: 'translateY(-2px)'
                                 }
                             }}
-                            onClick={() => setSelectedImage(img)}
+                            onClick={() => handleImageSelect(productSlug.thumb.url)}
                         >
                             <Box
                                 sx={{
@@ -173,10 +219,48 @@ export const ProductDetailInfo = () => {
                                 }}
                             >
                                 <Image
-                                    src={img}
+                                    src={productSlug.thumb.url}
                                     fill
-                                    alt={`Thumbnail ${index + 1}`}
+                                    alt={`${productSlug.name_vn} thumbnail`}
                                     style={{ objectFit: 'cover' }}
+                                    sizes="100px"
+                                />
+                            </Box>
+                        </Card>
+                    )}
+                    
+                    {/* Các ảnh phụ (nếu có) */}
+                    {productSlug?.images && productSlug?.images.map((image, index) => (
+                        <Card
+                            key={index}
+                            sx={{
+                                width: 100, 
+                                border: selectedImage === image.url ? 
+                                    `2px solid ${theme.palette.primary.dark}` : 
+                                    `1px solid ${theme.palette.text.secondary}`,
+                                cursor: 'pointer',
+                                opacity: selectedImage === image.url ? 1 : 0.7,
+                                transition: 'all 0.2s ease',
+                                '&:hover': {
+                                    opacity: 1,
+                                    transform: 'translateY(-2px)'
+                                }
+                            }}
+                            onClick={() => handleImageSelect(image.url)}
+                        >
+                            <Box
+                                sx={{
+                                    position: 'relative',
+                                    width: '100%',
+                                    aspectRatio: '5 / 4',
+                                }}
+                            >
+                                <Image
+                                    src={image.url}
+                                    fill
+                                    alt={`${productSlug.name_vn} image ${index + 1}`}
+                                    style={{ objectFit: 'cover' }}
+                                    sizes="100px"
                                 />
                             </Box>
                         </Card>
@@ -197,7 +281,7 @@ export const ProductDetailInfo = () => {
                         fontWeight: theme.typography.fontWeightBold
                     }}
                 >
-                    RYNAN® VETAMATE 140 NPK 27-08-08+TE (1% HUMIC) - Hũ 1.25kg
+                    {productSlug.name_vn}
                 </Typography>
 
                 <Box 
@@ -234,7 +318,7 @@ export const ProductDetailInfo = () => {
                         color: theme.palette.error.main,
                         fontWeight: 'bold'
                     }}>
-                        85.000 VNĐ
+                        {productSlug.price_reference?.toLocaleString()} VNĐ
                     </Typography>
                 </Box>
                 <Box sx={{py: 0.5}}>
@@ -244,7 +328,7 @@ export const ProductDetailInfo = () => {
                     <Typography
                         sx={{
                             backgroundColor: theme.palette.primary.light,
-                            width: '25%',
+                            width: '35%',
                             textAlign: 'center',
                             p: 1,
                             mt: 0.5,
@@ -253,7 +337,7 @@ export const ProductDetailInfo = () => {
                             fontWeight: theme.typography.fontWeightMedium
                         }}
                     >
-                        V39VLE03002 1.25 Kg
+                        {productSlug.code} {specification.find(el => el._id === productSlug.specification)?.name}
                     </Typography>
                 </Box>
 
@@ -270,11 +354,11 @@ export const ProductDetailInfo = () => {
                 <Box sx={{ display: 'flex', gap: 2, mt: 3, width: '100%' }}>
                     <Button
                         name='Mua ngay'
-                        handleOnClick={handleAddToCart}
+                        handleOnClick={handleBuyNow}
                     />
                     <Button
                         name='Thêm vào giỏ hàng'
-                        handleOnClick={handleBuyNow}
+                        handleOnClick={handleAddToCart}
                     />
                 </Box>
                 <Box sx={{ mt: 3 }}>
@@ -320,7 +404,7 @@ export const ProductDetailInfo = () => {
                                     fontWeight: theme.typography.fontWeightMedium,
                                     color: theme.palette.text.secondary
                                 }}>
-                                    Phân bón dùng cho rau cải
+                                    {categories.find(el => el._id ===productSlug.category)?.name}
                                 </Typography>
                             </Box>
                         </Box>
@@ -351,7 +435,7 @@ export const ProductDetailInfo = () => {
                                     fontWeight: theme.typography.fontWeightMedium,
                                     color: theme.palette.text.secondary,
                                 }}>
-                                    RSA00123
+                                    {productSlug.code}
                                 </Typography>
                             </Box>
                         </Box>

@@ -1,19 +1,28 @@
 'use client'
 import { Card, CardContent, Typography, Box, IconButton, Chip, useTheme } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { ProductCardData } from '@/features/product/type/productType';
+import Link from 'next/link';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { getCategory } from '@/features/category/store/asyncActions';
 
 
-const ProductCard = () => {
+const ProductCard = ({ data }: { data: ProductCardData }) => {
   const router = useRouter();
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
+  const dispatch = useAppDispatch();
+  const {categories} = useAppSelector((state) => state.category);
+  useEffect(() => {
+        dispatch(getCategory());
+    }, [dispatch]);
   const handleProduct = () => {
-    router.push('/products/aaaa')
+    router.push(`/product/${data.slug}`)
   }
   return (
     <Card
@@ -40,8 +49,8 @@ const ProductCard = () => {
         >
           <Image
             fill
-            src='/product/NPK 22-10-10+TE_800x600_XcD0ucElDl.png'
-            alt='VETAMATE 210'/>
+            src={data.thumb.url}
+            alt={data.name_vn}/>
         </Box>
         {/* Giá */}
         <Box
@@ -58,7 +67,7 @@ const ProductCard = () => {
             color: theme.palette.primary.main 
           }}
         >
-          100.000 VNĐ
+          {data.price_reference.toLocaleString()} VNĐ
         </Box>
 
         {/* Icon */}
@@ -75,8 +84,6 @@ const ProductCard = () => {
           }}
         >
           <IconButton 
-            component='a' 
-            href='/' 
             sx={{ 
               boxShadow: 5,
               '&:hover': { 
@@ -87,25 +94,24 @@ const ProductCard = () => {
           >
             <FavoriteIcon sx={{ color: theme.palette.primary.light, fontSize: theme.typography.fontSize }} />
           </IconButton>
-          
+          <Link href={`/products/${data.slug}`}>
+            <IconButton 
+              sx={{ 
+                boxShadow: 5,
+                '&:hover': { 
+                  backgroundColor: 'white',
+                  transform: 'scale(1.1)'
+                },
+                transition: 'all 0.2s ease',
+                transitionDelay: '0.05s'
+              }}
+            >
+            
+                  <VisibilityIcon sx={{ color: theme.palette.primary.light,  fontSize: theme.typography.fontSize }} />
+            </IconButton>
+          </Link>
+
           <IconButton 
-            component='a' 
-            href='/products/aaa' 
-            sx={{ 
-              boxShadow: 5,
-              '&:hover': { 
-                backgroundColor: 'white',
-                transform: 'scale(1.1)'
-              },
-              transition: 'all 0.2s ease',
-              transitionDelay: '0.05s'
-            }}
-          >
-            <VisibilityIcon sx={{ color: theme.palette.primary.light,  fontSize: theme.typography.fontSize }} />
-          </IconButton>
-          <IconButton 
-            component='a' 
-            href='/' 
             sx={{ 
               boxShadow: 5,
               '&:hover': { 
@@ -144,15 +150,16 @@ const ProductCard = () => {
             fontSize: {xs: '14px' , md: theme.typography.body1.fontSize},
           }}
         >
-          RYNAN® FLOWERMATE 210 - Hũ 150g
+          {data.name_vn}
         </Typography>
         
         <Typography 
           sx={{
             fontSize: {xs: '12px' , md: theme.typography.body1.fontSize},
+            my:1
           }}
         >
-          Phân bón dùng cho lan hồ điệp giai đoạn phân hóa mầm
+          {categories.find((el) => el._id === data.category)?.name}
         </Typography>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt:1 }}>
           <Chip 

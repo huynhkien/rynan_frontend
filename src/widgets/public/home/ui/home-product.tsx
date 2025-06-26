@@ -1,11 +1,22 @@
 'use client'
+import { getAllProduct } from "@/features/product/api/productApi";
+import { Product } from "@/features/product/type/productType";
 import ProductCard from "@/widgets/public/product/ui/product-card";
 import { Box, Container, Tab, Tabs, Typography, useTheme } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export const HomeProduct = () => {
     const theme = useTheme();
     const [tabIndex, setTabIndex] = useState(0);
+    const [product, setProduct] = useState<Product[] | []>([]);
+
+    const fetchProduct = async() => {
+        const response = await getAllProduct();
+        if(response.success) setProduct(response.data || []);
+    }
+    useEffect(() => {
+        fetchProduct();
+    })
 
     return (
         <Container sx={{color: theme.palette.text.primary, pb:7}}>
@@ -34,8 +45,8 @@ export const HomeProduct = () => {
                 <Tab label="Mua Nhiều" sx={{color: theme.palette.text.primary}} />
             </Tabs>
             <Box sx={{ mt: 5, display: "flex", flexWrap: "wrap", justifyContent: { xs: "center", md: "flex-start" }, gap: 5.5 }}>
-                {Array.from({ length: 12 }).map((_, index) => (
-                <ProductCard key={index} />
+                {product.map((item, index) => (
+                    <ProductCard data={item} key={index}  />
                 ))}
             </Box>
         </Container>

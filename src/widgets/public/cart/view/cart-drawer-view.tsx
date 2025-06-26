@@ -3,66 +3,20 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { Typography, useTheme, IconButton } from '@mui/material';
-import { Close } from '@mui/icons-material';
+import { Close, Delete } from '@mui/icons-material';
 import Image from 'next/image';
 import { CartDrawerProps } from '@/types/widgets/cart';
 import { Button } from '@/shared/components';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { removeItemCart } from '@/features/user/store/userSlice';
+import { toast } from 'react-toastify';
 
 export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const theme = useTheme();
     const router = useRouter();
-    const orders = [
-    {
-      id: 1,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón A',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 2,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón B',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 3, 
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón C',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 4,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón D',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 5,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón E',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 6, 
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón F',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    }
-  ];
-
+    const dispatch = useAppDispatch();
+    const {cart} = useAppSelector((state) => state.user);
     const handleClose = () => {
         setOpen(false);
     };
@@ -72,9 +26,16 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const handleCart = () => {
       router.push('/cart')
     }
+    // Xóa sản phẩm trong giỏ hàng
+    const handleDeleteCart = async(id: string) => {
+      dispatch(removeItemCart({
+        pid: id
+      }))
+      toast.success('Xóa thành công sản phẩm khỏi giỏ hàng')
+    }
 
     const DrawerList = (
-        <Box sx={{ width: 450, height: '100%' }} role='presentation' position='relative'>
+        <Box sx={{ width: 500, height: '100%' }} role='presentation' position='relative'>
             {/* Header với nút đóng */}
             <Box sx={{ 
                 display: 'flex', 
@@ -112,7 +73,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                 }
               }}
             >
-              {orders.map((order, index) => (
+              {cart.map((item, index) => (
                 <Box
                   key={index} 
                   sx={{
@@ -146,8 +107,8 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                     >
                       <Image
                         fill
-                        src={order.image}
-                        alt={order.name}
+                        src={item.thumb || ''}
+                        alt={item.name || ''}
                         style={{ objectFit: 'cover' }}
                       />
                     </Box>
@@ -157,10 +118,14 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                         variant='body1'
                         sx={{
                           fontWeight: theme.typography.fontWeightMedium,
-                          mb: 0.5
+                          mb: 0.5,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '200px'
                         }}
                         >
-                        {order.name}
+                        {item.name}
                         </Typography>
                         <Typography
                         variant='body1'
@@ -168,7 +133,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                           mb: 0.5
                         }}
                         >
-                        x {order.quantity}
+                        x {item.quantity}
                         </Typography>
                       </Box>
                       <Typography
@@ -177,8 +142,13 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                           color: theme.palette.text.secondary,
                         }}
                       >
-                        {order.quantity} x {order.price.toLocaleString()} VNĐ
+                        {item.quantity} x {(item.price || 0).toLocaleString()} VNĐ
                       </Typography>
+                      <Box>
+                        <IconButton onClick={() => handleDeleteCart(item.pid || '')}>
+                          <Delete color='error'/>
+                        </IconButton>
+                      </Box>
                     </Box>
                   </Box>
                   <Typography
@@ -188,7 +158,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                       color: theme.palette.primary.main
                     }}
                   >
-                    {order.total.toLocaleString()} VNĐ
+                    {((item.price || 0) * item.quantity).toLocaleString()} VNĐ
                   </Typography>
                 </Box>
               ))}
@@ -207,7 +177,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                         fontWeight: theme.typography.fontWeightBold,
                         color: theme.palette.primary.main 
                     }}>
-                        {orders.reduce((sum, order) => sum + order.total, 0).toLocaleString()} VNĐ
+                        {cart.reduce((sum, cart) => sum + ((cart.price || 0)*cart.quantity), 0).toLocaleString()} VNĐ
                     </Typography>
                 </Box>
                 
@@ -244,7 +214,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
             sx={{
                 '& .MuiDrawer-paper': {
                     boxSizing: 'border-box',
-                    width: 450,
+                    width: 500,
                     height: '100%'
                 }
             }}

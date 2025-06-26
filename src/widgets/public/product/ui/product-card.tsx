@@ -6,13 +6,15 @@ import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ProductCardData } from '@/features/product/type/productType';
+import { Product} from '@/features/product/type/productType';
 import Link from 'next/link';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { getCategory } from '@/features/category/store/asyncActions';
+import { addToCart } from '@/features/user/store/userSlice';
+import { toast } from 'react-toastify';
 
 
-const ProductCard = ({ data }: { data: ProductCardData }) => {
+const ProductCard = ({ data }: { data: Product }) => {
   const router = useRouter();
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
@@ -23,6 +25,17 @@ const ProductCard = ({ data }: { data: ProductCardData }) => {
     }, [dispatch]);
   const handleProduct = () => {
     router.push(`/products/${data.slug}`)
+  }
+  // Xử lý thêm sản phẩm vào giỏ hàng
+  const handleAddCart = async () => {
+    dispatch(addToCart({
+      pid: data._id,
+      price: data.price_reference,
+      quantity: 1,
+      thumb: data.thumb.url,
+      name: data.name_vn
+    }))
+    toast.success('Thêm thành công sản phẩm vào giỏ hàng');
   }
   return (
     <Card
@@ -112,6 +125,7 @@ const ProductCard = ({ data }: { data: ProductCardData }) => {
           </Link>
 
           <IconButton 
+            onClick={handleAddCart}
             sx={{ 
               boxShadow: 5,
               '&:hover': { 

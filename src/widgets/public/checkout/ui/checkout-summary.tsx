@@ -1,64 +1,15 @@
 'use client'
 
 import { Button } from '@/shared/components'
+import { useAppSelector } from '@/shared/hooks/useAppHook'
 import { Box, Typography, useTheme } from '@mui/material'
 import Image from 'next/image'
 
 export const CheckoutSummary = () => {
   const theme = useTheme()
-  
-  const orders = [
-    {
-      id: 1,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón A',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 2,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón B',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 3, 
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón C',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 4,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón D',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 5,
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón E',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    },
-    {
-      id: 6, 
-      image: '/banner/banner-5.jpg',
-      name: 'Phân bón F',
-      quantity: 1,
-      price: 100000,
-      total: 100000
-    }
-  ]
+  const { cart } = useAppSelector((state) => state.user);
 
-  const totalAmount = orders.reduce((sum, order) => sum + order.total, 0)
+  const totalAmount = cart.reduce((sum, item) => sum + (item.price || 0) * item.quantity, 0);
 
   return (
     <Box sx={{ overflow: 'hidden' }}>
@@ -105,7 +56,7 @@ export const CheckoutSummary = () => {
             }
           }}
         >
-          {orders.map((order, index) => (
+          {cart.map((item, index) => (
             <Box
               key={index} 
               sx={{
@@ -136,8 +87,8 @@ export const CheckoutSummary = () => {
                 >
                   <Image
                     fill
-                    src={order.image}
-                    alt={order.name}
+                    src={item.thumb || ''}
+                    alt={item.name || ''}
                     style={{ objectFit: 'cover' }}
                   />
                 </Box>
@@ -145,10 +96,14 @@ export const CheckoutSummary = () => {
                   variant="body1"
                   sx={{
                     fontWeight: theme.typography.fontWeightMedium,
-                    mx: 1
+                    mx: 1,
+                    whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          maxWidth: '200px'
                   }}
                 >
-                  {order.name}
+                  {item.name || ''}
                 </Typography>
                 <Typography
                   sx={{
@@ -156,7 +111,7 @@ export const CheckoutSummary = () => {
                     mx: 3
                   }}
                 >
-                  {order.quantity} x {order.price.toLocaleString()} VNĐ
+                  {item.quantity} x {(item.price || 0).toLocaleString()} VNĐ
                 </Typography>
               </Box>
               <Typography
@@ -166,7 +121,7 @@ export const CheckoutSummary = () => {
                   color: theme.palette.primary.main
                 }}
               >
-                {order.total.toLocaleString()} VNĐ
+                {(item.quantity * (item.price || 0)).toLocaleString()} VNĐ
               </Typography>
             </Box>
           ))}

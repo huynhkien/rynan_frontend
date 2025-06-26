@@ -1,16 +1,24 @@
 'use client'
-import { InvalidFieldProps } from "@/types/widgets/contact";
-import { LoginFormProps } from "@/types/widgets/login";
-import {  Lock, Email, Person, Phone, Password } from "@mui/icons-material";
-import { Box, Container, Typography, useTheme, Divider} from "@mui/material"
-import { useState } from "react";
+import { InvalidFieldProps } from '@/types/widgets/contact';
+import { LoginFormProps } from '@/types/widgets/login';
+import {  Lock, Email, Person, Phone, Password } from '@mui/icons-material';
+import { Box, Container, Typography, useTheme, Divider} from '@mui/material'
+import { useCallback, useState } from 'react';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-import {  Button } from "@/shared/components";
-import Link from "next/link";
-import { BaseInput } from "@/shared/components/ui/public/BaseInput";
+import {  Button } from '@/shared/components';
+import Link from 'next/link';
+import Swal from 'sweetalert2';
+import { BaseInput } from '@/shared/components/ui/public/BaseInput';
+import { validateFormLoginAndRegister } from '@/shared/validation/form';
+import { loginUser,  registerUser } from '@/features/user/api/userApis';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { useRouter } from 'next/navigation';
+import { login } from '@/features/user/store/userSlice';
 
 export const LoginForm = () => {
     const theme = useTheme();
+    const router = useRouter();
+    const dispatch = useAppDispatch();
     const [payload, setPayload] = useState<LoginFormProps>({
         email: '',
         name: '',
@@ -18,8 +26,52 @@ export const LoginForm = () => {
         password: '',
         confirmPassword: ''
     });
+    const resetPayload = () => {
+        setPayload({
+            email:'',
+            name: '',
+            phone: '',
+            password: '',
+            confirmPassword: ''
+        })
+    }
     const [isRegister, setIsRegister] = useState(false);
     const [invalidFields, setInValidFields] = useState<InvalidFieldProps[]>([])
+    const handleRegisterAndLogin = useCallback(async() => {
+        const invalids = validateFormLoginAndRegister(payload, isRegister, setInValidFields);
+        if(invalids.length > 0) return;
+        try{
+            if(isRegister){
+                const response = await registerUser(payload);
+                if(response.success) {
+                    Swal.fire('Chúc mừng', response.message, 'success').then(() => {
+                        setIsRegister(false);
+                        resetPayload();
+                    });
+                }else{
+                    Swal.fire('Thất bại', response.message, 'error').then(() => {
+                        resetPayload();
+                    });
+                }
+            }else{
+                const response = await loginUser({email: payload.email, password: payload.password});
+                if(response.success) {
+                    dispatch(login({ isLogin: true, token: response.accessToken || '', userData: response.data }));
+                    if(response.data.role === '2006'){
+                        router.push('/admin');
+                    }else{
+                        router.push('/login')
+                    }
+                    resetPayload();
+                }
+            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            Swal.fire('Thất bại', errorMessage, 'error');
+            // resetPayload();
+        }
+        setTimeout(() => setInValidFields([]), 3000);
+    }, [isRegister, payload, router, dispatch]);
     
     return (
         <Container
@@ -86,9 +138,9 @@ export const LoginForm = () => {
                         <BaseInput
                             iconClass={<Person sx={{ color: theme.palette.primary.main }} />}
                             value={payload.name || ''}
-                            setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
-                            nameKey="email"
-                            placeholder="Nhập tên của bạn"
+                            setValue={(value) => setPayload((prev) => ({ ...prev, name: value }))}
+                            nameKey='name'
+                            placeholder='Nhập tên của bạn'
                             invalidFields={invalidFields}
                             setInValidFields={setInValidFields}
                         />
@@ -97,8 +149,8 @@ export const LoginForm = () => {
                         iconClass={<Email sx={{ color: theme.palette.primary.main }} />}
                         value={payload.email || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
-                        nameKey="email"
-                        placeholder="Nhập email của bạn"
+                        nameKey='email'
+                        placeholder='Nhập email của bạn'
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     />
@@ -106,9 +158,9 @@ export const LoginForm = () => {
                         <BaseInput
                             iconClass={<Phone sx={{ color: theme.palette.primary.main }} />}
                             value={payload.phone || ''}
-                            setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
-                            nameKey="phone"
-                            placeholder="Nhập số điện thoại của bạn"
+                            setValue={(value) => setPayload((prev) => ({ ...prev, phone: value }))}
+                            nameKey='phone'
+                            placeholder='Nhập số điện thoại của bạn'
                             invalidFields={invalidFields}
                             setInValidFields={setInValidFields}
                         />
@@ -118,8 +170,9 @@ export const LoginForm = () => {
                         iconClass={<Lock sx={{ color: theme.palette.primary.main }} />}
                         value={payload.password || ''}
                         setValue={(value) => setPayload((prev) => ({ ...prev, password: value }))}
-                        nameKey="password"
-                        placeholder="Nhập mật khẩu"
+                        nameKey='password'
+                        type='password'
+                        placeholder='Nhập mật khẩu'
                         invalidFields={invalidFields}
                         setInValidFields={setInValidFields}
                     />
@@ -127,15 +180,16 @@ export const LoginForm = () => {
                         <BaseInput
                             iconClass={<Password sx={{ color: theme.palette.primary.main }} />}
                             value={payload.confirmPassword || ''}
-                            setValue={(value) => setPayload((prev) => ({ ...prev, email: value }))}
-                            nameKey="confirmPassword"
-                            placeholder="Vui lòng nhập lại mật khẩu"
+                            type='password'
+                            setValue={(value) => setPayload((prev) => ({ ...prev, confirmPassword: value }))}
+                            nameKey='confirmPassword'
+                            placeholder='Vui lòng nhập lại mật khẩu'
                             invalidFields={invalidFields}
                             setInValidFields={setInValidFields}
                         />
                     )}
                     
-                    <Button name='Đăng nhập'/>
+                    <Button handleOnClick={handleRegisterAndLogin} name='Đăng nhập'/>
                 </Box>
                 <Box 
                     sx={{

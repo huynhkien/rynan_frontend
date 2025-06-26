@@ -4,20 +4,24 @@ import { GetProductBySlug } from '@/features/product/api/productApi';
 import { Product } from '@/features/product/type/productType';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
 import { Specification } from '@/features/specification/type/specificationType';
+import { addToCart } from '@/features/user/store/userSlice';
 import { Button } from '@/shared/components';
 import { Quantity } from '@/shared/components/ui/public/Quantity';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useCallback, useState, useRef, useEffect } from 'react';
+import { toast } from 'react-toastify';
 
 export const ProductDetailInfo = ({slug}: {slug: string}) => {
     const theme = useTheme();
+    const router = useRouter();
     const dispatch = useAppDispatch();
     const [productSlug, setProductSlug] = useState<Product | null>(null);
     const [selectedImage, setSelectedImage] = useState<string>('');
-    const [quantity, setQuantity] = useState<number | string>(1);
+    const [qty, setQty] = useState<number>(1);
     const [specification, setSpecification] = useState<Specification[] | []>([]);
     const {categories} = useAppSelector((state) => state.category);
     
@@ -53,37 +57,47 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
 
     const handleQuantity = useCallback((value: string) => {
         if (value === '') {
-            setQuantity(''); 
+            setQty(0); 
             return;
         }
         const num = Number(value);
         if (!isNaN(num) && num >= 1 && num <= 999) {
-            setQuantity(num);
+            setQty(num);
         }
     }, []);
 
     const handleChangeQuantity = useCallback((flag: string) => {
-        const currentQty = typeof quantity === 'string' ? 
-            (quantity === '' ? 1 : Number(quantity)) : quantity;
+        const currentQty = typeof qty === 'string' ? 
+            (qty === '' ? 1 : Number(qty)) : qty;
         
         if (flag === 'minus' && currentQty > 1) {
-            setQuantity(currentQty - 1);
+            setQty(currentQty - 1);
         } else if (flag === 'plus' && currentQty < 999) {
-            setQuantity(currentQty + 1);
+            setQty(currentQty + 1);
         }
-    }, [quantity]);
+    }, [qty]);
 
-    const handleBuyNow = () => {
-        const finalQuantity = typeof quantity === 'string' ? 
-            (quantity === '' ? 1 : Number(quantity)) : quantity;
-        alert(`Mua ngay ${finalQuantity} sản phẩm!`);
-    };
 
     const handleAddToCart = () => {
-        const finalQuantity = typeof quantity === 'string' ? 
-            (quantity === '' ? 1 : Number(quantity)) : quantity;
-        alert(`Đã thêm ${finalQuantity} sản phẩm vào giỏ hàng!`);
+        dispatch(addToCart({
+            pid: productSlug?._id || '',
+            price: productSlug?.price_reference || 0,
+            name: productSlug?.name_vn || '',
+            quantity: qty,
+            thumb: productSlug?.thumb.url || ''
+        }));
+        toast.success(`Thêm ${qty} sản phẩm vào giỏ hàng`)
     };
+    const handleBuyNow = () => {
+        dispatch(addToCart({
+            pid: productSlug?._id || '',
+            price: productSlug?.price_reference || 0,
+            name: productSlug?.name_vn || '',
+            quantity: qty,
+            thumb: productSlug?.thumb.url || ''
+        }));
+        router.push('/cart')
+    }
 
     // Xử lý khi di chuyển chuột vào ảnh
     const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -346,15 +360,15 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
                         Số lượng
                     </Typography>
                     <Quantity
-                        quantity={quantity}
+                        quantity={qty}
                         handleChangeQuantity={handleChangeQuantity}
                         handleQuantity={handleQuantity}
                     />
                 </Box>
                 <Box sx={{ display: 'flex', gap: 2, mt: 3, width: '100%' }}>
                     <Button
-                        name='Mua ngay'
                         handleOnClick={handleBuyNow}
+                        name='Mua ngay'
                     />
                     <Button
                         name='Thêm vào giỏ hàng'

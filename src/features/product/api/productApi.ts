@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { ProductResponse, ProductResponseById } from "../type/productType";
+import { ProductParams, ProductResponse, ProductResponseById } from "../type/productType";
 import { ProductEndpoints } from "./productEndpoints";
 
 
@@ -47,13 +47,16 @@ export const deletePriceProduct = async ({id, rid}: {id: string; rid: string}): 
     withCredentials: true,
   });
 // Hiển thị tất cả bai viet
-export const getAllProduct = async(): Promise<ProductResponse> => 
-    axiosInstance.get(ProductEndpoints.GET_ALL);
+export const getAllProduct = async ( params? : ProductParams): Promise<ProductResponse> => 
+    axiosInstance.get(ProductEndpoints.GET_ALL, {
+        params,
+        withCredentials: true, 
+    });
 // Lấy bai viet theo id
 export const getProductById = async(id: string): Promise<ProductResponseById> => 
     axiosInstance.get(ProductEndpoints.GET_BY_ID(id));
 // Lất bai viet theo slug
-export const GetBySlug = async(slug: string): Promise<ProductResponse> => 
+export const GetProductBySlug = async(slug: string): Promise<ProductResponseById> => 
     axiosInstance.get(ProductEndpoints.GET_BY_SLUG(slug));
 // Xóa bai viet
 export const deleteProduct = async(id: string): Promise<ProductResponse> => 

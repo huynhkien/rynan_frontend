@@ -28,6 +28,7 @@ export interface Product {
     name_eng: string;
     name_short: string;
     thumb: ProductThumb;
+    images: ProductThumb[];
     description: string;
     category: string;
     sold: string;
@@ -58,6 +59,13 @@ export interface ProductData extends Record<string, unknown> {
     origin: string;
     
 }
+export interface ProductCardData {
+    name_vn: string;
+    category: string;
+    price_reference: number;
+    thumb: ProductThumb;
+    slug: string;
+}
 export interface ProductPrice extends Record<string, unknown> {
     productId?: string;
     priceType: string;
@@ -74,15 +82,24 @@ export interface PriceProduct {
     endDate: Date | string;                     
     note: string;
 }
+export interface ProductParams {
+    q?: string,
+    sort?: string;
+    page?: string;
+    limit?: number;
+    price_gte?: number | string;
+    price_lte?: number | string;
+}
 export interface ProductPriceData {
     id: string,
     product: Product;
     render: () => void;
 }
 export interface ProductResponse{
-    success: boolean, 
-    message?: string,
-    data?: Product[]
+    success: boolean; 
+    message?: string;
+    data?: Product[];
+    counts?: number;
 }
 export interface ProductResponseById{
     success: boolean;

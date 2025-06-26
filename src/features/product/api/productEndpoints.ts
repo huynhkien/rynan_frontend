@@ -8,5 +8,5 @@ export const ProductEndpoints = {
     UPDATE_DESCRIPTION: (id: string | number) => `/product/update-description/${id}`,
     ADD_PRICE: (id: string | number) => `/product/add-price/${id}`,
     DELETE: (id: string | number) => `/product/${id}`,
-    GET_BY_SLUG: (slug: string ) => `/product/${slug}`
+    GET_BY_SLUG: (slug: string ) => `/product/detail/${slug}`
 }

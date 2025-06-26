@@ -46,7 +46,7 @@ export const BaseInput = ({
         ),
         className: style,
       }}
-      sx={{ mt: 2 }}
+     
       required
     />
   );

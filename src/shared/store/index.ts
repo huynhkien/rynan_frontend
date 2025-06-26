@@ -11,8 +11,9 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import userReducer, { UserState } from '../../features/user/store/userSlice';
+import userReducer from '@/features/user/store/userSlice';
 import categoryReducer, { CategoryState } from '@/features/category/store/categorySlice';
+import { UserState } from '@/features/user/type/userTypes';
 
 interface PersistConfig<T> {
   key: string;

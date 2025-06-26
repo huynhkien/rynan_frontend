@@ -3,7 +3,7 @@ export interface UserData {
   name: string;
   email: string;
   phone: string;
-  address: string;
+  role: string;
   refreshToken?: string;
   passwordChangedAt?: string;
   passwordResetToken?: string;
@@ -18,7 +18,6 @@ export interface RegisterData {
     password: string;
     confirmPassword: string;
     phone?: string;
-    address?: string;
 }
 export interface LoginData {
   email: string;
@@ -37,5 +36,30 @@ export interface LoginResponse {
   success: boolean;
   message: string;
   accessToken: string;
+  data: UserData;
+}
+
+// Quản lý trạng thái với redux
+export interface UserState {
+  isLogin: boolean;
+  current: UserData | null;
+  token: string | null;
+  isLoading: boolean;
+  mes: string;
+  cart: CartItem[];
+}
+
+export interface LoginPayload {
+  isLogin: boolean;
+  token: string;
   userData: UserData;
+}
+// Giỏ hàng 
+
+export interface CartItem {
+  pid: string;
+  thumb: string;
+  name: string;
+  price: number;
+  quantity: number;
 }

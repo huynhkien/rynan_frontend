@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse } from "./userTypes";
+import { LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse } from "../type/userTypes";
 
 
 export const apiRegister = async (data: RegisterData): Promise<RegisterResponse> => axiosInstance({

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as actions from './asyncAction';
-import { UserData } from './userTypes';
+import { UserData } from '../type/userTypes';
 
 
 

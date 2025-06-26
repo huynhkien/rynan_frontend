@@ -1,10 +1,11 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import * as apis from './userApis';
-import { UserResponse } from './userTypes';
+import { UserResponse } from '../type/userTypes';
+import { apiGetCurrent } from '../api/userApis';
+
 
 export const getCurrent = createAsyncThunk('user/current', async (_, { rejectWithValue }) => {
     try {
-        const response: UserResponse = await apis.apiGetCurrent();
+        const response: UserResponse = await apiGetCurrent();
         if (!response.success) return rejectWithValue(response);
         return response.data;
     } catch (error) {

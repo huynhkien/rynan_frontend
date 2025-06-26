@@ -11,7 +11,8 @@ import {
   REGISTER,
 } from 'redux-persist';
 
-import userReducer, { UserState } from '../../features/user/userSlice';
+import userReducer, { UserState } from '../../features/user/store/userSlice';
+import categoryReducer, { CategoryState } from '@/features/category/store/categorySlice';
 
 interface PersistConfig<T> {
   key: string;
@@ -24,15 +25,24 @@ const userConfig: PersistConfig<UserState> = {
   storage,
   whitelist: ['isLogin', 'token', 'current']
 };
+const categoryConfig: PersistConfig<CategoryState> = {
+  key: 'shop/category',
+  storage,
+  whitelist: ['categories'] 
+};
 
 const persistedUserReducer = persistReducer<UserState>(
   userConfig,
   userReducer
 );
-
+const persistedCategoryReducer = persistReducer<CategoryState>(
+  categoryConfig,
+  categoryReducer
+);
 export const store = configureStore({
   reducer: {
-    user: persistedUserReducer
+    user: persistedUserReducer,
+    category: persistedCategoryReducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

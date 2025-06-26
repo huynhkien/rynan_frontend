@@ -22,7 +22,7 @@ const ProductCard = ({ data }: { data: ProductCardData }) => {
         dispatch(getCategory());
     }, [dispatch]);
   const handleProduct = () => {
-    router.push(`/product/${data.slug}`)
+    router.push(`/products/${data.slug}`)
   }
   return (
     <Card

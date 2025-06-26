@@ -109,3 +109,108 @@ export const PriceType = [
         name: 'Giá lẽ tham khảo'
     },
 ]
+// Loại khách hàng
+export const CustomerType = [
+    {
+        id: "Khách hàng lẽ",
+        name: "Khách hàng lẽ"
+    },
+    {
+        id: "Cửa hàng",
+        name: "Cửa hàng"
+    },
+    {
+        id: "HTX",
+        name: "HTX"
+    },
+    {
+        id: "Nhà vườn",
+        name: "Nhà vườn"
+    },
+    {
+        id: "Nhà phân phối",
+        name: "Nhà phân phối"
+    },
+    {
+        id: "Khách hàng dự án ",
+        name: "Khách hàng dự án"
+    },
+    {
+        id: "Khách hàng dự Vip",
+        name: "Khách hàng dự Vip"
+    },
+]
+// Nguồn khách hàng
+export const CustomerSource = [
+    {
+        id: "Điện Thoại",
+        name: "Điện Thoại"
+    },
+    {
+        id: "Email",
+        name: "Email"
+    },
+    {
+        id: "Trực Tiếp",
+        name: "Trực Tiếp"
+    },
+    {
+        id: "Website",
+        name: "Website"
+    },
+    {
+        id: "Mobile App",
+        name: "Mobile App"
+    },
+    {
+        id: "Đối tác giới thiệu ",
+        name: "Đối tác giới thiệu"
+    },
+    {
+        id: "Internet",
+        name: "Internet"
+    },
+    {
+        id: "Khác",
+        name: "Khác"
+    },
+    {
+        id: "Công tác",
+        name: "Công tác"
+    },
+    {
+        id: "Facebook",
+        name: "Facebook"
+    },
+    {
+        id: "Zalo",
+        name: "Zalo"
+    },
+    {
+        id: "Hội nghị/Hội thảo",
+        name: "Hội nghị/Hội thảo"
+    },
+    {
+        id: "Khách tham quan",
+        name: "Khách tham quan"
+    },
+    {
+        id: "Khách từ Chú Mỹ ",
+        name: "Khách từ Chú Mỹ"
+    },
+     
+]
+export const CustomerGender = [
+    {
+    id: 'male',
+    name: 'Nam'
+    },
+    {
+    id: 'female',
+    name: 'Nữ'
+    },
+    {
+    id: 'order',
+    name: 'Khác'
+    },
+]

@@ -38,10 +38,10 @@ const menuItems: MenuItem[] = [
       { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
     ]
   },
+  { text: 'Người dùng', icon: <Person />, path: '/admin/user-management' },
   { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
   { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
   { text: 'Bình luận', icon: <Comment />, path: '/admin' },
-  { text: 'Người dùng', icon: <Person />, path: '/admin' },
   { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin' },
   { text: 'Kho hàng', icon: <Warehouse />, path: '/admin' },
   { text: 'Báo giá', icon: <RequestQuote />, path: '/admin', badge: 5 },

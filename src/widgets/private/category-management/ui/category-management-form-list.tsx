@@ -322,12 +322,12 @@ return (
                             />
                         </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
-                        <Typography variant='body2' noWrap>
+                        <Typography variant='body1' noWrap>
                           {item.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body2' sx={{ 
+                        <Typography variant='body1' sx={{ 
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           display: '-webkit-box',
@@ -338,7 +338,7 @@ return (
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body2'>
+                        <Typography variant='body1'>
                           {item.slug}
                         </Typography>
                       </TableCell>

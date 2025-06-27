@@ -112,105 +112,105 @@ export const PriceType = [
 // Loại khách hàng
 export const CustomerType = [
     {
-        id: "Khách hàng lẽ",
+        _id: "Khách hàng lẽ",
         name: "Khách hàng lẽ"
     },
     {
-        id: "Cửa hàng",
+        _id: "Cửa hàng",
         name: "Cửa hàng"
     },
     {
-        id: "HTX",
+        _id: "HTX",
         name: "HTX"
     },
     {
-        id: "Nhà vườn",
+        _id: "Nhà vườn",
         name: "Nhà vườn"
     },
     {
-        id: "Nhà phân phối",
+        _id: "Nhà phân phối",
         name: "Nhà phân phối"
     },
     {
-        id: "Khách hàng dự án ",
+        _id: "Khách hàng dự án ",
         name: "Khách hàng dự án"
     },
     {
-        id: "Khách hàng dự Vip",
+        _id: "Khách hàng dự Vip",
         name: "Khách hàng dự Vip"
     },
 ]
 // Nguồn khách hàng
 export const CustomerSource = [
     {
-        id: "Điện Thoại",
+        _id: "Điện Thoại",
         name: "Điện Thoại"
     },
     {
-        id: "Email",
+        _id: "Email",
         name: "Email"
     },
     {
-        id: "Trực Tiếp",
+        _id: "Trực Tiếp",
         name: "Trực Tiếp"
     },
     {
-        id: "Website",
+        _id: "Website",
         name: "Website"
     },
     {
-        id: "Mobile App",
+        _id: "Mobile App",
         name: "Mobile App"
     },
     {
-        id: "Đối tác giới thiệu ",
+        _id: "Đối tác giới thiệu ",
         name: "Đối tác giới thiệu"
     },
     {
-        id: "Internet",
+        _id: "Internet",
         name: "Internet"
     },
     {
-        id: "Khác",
+        _id: "Khác",
         name: "Khác"
     },
     {
-        id: "Công tác",
+        _id: "Công tác",
         name: "Công tác"
     },
     {
-        id: "Facebook",
+        _id: "Facebook",
         name: "Facebook"
     },
     {
-        id: "Zalo",
+        _id: "Zalo",
         name: "Zalo"
     },
     {
-        id: "Hội nghị/Hội thảo",
+        _id: "Hội nghị/Hội thảo",
         name: "Hội nghị/Hội thảo"
     },
     {
-        id: "Khách tham quan",
+        _id: "Khách tham quan",
         name: "Khách tham quan"
     },
     {
-        id: "Khách từ Chú Mỹ ",
+        _id: "Khách từ Chú Mỹ ",
         name: "Khách từ Chú Mỹ"
     },
      
 ]
 export const CustomerGender = [
     {
-    id: 'male',
+    _id: 'male',
     name: 'Nam'
     },
     {
-    id: 'female',
+    _id: 'female',
     name: 'Nữ'
     },
     {
-    id: 'order',
+    _id: 'order',
     name: 'Khác'
     },
 ]

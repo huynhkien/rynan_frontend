@@ -32,12 +32,12 @@ const Select = ({
         renderValue={(selected) => {
           if (!selected) return <span style={{ color: '#999' }}>{placeholder}</span>;
           const selectedOption = options.find(opt => opt._id === selected);
-          return (selectedOption?.name || selectedOption?.name_vn) || placeholder;
+          return (selectedOption?.name);
         }}
       >
         {options.map((el) => (
           <MenuItem key={el._id} value={el._id}>
-            {el.name || el.name_vn}
+            {el.name}
           </MenuItem>
         ))}
       </SelectItem>

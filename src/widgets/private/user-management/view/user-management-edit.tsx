@@ -3,7 +3,7 @@ import { Box, useTheme } from "@mui/material";
 import { Breadcrumb } from "@/shared/components";
 import { UserManagementFormAddEdit } from "../ui/user-management-form-add-edit";
 
-export const UserManagementAddView = () => {
+export const UserManagementEditView = () => {
     const theme = useTheme();
     return (
         <>
@@ -20,8 +20,8 @@ export const UserManagementAddView = () => {
                         url: '/admin/product-management',
                     },
                     {
-                        name: 'Thêm thông tin khách',
-                        url: '/admin/user-management/add'
+                        name: 'Cập nhật thông tin khách',
+                        url: '/admin/user-management/'
                     }
                 ]}
                 />

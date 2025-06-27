@@ -23,18 +23,21 @@ import {
 } from '@mui/material';
 import { Add, Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { Specification } from '@/features/specification/type/specificationType';
-import { deleteSpecification, getAllSpecification } from '@/features/specification/api/specificationApi';
+import { UserData} from '@/features/user/type/userTypes';
+import { deleteUser, getAllUser } from '@/features/user/api/userApis';
+import Link from 'next/link';
+import moment from 'moment';
+import { CustomerGender } from '@/shared/constant/common';
 
 const headCells = [
   { id: 'code', label: 'ID khách hàng', sortable: true },
-  { id: 'sku', label: 'Mã khách hàng', sortable: true },
   { id: 'name', label: 'Tên khách hàng', sortable: true },
   { id: 'gender', label: 'Giới tính', sortable: true },
   { id: 'phone', label: 'SĐT', sortable: true },
   { id: 'email', label: 'Email', sortable: true },
   { id: 'address', label: 'Địa chỉ', sortable: true },
   { id: 'createdAt', label: 'Ngày tạo', sortable: false },
+  { id: 'type', label: 'Loại khách', sortable: false },
   { id: 'lastLoginAt', label: 'Đăng nhập cuối', sortable: false },
   { id: 'actions', label: 'Thao tác', sortable: false }
 
@@ -45,7 +48,7 @@ type SortOrder = 'asc' | 'desc';
 export const UserManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [specification, setSpecification] = useState<Specification[] | []>([]);
+    const [user, setUser] = useState<UserData[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -53,33 +56,33 @@ export const UserManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
-    const fetchAllSpecification = async () => {
-        const response = await getAllSpecification();
+    const fetchAllUser = async () => {
+        const response = await getAllUser();
         if(response.success) {
-          setSpecification(response.data || []);
+          setUser(response.data || []);
         }
       }
 
-    // hiển thị tất cả quy cách
+    // hiển thị tất cả người dùng
     useEffect(() => {
-      fetchAllSpecification();
+      fetchAllUser();
     },[]);
-    // xóa quy cách
+    // xóa người dùng
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa quy cách không?');
-        const response = await deleteSpecification(id);
+        window.confirm('Bạn có chắc muốn xóa người dùng không?');
+        const response = await deleteUser(id);
         if(response.success) {
           toast.success(response.message);
-          fetchAllSpecification();
+          fetchAllUser();
           return;
         }else{
           toast.error(response.message);
-          fetchAllSpecification();
+          fetchAllUser();
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
-        fetchAllSpecification();
+        fetchAllUser();
       }
     };
 
@@ -99,10 +102,10 @@ export const UserManagementFormList = () => {
     };
     // click chọn tất cả
     const handleAllCheckbox = () => {
-        if(selectedItems.length === specification.length){
+        if(selectedItems.length === user.length){
             setSelectedItems([]);
         }else{
-            setSelectedItems(specification.map(el => el._id));
+            setSelectedItems(user.map(el => el._id));
         }
     }
     // click chọn từng item
@@ -116,25 +119,18 @@ export const UserManagementFormList = () => {
         });
     }
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === specification.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= specification.length;
+    const isAllSelected = selectedItems.length === user.length;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= user.length;
 
     const filteredAndSortedData = useMemo(() => {
-    const filtered = specification.filter(item => {
+    const filtered = user.filter(item => {
       const matchesSearch =
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.unit.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.conversionQuantity.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.packagingWeight.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.height.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.width.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.length.toLowerCase().includes(searchTerm.toLowerCase()) ;
+        item.name?.toLowerCase().includes(searchTerm.toLowerCase());
+        
 
       const matchesAlpha =
         filterAlpha === 'all' ||
-        item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-        item.name.toLowerCase().startsWith(filterAlpha.toLowerCase());
+        item.name?.toLowerCase().startsWith(filterAlpha.toLowerCase());
 
       return matchesSearch && matchesAlpha;
     });
@@ -155,7 +151,7 @@ export const UserManagementFormList = () => {
     }
 
     return filtered;
-  }, [searchTerm, sortBy, sortOrder, specification, filterAlpha]);
+  }, [searchTerm, sortBy, sortOrder, user, filterAlpha]);
    
 return (
     <Box sx={{ width: '100%' }}>
@@ -175,8 +171,10 @@ return (
           <Box
             sx={{display: 'flex', gap: 2}}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
-                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm quy cách
+            <Box sx={{p: 1, backgroundColor: theme.palette.primary.main}}>
+                <Link href='/admin/user-management/add' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
+                    <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm thông tin khách
+                </Link>
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
@@ -234,7 +232,7 @@ return (
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} quy cách
+              Hiển thị: {filteredAndSortedData.length} người dùng
             </Typography>
           </Box>
         </Box>
@@ -304,7 +302,7 @@ return (
               {filteredAndSortedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
-                    {searchTerm ? 'Không tìm thấy quy cách nào' : 'Danh sách trống'}
+                    {searchTerm ? 'Không tìm thấy người dùng nào' : 'Danh sách trống'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -340,37 +338,37 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.unit}
+                          {CustomerGender.find(el => el._id === item.gender)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.conversionQuantity}
+                          {item.phone}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.packagingWeight}
+                          {item.email}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.height}
+                          {item.address?.detail}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.length}
+                          {moment(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.width}
+                          {item.type}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.description}
+                          {moment(item.lastLoginAt).format('YYYY-MM-DD HH:mm:ss')}
                         </Typography>
                       </TableCell>
                       
@@ -381,7 +379,9 @@ return (
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
                             >
-                                <Edit/>
+                                <Link href={`/admin/user-management/edit/${item._id}`} style={{color: theme.palette.success.main}}>
+                                  <Edit/>
+                                </Link>
                             </IconButton>
                             <IconButton 
                                 onClick={() => handleDelete(item._id)} 

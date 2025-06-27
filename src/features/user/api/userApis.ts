@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse } from "../type/userTypes";
+import { LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse, UsersResponse } from "../type/userTypes";
 import { UserEndpoints } from "./userEndpoints";
 
 
@@ -19,4 +19,21 @@ export const getUserById = async (id: string): Promise<UserResponse> =>
   axiosInstance.get(UserEndpoints.GET_BY_ID(id));
 // Lấy thông tin người dùng theo _id trong token
 export const getUserCurrent = async (): Promise<UserResponse> => 
-  axiosInstance.get(UserEndpoints.GET_CURRENT());
+  axiosInstance.get(UserEndpoints.GET_CURRENT);
+
+// Lấy tất cả thông tin người dùng
+export const getAllUser = async (): Promise<UsersResponse> => 
+  axiosInstance.get(UserEndpoints.GET_ALL);
+// thêm thông tin
+export const addUserByAdmin = async (data: FormData): Promise<RegisterResponse> => 
+  axiosInstance.post(UserEndpoints.ADD, data, {
+    withCredentials: true,
+});
+// cập nhật thông tin
+export const updateUserByAdmin = async (id: string, data: FormData): Promise<RegisterResponse> => 
+  axiosInstance.put(UserEndpoints.UPDATE(id), data, {
+    withCredentials: true,
+});
+// Xóa thông tin người dùng
+export const deleteUser = async (id: string): Promise<UserResponse> => 
+  axiosInstance.delete(UserEndpoints.DELETE(id));

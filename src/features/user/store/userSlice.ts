@@ -74,9 +74,9 @@ export const userSlice = createSlice({
       .addCase(actions.getCurrent.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(actions.getCurrent.fulfilled, (state, action: PayloadAction<UserData>) => {
+      .addCase(actions.getCurrent.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.current = action.payload; 
+        state.current = action.payload as UserData; 
         state.isLogin = true;
       })
       .addCase(actions.getCurrent.rejected, (state) => {

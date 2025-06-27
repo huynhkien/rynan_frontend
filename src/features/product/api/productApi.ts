@@ -60,4 +60,5 @@ export const GetProductBySlug = async(slug: string): Promise<ProductResponseById
     axiosInstance.get(ProductEndpoints.GET_BY_SLUG(slug));
 // Xóa bai viet
 export const deleteProduct = async(id: string): Promise<ProductResponse> => 
-    axiosInstance.delete(ProductEndpoints.DELETE(id))
+    axiosInstance.delete(ProductEndpoints.DELETE(id));
+

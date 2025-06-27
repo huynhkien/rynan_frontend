@@ -1,11 +1,28 @@
 import { FormInputProps, InputImageProps } from "@/types/components/input";
 
+// UPdate
+export interface UpdateDataUser{
+  isUpdateDataUser?: boolean;
+  render?: () => void;
+}
+
 export interface UserData {
   _id: string;
   name: string;
-  email: string;
-  phone: string;
-  role: string;
+  email?: string;
+  phone?: string;
+  code?: string;
+  role?: string;
+  gender?: string;
+  address?: UserDataAddress;
+  identification_card?: string;
+  dateOfBirth?: string | Date;
+  source?: string;
+  tax_code?: string;
+  invoice_address?: string;
+  note?: string;
+  staff?: string;
+  website?: string;
   refreshToken?: string;
   passwordChangedAt?: string;
   passwordResetToken?: string;
@@ -13,14 +30,25 @@ export interface UserData {
   registerToken?: string;
   createdAt?: string;
   updatedAt?: string;
+  type?: string;
+  lastLoginAt: string;
+  avatar: UserDataAvatar;
 }
 export interface UserDataAddress{
-  street: string,
-  city: string,
-  ward: string,
-  district: string,
-  country: string,
-  zipCode: string,
+  detail: string,
+  addressAdd: string
+  province: {
+    code: string | number;
+    name: string;
+  };
+  district: {
+    code: string | number;
+    name: string;
+  };
+  ward: {
+    code: string | number;
+    name: string;
+  };
 }
 export interface UserDataAvatar{
   url: string,
@@ -30,8 +58,11 @@ export interface UserDataProps extends Record<string, unknown> {
     code: string;
     sku: string;
     name: string;
+    phone: string;
+    email: string;
+    avatar: FileList;
     address: UserDataAddress;
-    dateOfBirth: Date;
+    dateOfBirth: string | Date;
     gender: string;
     identification_card: string;
     tax_code: string;
@@ -42,6 +73,8 @@ export interface UserDataProps extends Record<string, unknown> {
     type: string;
     source: string;
     website?: string;
+    role: string;
+    createdAt: Date;
 }
 export interface RegisterData {
     name: string;
@@ -57,7 +90,12 @@ export interface LoginData {
 
 export interface UserResponse {
   success: boolean;
-  data: UserData ;
+  data?: UserData ;
+  message?: string;
+}
+export interface UsersResponse {
+  success: boolean;
+  data: UserData[] ;
 }
 export interface RegisterResponse {
   success: boolean;
@@ -97,3 +135,4 @@ export interface CartItem {
 // input
 export type UserFormInputProps = FormInputProps<UserDataProps>;
 export type UserImageInputProps = InputImageProps<UserDataProps>;
+

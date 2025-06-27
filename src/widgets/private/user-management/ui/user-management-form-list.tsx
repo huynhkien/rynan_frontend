@@ -33,6 +33,7 @@ const headCells = [
   { id: 'code', label: 'ID khách hàng', sortable: true },
   { id: 'name', label: 'Tên khách hàng', sortable: true },
   { id: 'gender', label: 'Giới tính', sortable: true },
+  { id: 'role', label: 'Vai trò', sortable: true },
   { id: 'phone', label: 'SĐT', sortable: true },
   { id: 'email', label: 'Email', sortable: true },
   { id: 'address', label: 'Địa chỉ', sortable: true },
@@ -339,6 +340,19 @@ return (
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
                           {CustomerGender.find(el => el._id === item.gender)?.name}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.role === '2000'
+                            ? 'Khách hàng'
+                            : item.role === '2002'
+                            ? 'Nhân viên'
+                            : item.role === '2004'
+                            ? 'Quản lý'
+                            :
+                            'Quản lý'
+                            }
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>

@@ -57,9 +57,9 @@ export interface LoginPayload {
 // Giỏ hàng 
 
 export interface CartItem {
-  pid: string;
-  thumb: string;
-  name: string;
-  price: number;
+  pid?: string;
+  thumb?: string;
+  name?: string;
+  price?: number;
   quantity: number;
 }

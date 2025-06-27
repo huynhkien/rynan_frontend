@@ -411,7 +411,8 @@ export const ProductManagementFormEdit = () => {
             toast.success(response.message);
             setPreview(null);
         } catch (error: unknown) {
-            toast.error(`Lỗi: ${error}`);
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage)
             setPreview(null);
         }
     };

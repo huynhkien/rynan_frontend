@@ -380,7 +380,8 @@ export const ProductManagementFormAdd = () => {
             reset();
             setProductId(response.data._id);
         } catch (error: unknown) {
-            toast.error(`Lỗi: ${error}`);
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage)
             setPreview(null);
             reset();
         }

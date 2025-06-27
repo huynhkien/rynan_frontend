@@ -165,7 +165,8 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
               toast.success(response.message);
               render();
           } catch (error) {
-              toast.error(`Lỗi: ${error}`);
+              const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+              toast.error(errorMessage)
           }
       };
 

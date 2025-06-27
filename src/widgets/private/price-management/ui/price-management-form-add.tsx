@@ -47,7 +47,8 @@ export const PriceManagementFormAdd = () => {
             reset();
             
         } catch (error) {
-            toast.error(`Lỗi: ${error}`);
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage)
             reset();
         }
     };
@@ -92,7 +93,10 @@ export const PriceManagementFormAdd = () => {
                         }}
                         name='productId'
                         control={control}
-                        options={product}
+                        options={product.map((item) => ({
+                            _id: item._id,
+                            name: item.name_vn
+                        }))}
                         rules={{
                         required: 'Vui lòng chọn danh mục',
                         validate: (value) => {

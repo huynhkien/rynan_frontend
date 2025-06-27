@@ -17,9 +17,8 @@ export interface SelectProps {
   sx?: SxProps<Theme>;
 }
 export interface OptionPrivate {
-  _id?: string;
-  name?: string;
-  name_vn?: string;
+  _id: string | number;
+  name: string;
 }
 
 export interface SelectPrivateProps {

@@ -14,7 +14,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     >
       <div
         style={{
-          width: isCollapsed ? '4.5%' : '15%'
+          width: isCollapsed ? '4.5%' : '16%'
         }}
       >
         <Sidebar
@@ -24,7 +24,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
       </div>
       <div
         style={{
-          width: isCollapsed? '95.5%' : '85%',
+          width: isCollapsed? '95.5%' : '84%',
           transition: 'width 0.4s ease',
           paddingRight: 10
         }}

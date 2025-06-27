@@ -1,3 +1,5 @@
+import { FormInputProps, InputImageProps } from "@/types/components/input";
+
 export interface UserData {
   _id: string;
   name: string;
@@ -11,6 +13,35 @@ export interface UserData {
   registerToken?: string;
   createdAt?: string;
   updatedAt?: string;
+}
+export interface UserDataAddress{
+  street: string,
+  city: string,
+  ward: string,
+  district: string,
+  country: string,
+  zipCode: string,
+}
+export interface UserDataAvatar{
+  url: string,
+  public_id: string,
+}
+export interface UserDataProps extends Record<string, unknown> {
+    code: string;
+    sku: string;
+    name: string;
+    address: UserDataAddress;
+    dateOfBirth: Date;
+    gender: string;
+    identification_card: string;
+    tax_code: string;
+    lastLoginAt: string;
+    note?: string;
+    invoice_address: string;
+    staff: string;
+    type: string;
+    source: string;
+    website?: string;
 }
 export interface RegisterData {
     name: string;
@@ -63,3 +94,6 @@ export interface CartItem {
   price?: number;
   quantity: number;
 }
+// input
+export type UserFormInputProps = FormInputProps<UserDataProps>;
+export type UserImageInputProps = InputImageProps<UserDataProps>;

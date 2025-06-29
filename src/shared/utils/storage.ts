@@ -1,7 +1,6 @@
 
 import createWebStorage from "redux-persist/es/storage/createWebStorage";
 
-
 // khi chạy trên server, nó giả lập localStorage nhưng không lưu gì cả => tránh lỗi mà vẫn cho redux hoạt động
 const createNoopStorage = () => {
     return {

@@ -12,7 +12,7 @@ import { getAllSpecification } from "@/features/specification/api/specificationA
 import { Specification } from "@/features/specification/type/specificationType";
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
-import { isActive, Origin } from "@/shared/constant/common";
+import { isActive, Nutrition, Origin } from "@/shared/constant/common";
 import { Box, Paper, Tab, Tabs, Typography, useTheme } from "@mui/material"
 import { useCallback, useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -39,6 +39,11 @@ const ProductManagementFormUpdateInfo = ({category, specification, preview, setP
                     origin: response.data.origin || '',
                     isActive: response.data.isActive || '',
                     tags: response.data.tags || [],
+                    specifications: response.data.specifications || '',
+                    crop: response.data.crop || '',
+                    stage: response.data.stage || '',
+                    provide_nutrition: response.data.provide_nutrition || '',
+
                 });
                 setPreview(response.data.thumb.url);
             }
@@ -176,10 +181,10 @@ const ProductManagementFormUpdateInfo = ({category, specification, preview, setP
                     }}
                 >
                     <ControlledSelect
-                        label='Quy cách'
+                        label='Quy cách đóng gói'
                         important
                         sx={{
-                            width: '33%'
+                            width: '25%'
                         }}
                         name='specification'
                         control={control}
@@ -193,10 +198,19 @@ const ProductManagementFormUpdateInfo = ({category, specification, preview, setP
                         }}
                     />
                     <ControlledSelect
+                        label='Chi tiết quy cách'
+                        sx={{
+                            width: '25%'
+                        }}
+                        name='specifications'
+                        control={control}
+                        options={specification.filter((el) => el.type === 'Chi tiết đóng gói')}
+                    />
+                    <ControlledSelect
                         label='Nhà sản xuất'
                         important
                         sx={{
-                            width: '33%'
+                            width: '25%'
                         }}
                         name='origin'
                         control={control}
@@ -213,17 +227,56 @@ const ProductManagementFormUpdateInfo = ({category, specification, preview, setP
                         label='Trạng thái'
                         important
                         sx={{
-                            width: '33%'
+                            width: '25%'
                         }}
                         name='isActive'
                         control={control}
                         options={isActive}
                         rules={{
-                        required: 'Vui lòng chọn danh mục',
+                        required: 'Vui lòng chọn loại trạng thái',
                         validate: (value) => {
                             if (value === 'electronics') return 'Không được chọn điện tử';
                             return true;
                         }
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    <ControlledSelect
+                        label='Cung cấp dinh dưỡng'
+                        important
+                        sx={{
+                            width: '33%'
+                        }}
+                        name='provide_nutrition'
+                        control={control}
+                        options={Nutrition}
+                    />
+                    <ProductFormInput
+                        label='Phù hợp với loại cây'
+                        important
+                        placeholder='Phù hợp với loại cây'
+                        register={register as UseFormRegister<ProductData>}
+                        errors={errors as FieldErrors<ProductData>}
+                        id='crop'
+                        sx={{
+                            width: '33%'
+                        }}
+                    />
+                    <ProductFormInput
+                        label='Phù hợp với giai đoạn'
+                        important
+                        placeholder='Phù hợp với giai đoạn'
+                        register={register as UseFormRegister<ProductData>}
+                        errors={errors as FieldErrors<ProductData>}
+                        id='stage'
+                        sx={{
+                            width: '33%'
                         }}
                     />
                 </Box>
@@ -393,15 +446,15 @@ export const ProductManagementFormEdit = () => {
             formData.append("origin", data.origin);
             formData.append("isActive", data.isActive);
             formData.append("specification", data.specification);
+            formData.append("specifications", data.specifications);
+            formData.append("crop", data.crop);
+            formData.append("stage", data.stage);
+            formData.append("provide_nutrition", data.provide_nutrition);
             formData.append("tags", JSON.stringify(data.tags));
             formData.append("price_reference", data.price_reference?.toString() || "0");
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]);
             }
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}:`, value);
-            }
-
             const response = await updateProduct(formData, id);
             if (!response.success) {
                 toast.error(response.message);
@@ -409,11 +462,9 @@ export const ProductManagementFormEdit = () => {
             }
 
             toast.success(response.message);
-            setPreview(null);
         } catch (error: unknown) {
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
-            setPreview(null);
         }
     };
 

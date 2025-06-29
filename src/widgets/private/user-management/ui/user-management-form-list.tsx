@@ -60,7 +60,7 @@ export const UserManagementFormList = () => {
     const fetchAllUser = async () => {
         const response = await getAllUser();
         if(response.success) {
-          setUser(response.data || []);
+          setUser(response?.data || []);
         }
       }
 

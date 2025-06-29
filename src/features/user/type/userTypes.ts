@@ -116,6 +116,7 @@ export interface UserState {
   isLoading: boolean;
   mes: string;
   cart: CartItem[];
+  quoteProduct: QuoteProductItem[];
 }
 
 export interface LoginPayload {
@@ -124,13 +125,39 @@ export interface LoginPayload {
   userData: UserData;
 }
 // Giỏ hàng 
-
 export interface CartItem {
   pid?: string;
   thumb?: string;
   name?: string;
   price?: number;
   quantity: number;
+}
+// Báo giá
+interface QuoteProductPricesData {
+  priceType: string;
+  price: number;
+  startDate: string | Date;
+  endDate: string | Date;
+  note?: string;
+}
+export interface QuoteProductItem {
+  pid: string | number;
+  code?: string,
+  name?: string;
+  prices?: QuoteProductPricesData[];
+  provide_nutrition?: string;
+  crop?: string;
+  stage?: string;
+  origin?: string;
+  specification?: string;
+  specifications?: string;
+  thumb?: string;
+}
+export interface QuoteItem {
+  qid: string;
+  quotation: string;
+  products: QuoteProductItem[];
+  client: string;
 }
 // input
 export type UserFormInputProps = FormInputProps<UserDataProps>;

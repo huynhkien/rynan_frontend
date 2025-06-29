@@ -41,6 +41,10 @@ export interface Product {
     updatedAt: string;
     createdAt: string;
     prices: PriceProduct[];
+    specifications: string;
+    provide_nutrition: string;
+    crop: string;
+    stage: string;
 }
 
 export interface ProductData extends Record<string, unknown> {
@@ -56,7 +60,11 @@ export interface ProductData extends Record<string, unknown> {
     tags: ProductTags[];
     price_reference: number;
     specification: string;
+    specifications: string;
+    provide_nutrition: string;
     origin: string;
+    crop: string;
+    stage: string;
     
 }
 export interface ProductCardData {

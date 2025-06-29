@@ -4,6 +4,8 @@ import SpecificationFormInput from "@/features/specification/components/Specific
 import { SpecificationData, UpdateSpecification } from "@/features/specification/type/specificationType";
 
 import { Button } from "@/shared/components";
+import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
+import { SpecificationType } from "@/shared/constant/common";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useEffect, } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -11,7 +13,7 @@ import { toast } from "react-toastify";
 
 export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, render} : UpdateSpecification) => {
     const theme = useTheme();
-    const { register, handleSubmit,  formState: { errors }, reset} = useForm<SpecificationData>();
+    const { register, handleSubmit,  formState: { errors }, reset, control} = useForm<SpecificationData>();
 
     // Thêm quy cách
     const handleAddSpecification = async (data: SpecificationData) => {
@@ -49,6 +51,7 @@ export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, rende
                     width: response.data.width || '',
                     length: response.data.length || '',
                     description: response.data.description || '',
+                    type: response.data.type || '',
                 });
             }
         } catch (error) {
@@ -173,6 +176,16 @@ export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, rende
                             width: '50%'
                         }}
                     />
+                    <ControlledSelect
+                        label='Lựa chọn loại quy cách'
+                        important
+                        sx={{ width: '50%' }}
+                        name='type'
+                        control={control}
+                        options={SpecificationType}
+                        rules={{ required: 'Vui lòng chọn loại quy cách' }}
+                        searchable={true}
+                    />
                     
                 </Box>
                 <Box
@@ -183,7 +196,7 @@ export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, rende
                     }}
                 >
                     <SpecificationFormInput
-                        label='Khối lương đóng gói'
+                        label='Khối lượng'
                         important
                         placeholder='Thêm khối lượng đóng gói'
                         register={register as UseFormRegister<SpecificationData>}

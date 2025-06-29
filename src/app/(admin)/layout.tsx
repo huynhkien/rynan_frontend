@@ -9,12 +9,13 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
     <div
       style={{
         display: 'flex',
+        justifyContent: 'space-between',
         width: '100%'
       }}
     >
       <div
         style={{
-          width: isCollapsed ? '4.5%' : '16%'
+          width: isCollapsed ? '4.5%' : '15%'
         }}
       >
         <Sidebar

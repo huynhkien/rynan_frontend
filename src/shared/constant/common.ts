@@ -55,7 +55,7 @@ export const VoteStar = [
     },
 ]
 // kích thước sidebar
-export const SIDEBAR_WIDTH = 280;
+export const SIDEBAR_WIDTH = '15%';
 // thu nhỏ kích thước sidebar
 export const COLLAPSED_WIDTH = 72;
 
@@ -212,5 +212,115 @@ export const CustomerGender = [
     {
     _id: 'order',
     name: 'Khác'
+    },
+]
+// Cung cấp dinh duỡng
+export const Nutrition = [
+    {
+        _id: '1 tháng',
+        name: '1 tháng'
+    },
+    {
+        _id: '2 tháng',
+        name: '2 tháng'
+    },
+    {
+        _id: '3 tháng',
+        name: '3 tháng'
+    },
+    {
+        _id: '4 tháng',
+        name: '4 tháng'
+    },
+    {
+        _id: '5 tháng',
+        name: '5 tháng'
+    },
+    {
+        _id: '6 tháng',
+        name: '6 tháng'
+    },
+    {
+        _id: '7 tháng',
+        name: '7 tháng'
+    },
+    {
+        _id: '8 tháng',
+        name: '8 tháng'
+    },
+    {
+        _id: '9 tháng',
+        name: '9 tháng'
+    },
+    {
+        _id: '10 tháng',
+        name: '10 tháng'
+    },
+    {
+        _id: '11 tháng',
+        name: '11 tháng'
+    },
+    {
+        _id: '12 tháng',
+        name: '12 tháng'
+    },
+    {
+        _id: '13 tháng',
+        name: '13 tháng'
+    },
+    {
+        _id: '14 tháng',
+        name: '14 tháng'
+    },
+    {
+        _id: '15 tháng',
+        name: '15 tháng'
+    },
+    {
+        _id: '16 tháng',
+        name: '16 tháng'
+    },
+    {
+        _id: '17 tháng',
+        name: '17 tháng'
+    },
+    {
+        _id: '18 tháng',
+        name: '18 tháng'
+    },
+    {
+        _id: '19 tháng',
+        name: '19 tháng'
+    },
+    {
+        _id: '20 tháng',
+        name: '20 tháng'
+    },
+    {
+        _id: '21 tháng',
+        name: '21 tháng'
+    },
+    {
+        _id: '22 tháng',
+        name: '22 tháng'
+    },
+    {
+        _id: '23 tháng',
+        name: '23 tháng'
+    },
+    {
+        _id: '24 tháng',
+        name: '24 tháng'
+    },
+]
+// Phân biệt quy cách đóng gói
+export const SpecificationType = [
+    {
+        _id: 'Quy cách đóng gói',
+        name: 'Quy cách đóng gói'
+    },
+    {
+        _id: 'Chi tiết đóng gói',
+        name: 'Chi tiết đóng gói'
     },
 ]

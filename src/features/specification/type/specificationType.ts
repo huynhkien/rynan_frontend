@@ -18,6 +18,7 @@ export interface Specification {
     updatedAt: Date;
     createdAt: Date;
     description?: string;
+    type: string;
 }
 export interface SpecificationData extends Record<string, unknown> {
     code: string;
@@ -29,6 +30,7 @@ export interface SpecificationData extends Record<string, unknown> {
     length: string;
     width: string;
     description?: string;
+    type: string
 }
 
 export interface SpecificationResponse{

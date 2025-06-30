@@ -1,15 +1,15 @@
 import axiosInstance from "@/shared/configs/axios";
 import { QuoteEndpoints } from "./quoteEndpoints";
-import { QuoteResponse, QuotesResponse } from "../type/quoteType";
+import { QuoteData, QuoteResponse, QuotesResponse } from "../type/quoteType";
 
 // Thêm danh mục
-export const createQuote = async (data: FormData): Promise<QuoteResponse> => 
+export const createQuote = async (data: QuoteData): Promise<QuoteResponse> => 
   axiosInstance.post(QuoteEndpoints.CREATE, data, {
     withCredentials: true,
     
 });
 // Cập nhật danh mục
-export const updateQuote = async (data: FormData, id: string): Promise<QuoteResponse> => 
+export const updateQuote = async (data: QuoteData, id: string): Promise<QuoteResponse> => 
   axiosInstance.put(QuoteEndpoints.UPDATE(id), data, {
     withCredentials: true,
 });

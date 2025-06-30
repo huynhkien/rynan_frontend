@@ -31,16 +31,26 @@ export const addPriceProduct = async ({prices, id}: {prices: {
     withCredentials: true,
   });
 // Cập nhật giá tiền
-export const updatePriceProduct = async ({prices, id, rid}: {prices: {
+export const updatePriceProduct = async ({updatePrice, id, rid}: {updatePrice: {
         priceType: string;
         price: number;
         startDate: Date | string;
         endDate: Date | string;
         note?: string;
     }; id: string; rid: string}): Promise<ProductResponse> =>
-  axiosInstance.put(ProductEndpoints.UPDATE_PRICE_PRODUCT(id, rid), { prices }, {
+  axiosInstance.put(ProductEndpoints.UPDATE_PRICE_PRODUCT(id, rid), { updatePrice }, {
     withCredentials: true,
-  });
+});
+export const addUpdatePriceProduct = async ({updatePrice, id}: {updatePrice: {
+        priceType: string;
+        price: number;
+        startDate: Date | string;
+        endDate: Date | string;
+        note?: string;
+    }; id: string}): Promise<ProductResponse> =>
+  axiosInstance.put(ProductEndpoints.ADD_UPDATE_PRICE_PRODUCT(id), { updatePrice }, {
+    withCredentials: true,
+});
 // Xóa giá tiền
 export const deletePriceProduct = async ({id, rid}: {id: string; rid: string}): Promise<ProductResponse> =>
   axiosInstance.delete(ProductEndpoints.DELETE_PRICE_PRODUCT(id, rid), {

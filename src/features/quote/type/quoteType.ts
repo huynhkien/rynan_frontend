@@ -1,34 +1,28 @@
 import { Product } from "@/features/product/type/productType";
-import { FormInputProps } from "@/types/components/input";
 
 export interface QuoteProductData extends Record<string, unknown> {
-    _id: string;
-    name_vn: string;
-    priceType: string;
-    price: number;
-    endDate: string | Date;
-    startDate: string | Date;
+    pid: string;
 }
 export interface QuoteData {
+    _id?: string;
     client: string;
-    products: QuoteProductData[] | QuoteData;
+    products: QuoteProductData[];
+    quotation?: string;
 }
 
 export interface QuoteResponse {
     success: boolean,
-    data?: QuoteData | string,
+    data?: QuoteData,
     message?: string
 }
 export interface QuotesResponse {
     success: boolean,
-    data?: QuoteData[] | string,
+    data?: QuoteData[],
     message?: string
 }
 export interface QuoteFormProductList {
     product: Product[];
     render: () => void;
-    isEditProduct: boolean;
-    setIsEditProduct: (isEditProduct: boolean) => void
+    id?: string;
 }
 
-export type QuoteFormInputProps = FormInputProps<QuoteProductData>;

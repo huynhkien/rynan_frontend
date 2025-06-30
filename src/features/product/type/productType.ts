@@ -76,6 +76,8 @@ export interface ProductCardData {
 }
 export interface ProductPrice extends Record<string, unknown> {
     productId?: string;
+    name_vn?: string;
+    code?: string;
     priceType: string;
     price: number;                       
     startDate: Date | string;                   

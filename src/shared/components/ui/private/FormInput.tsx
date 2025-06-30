@@ -14,6 +14,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
   validate,
   placeholder,
   defaultValue,
+  disabled = false,
   sx,
   type ,
   multiline = false,
@@ -39,6 +40,7 @@ export const FormInput = <TFormValues extends Record<string, unknown>>({
         multiline={multiline}
         rows={multiline ? rows : undefined}
         error={!!fieldError}
+        disabled={disabled}
         helperText={errorMessage || ''}
         variant='outlined'
         sx={{

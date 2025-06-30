@@ -28,6 +28,7 @@ export interface FormInputProps<TFormValues extends Record<string, unknown>> {
   placeholder?: string;
   defaultValue?: string | number;
   sx?: SxProps<Theme>;
+  disabled?: boolean;
   type?: string;
   multiline?: boolean;
   rows?: number;

@@ -138,7 +138,8 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
                   
               }
           } catch (error) {
-              console.error('Error fetching category:', error);
+              const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+              toast.error(errorMessage)
           }
       };
       
@@ -158,7 +159,7 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
                   note: data.note || ''
               };
               const response = await updatePriceProduct({
-                  prices: priceData ,
+                  updatePrice: priceData ,
                   id: id,
                   rid: isUpdatePriceProduct,
               });

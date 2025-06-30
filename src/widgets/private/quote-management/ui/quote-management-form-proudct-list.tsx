@@ -18,10 +18,12 @@ import {
 } from '@mui/material';
 import { Cancel, Delete, Edit} from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { deleteProduct} from '@/features/product/api/productApi';
 import Image from 'next/image';
 import { QuoteFormProductList } from '@/features/quote/type/quoteType';
 import { QuoteManagementFormProductEdit } from './quote-management-form-product-edit';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { removeItemQuoteProduct } from '@/features/user/store/userSlice';
+import { deleteQuote } from '@/features/quote/api/quoteApi';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -37,32 +39,30 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const QuoteManagementFormProductList = ({product, render}: QuoteFormProductList) => {
+export const QuoteManagementFormProductList = ({product, render, id}: QuoteFormProductList) => {
     const [page, setPage] = useState(0);
+    const dispatch = useAppDispatch();
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [isEditProduct, setIsEditProduct] = useState<string | null>(null);
     const theme = useTheme();
-    // xóa sản phẩm
+    // xóa sản phẩm theo trạng thái
     const handleDelete = async(id: string) => {
-      try{
         if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
-          const response = await deleteProduct(id);
-          if(response.success) {
-            toast.success(response.message);
-            render();
-            return;
-          }else{
-            toast.error(response.message);
-            render();
-          }
-        }
-      }catch(error: unknown){
-        toast.error(`Lỗi: ${error}`);
-        render();
-      }
-    };
+          dispatch(removeItemQuoteProduct({
+            pid:id
+          }));
+          toast.success('Xóa sản phẩm thành công')
+      };
+    }
+    // Xóa sản phẩm trong dữ liệu
+    const handleDeleteById = async(id: string) => {
+      if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+        const response = await deleteQuote(id);
+        if(response.success) toast.success(response.message);
+      };
+    }
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -82,7 +82,7 @@ export const QuoteManagementFormProductList = ({product, render}: QuoteFormProdu
     const handleCloseDialog = () => {
         setIsEditProduct(null);
     };
-    
+
    
 return (
     <Box sx={{ width: '100%' }}>
@@ -93,6 +93,11 @@ return (
           },
         
         }}>
+          {id && (
+            <Box>
+              <Typography variant='body2' sx={{p:2, textAlign: 'center',fontWeight: 'bold', color: theme.palette.primary.main}}>Danh sách sản phẩm hiện có</Typography>
+          </Box>
+          )}
           <Table>
             <TableHead>
               <TableRow
@@ -184,22 +189,22 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.prices.find(el => el.priceType === 'offeringPrice')?.price || 'Chưa Thêm'}
+                          {(item.prices.find(el => el.priceType === 'offeringPrice')?.price.toLocaleString())  || 'Chưa Thêm'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.prices.find(el => el.priceType === 'dealerPrice')?.price || 'Chưa Thêm'}
+                          {(item.prices.find(el => el.priceType === 'dealerPrice')?.price.toLocaleString()) || 'Chưa Thêm'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.prices.find((el) => el.priceType === 'storePrice')?.price || 'Chưa Thêm'}
+                          {(item.prices.find((el) => el.priceType === 'storePrice')?.price.toLocaleString()) || 'Chưa Thêm'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.prices.find((el) => el.priceType === 'referencePrice')?.price || 'Chưa Thêm'}
+                          {(item.prices.find((el) => el.priceType === 'referencePrice')?.price.toLocaleString()) || 'Chưa Thêm'}
                         </Typography>
                       </TableCell>
                       
@@ -209,12 +214,12 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name_vn}`}
                                 size='small'
-                                onClick={() => setIsEditProduct(prev => (prev === item?._id ? null : item._id))}
+                                onClick={() => setIsEditProduct(item._id)}
                             >
                                   <Edit/>
                             </IconButton>
                             <IconButton 
-                                onClick={() => handleDelete(item._id)} 
+                                onClick={id ? () => handleDeleteById(item._id) : () => handleDelete(item._id)} 
                                 color='error'
                                 aria-label={`Xóa ${item.name_vn}`}
                                 size='small'
@@ -259,7 +264,7 @@ return (
             }}
         >
             <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            <QuoteManagementFormProductEdit id={isEditProduct as string}/>
+            <QuoteManagementFormProductEdit productId={isEditProduct } ren={render}/>
         </Dialog>
       </Fragment>
     </Box>

@@ -1,58 +1,97 @@
 'use client'
-import {  getProductById } from "@/features/product/api/productApi";
-import QuoteFormInput from "@/features/quote/component/QuoteFormInput";
-import { QuoteProductData } from "@/features/quote/type/quoteType";
+import {  addUpdatePriceProduct, getProductById } from "@/features/product/api/productApi";
+import ProductInputPrice from "@/features/product/components/ProductInputPrice";
+import { ProductPrice } from "@/features/product/type/productType";
 import { Button } from "@/shared/components";
+import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
+import { PriceType } from "@/shared/constant/common";
 import { Box, Typography, useTheme } from "@mui/material"
 import {  useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
+import { toast } from "react-toastify";
 
-export const QuoteManagementFormProductEdit = ({id}: {id: string}) => {
+export const QuoteManagementFormProductEdit = ({productId, ren}: {productId: string | null; ren: () => void}) => {
     const theme = useTheme();
-    const { register,  formState: { errors }, reset} = useForm<QuoteProductData>();
+    console.log(productId);
+    const { register,  formState: { errors }, reset, control, handleSubmit, watch, setValue} = useForm<ProductPrice>();
+    
+    // Theo dõi thay đổi của priceType
+    const selectedPriceType = watch('priceType');
+    
     // Hiển thị thông tin sản phẩm
     useEffect(() => {
         const fetchProduct = async() => {
-            const response = await getProductById(id);
+            if(!productId) return;
+            const response = await getProductById(productId);
+            console.log(response);
             if(response.success) {
                 reset({
                     code: response.data.code,
                     name_vn: response.data.name_vn,
-                    
                 })
             };
         }
         fetchProduct();
-    },[id, reset]);
+    },[productId, reset]);
     
-    // // Thêm giá tiền
-    // const handleAddPriceProduct = async (data: QuoteProductData) => {
-    //     if (!productId) {
-    //         toast.error('Vui lòng chọn sản phẩm');
-    //         return;
-    //     }
-    //     try {
-    //         const priceData = {
-    //             priceType: data.priceType,
-    //             price: data.price,
-    //             startDate: data.startDate,
-    //             endDate: data.endDate,
-    //             note: data.note || ''
-    //         };
-           
-    //         const response = await addPriceProduct({
-    //             prices: priceData,
-    //             id: productId
-    //         });
-    //         toast.success(response.message);
-    //         reset();
+    // Cập nhật giá tiền khi chọn priceType
+    useEffect(() => {
+        const updatePriceByType = async () => {
+            if (!productId || !selectedPriceType) return;
             
-    //     } catch (error) {
-    //         const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
-    //         toast.error(errorMessage)
-    //         reset();
-    //     }
-    // };
+            const response = await getProductById(productId);
+            if (response.success && response.data.prices) {
+                const existingPrice = response.data.prices.find(p => p.priceType === selectedPriceType);
+                
+                if (existingPrice) {
+                    // Nếu có giá cho loại này, hiển thị thông tin
+                    setValue('price', existingPrice.price);
+                    setValue('startDate', (existingPrice.startDate as string)?.split('T')[0]);
+                    setValue('endDate', (existingPrice.endDate as string)?.split('T')[0]);
+                    setValue('note', existingPrice.note || '');
+                } else {
+                    // Nếu không có giá cho loại này, clear các field
+                    setValue('price', 0);
+                    setValue('startDate', '');
+                    setValue('endDate', '');
+                    setValue('note', '');
+                }
+            }
+        };
+        
+        updatePriceByType();
+    }, [selectedPriceType, productId, setValue]);
+    
+    // Cập nhật giá tiền sản phẩm
+    const handleAddPriceProduct = async (data: ProductPrice) => {
+        if (!productId) {
+            toast.error('Vui lòng chọn sản phẩm');
+            return;
+        }
+        try {
+            const priceData = {
+                priceType: data.priceType,
+                price: Number(data.price),
+                startDate: data.startDate,
+                endDate: data.endDate,
+                note: data.note || ''
+            };
+           
+            const response = await addUpdatePriceProduct({
+                updatePrice: priceData,
+                id: productId
+            });
+            toast.success(response.message);
+            reset();
+            ren();
+            
+        } catch (error) {
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage);
+            reset();
+        }
+    };
+    
     return (
         <Box
             sx={{
@@ -71,7 +110,7 @@ export const QuoteManagementFormProductEdit = ({id}: {id: string}) => {
                 </Typography>
             </Box>
             
-            <form
+            <form onSubmit={handleSubmit(handleAddPriceProduct)}
                 style={{
                     padding: 10,
                     display: 'flex',
@@ -94,16 +133,26 @@ export const QuoteManagementFormProductEdit = ({id}: {id: string}) => {
                         gap: 1
                     }}
                 >
-                    <QuoteFormInput
-                        label='Giá tiền'
-                        type='number'
+                    <ProductInputPrice
+                        label='Mã sản phẩm'
                         important
-                        placeholder='Thêm giá tiền'
-                        register={register as UseFormRegister<QuoteProductData>}
-                        errors={errors as FieldErrors<QuoteProductData>}
-                        id='price'
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
+                        id='code'
+                        disabled
                         sx={{
-                            width: '100%'
+                            width: '100%',
+                        }}
+                    />
+                    <ProductInputPrice
+                        label='Tên sản phẩm'
+                        important
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
+                        id='name_vn'
+                        disabled
+                        sx={{
+                            width: '100%',
                         }}
                     />
                 </Box>
@@ -114,23 +163,56 @@ export const QuoteManagementFormProductEdit = ({id}: {id: string}) => {
                         gap: 1
                     }}
                 >
-                    <QuoteFormInput
+                    <ControlledSelect
+                        label='Chọn loại giá'
+                        important
+                        sx={{
+                            width: '50%'
+                        }}
+                        name='priceType'
+                        control={control}
+                        options={PriceType}
+                        rules={{
+                        required: 'Vui lòng chọn loại giá',
+                        }}
+                    />
+                    <ProductInputPrice
+                        label='Đặt giá tiền'
+                        important
+                        type='number'
+                        placeholder='Vui lòng nhập giá tiền'
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
+                        id='price'
+                        sx={{
+                            width: '50%'
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: 1
+                    }}
+                >
+                    <ProductInputPrice
                         label='Ngày bắt đầu'
                         type='date'
                         important
-                        register={register as UseFormRegister<QuoteProductData>}
-                        errors={errors as FieldErrors<QuoteProductData>}
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
                         id='startDate'
                         sx={{
                             width: '50%'
                         }}
                     />
-                    <QuoteFormInput
+                    <ProductInputPrice
                         label='Ngày kết thúc'
                         type='date'
                         important
-                        register={register as UseFormRegister<QuoteProductData>}
-                        errors={errors as FieldErrors<QuoteProductData>}
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
                         id='endDate'
                         sx={{
                             width: '50%'
@@ -138,12 +220,12 @@ export const QuoteManagementFormProductEdit = ({id}: {id: string}) => {
                     />
                 </Box>
                 <Box>
-                    <QuoteFormInput
+                    <ProductInputPrice
                         label='Ghi chú(nếu có)'
                         important
                         placeholder='Thêm ghi chú'
-                        register={register as UseFormRegister<QuoteProductData>}
-                        errors={errors as FieldErrors<QuoteProductData>}
+                        register={register as UseFormRegister<ProductPrice>}
+                        errors={errors as FieldErrors<ProductPrice>}
                         id='note'
                     />
                 </Box>

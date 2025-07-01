@@ -12,15 +12,15 @@ export interface OrderData extends Record<string, unknown> {
     staff?: string;
     expectedDeliveryDate?: string | Date
     recipient: OrderRecipientData;
-    createdAt?: string | Date
-
+    createdAt?: string | Date;
+    code: string;
 }
-interface OrderRecipientData {
+export interface OrderRecipientData {
     name: string;
     phone: string;
     address: string;
 }
-interface OrderLocationData {
+export interface OrderLocationData {
     lat: number;
     lng: number;
 }

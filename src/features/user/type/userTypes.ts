@@ -117,6 +117,7 @@ export interface UserState {
   mes: string;
   cart: CartItem[];
   quoteProduct: QuoteProductItem[];
+  orderProduct: OrderProductItem[];
 }
 
 export interface LoginPayload {
@@ -158,6 +159,14 @@ export interface QuoteItem {
   quotation: string;
   products: QuoteProductItem[];
   client: string;
+}
+// Sản phẩm Đơn hàng
+export interface OrderProductItem {
+  pid: string | number;
+  quantity: number;
+  name?: string;
+  price?: number;
+  thumb?: string;
 }
 // input
 export type UserFormInputProps = FormInputProps<UserDataProps>;

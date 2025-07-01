@@ -1,4 +1,4 @@
-import { QuoteProductItem } from './../type/userTypes';
+import { OrderProductItem, QuoteProductItem } from './../type/userTypes';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as actions from './asyncAction';
 import { CartItem, LoginPayload, UserData, UserState } from '../type/userTypes';
@@ -7,6 +7,7 @@ import { getFromLocalStorage, removeToLocalStorage, setToLocalStorage } from '..
 // Khởi tạo trang thái giỏ hàng
 const initialCart: CartItem[] = getFromLocalStorage('cart', []);
 const initialProductQuote: QuoteProductItem[] = getFromLocalStorage('quote_product', []);
+const initialProductOrder: OrderProductItem[] = getFromLocalStorage('order_product', []);
 // Khởi tạo trạng thái người dùng
 const initialState: UserState = {
   isLogin: false,
@@ -15,7 +16,8 @@ const initialState: UserState = {
   isLoading: false,
   mes: '',
   cart: initialCart,
-  quoteProduct: initialProductQuote
+  quoteProduct: initialProductQuote,
+  orderProduct: initialProductOrder
 };
 
 export const userSlice = createSlice({
@@ -96,6 +98,30 @@ export const userSlice = createSlice({
       state.quoteProduct = [];
       removeToLocalStorage('quote_product');
     },
+    // Xử lý thêm sản phâm trong danh sách báo giá
+    addProductToOrder: (state, action: PayloadAction<OrderProductItem>) => {
+      const {pid, quantity, name, price, thumb} = action.payload;
+      const existingItem = state.orderProduct.findIndex(
+        item => item.pid === pid
+      );
+      if(existingItem !== -1) {
+        state.orderProduct[existingItem].quantity += quantity;
+      }else{
+        state.orderProduct.push({pid, quantity, name, price, thumb});
+      }
+      setToLocalStorage('order_product', state.orderProduct);
+    },
+    removeItemOrderProduct: (state, action) => {
+      const {pid} = action.payload;
+      state.orderProduct = state.orderProduct.filter(
+        item => !(item.pid === pid)
+      );
+      setToLocalStorage('order_product', state.orderProduct);
+    },
+    removeAllOrderProduct: (state) => {
+      state.orderProduct = [];
+      removeToLocalStorage('order_product');
+    },
   },
   
   extraReducers: (builder) => {
@@ -128,7 +154,10 @@ export const {
   removeAllCart,
   addProductToQuote,
   removeAllQuoteProduct,
-  removeItemQuoteProduct
+  removeItemQuoteProduct,
+  addProductToOrder,
+  removeAllOrderProduct,
+  removeItemOrderProduct
 } 
   = userSlice.actions;
 export default userSlice.reducer;

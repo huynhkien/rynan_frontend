@@ -13,7 +13,7 @@ import { useEffect, useState} from "react";
 import { useForm} from "react-hook-form";
 import { QuoteManagementFormProductList } from "./quote-management-form-proudct-list";
 import { QuoteManagementFormUserList } from "./quote-management-form-user-list";
-import { createQuote, getAllQuote, getQuoteById } from "@/features/quote/api/quoteApi";
+import { createQuote, getAllQuote, getQuoteById, updateQuote } from "@/features/quote/api/quoteApi";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { QuoteData, QuoteProductData } from "@/features/quote/type/quoteType";
@@ -185,7 +185,8 @@ export const QuoteManagementFormAddEdit = () => {
                 );
                 return;
             }
-            const combinedProducts = [...quoteProducts, ...quoteProduct];
+            const quoteProductsId = quoteProducts.map((el) => ({pid: el._id}));
+            const combinedProducts = [...quoteProductsId, ...quoteProduct];
             console.log(combinedProducts);
             const newQuoteData = {
                 client: selectedUser as string,
@@ -193,12 +194,12 @@ export const QuoteManagementFormAddEdit = () => {
                 quotation: quotation
             }
             console.log(newQuoteData);
-            // const response = await updateQuote(newQuoteData, id as string);
-            // if(response.success) {
-            //     toast.success(response.message)
-            //     setSelectedUser(null);
-            //     dispatch(removeAllQuoteProduct())
-            // }
+            const response = await updateQuote(newQuoteData, id as string);
+            if(response.success) {
+                toast.success(response.message)
+                setSelectedUser(null);
+                dispatch(removeAllQuoteProduct())
+            }
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)

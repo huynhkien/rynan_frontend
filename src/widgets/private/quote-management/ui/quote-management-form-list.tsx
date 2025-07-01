@@ -32,6 +32,7 @@ import { getAllUser } from '@/features/user/api/userApis';
 import Image from 'next/image';
 import { Product } from '@/features/product/type/productType';
 import { getAllProduct } from '@/features/product/api/productApi';
+import { ExportToPDF } from '@/shared/components/ui/private/ExportToPdf';
 
 const headCells = [
   { id: 'client', label: 'Thông tin khách hàng', sortable: true },
@@ -576,6 +577,9 @@ return (
                           size='small'
                         >
                           <Delete />
+                        </IconButton>
+                        <IconButton>
+                          <ExportToPDF qid={item._id as string}/>
                         </IconButton>
                       </TableCell>
                     </TableRow>

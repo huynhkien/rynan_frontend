@@ -324,3 +324,26 @@ export const SpecificationType = [
         name: 'Chi tiết đóng gói'
     },
 ]
+// Trạng thái đơn hàng
+export const OrderStatus = [
+    {
+        _id: 'Cancelled',
+        name: 'Hủy đơn hàng' 
+    }, 
+    {
+        _id: 'Processing', 
+        name: 'Đang xử lý' 
+    }, 
+    {
+        _id: 'Delivering', 
+        name: 'Đang giao hàng' 
+    },
+    {
+        _id: 'Received', 
+        name: 'Đã nhận hàng' 
+    },  
+    {
+        _id: 'Succeed', 
+        name: 'Nhận hàng thành công' 
+    },  
+]

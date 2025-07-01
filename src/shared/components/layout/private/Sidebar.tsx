@@ -45,10 +45,10 @@ const menuItems: MenuItem[] = [
       { text: 'Báo giá', icon: <RequestQuote/>, path: '/admin/quote-management' },
     ]
   },
+  { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin/order-management' },
   { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
   { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
   { text: 'Bình luận', icon: <Comment />, path: '/admin' },
-  { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin' },
   { text: 'Kho hàng', icon: <Warehouse />, path: '/admin' },
 ];
 

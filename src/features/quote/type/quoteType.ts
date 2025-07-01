@@ -8,6 +8,7 @@ export interface QuoteData {
     client: string;
     products: QuoteProductData[];
     quotation?: string;
+    createdAt?: Date | string;
 }
 
 export interface QuoteResponse {

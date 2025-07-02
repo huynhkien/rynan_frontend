@@ -165,6 +165,7 @@ export interface OrderProductItem {
   pid: string | number;
   quantity: number;
   name?: string;
+  priceType?: string;
   price?: number;
   thumb?: string;
 }

@@ -100,14 +100,14 @@ export const userSlice = createSlice({
     },
     // Xử lý thêm sản phâm trong danh sách báo giá
     addProductToOrder: (state, action: PayloadAction<OrderProductItem>) => {
-      const {pid, quantity, name, price, thumb} = action.payload;
+      const {pid, quantity, name, price, priceType, thumb} = action.payload;
       const existingItem = state.orderProduct.findIndex(
-        item => item.pid === pid
+        item => item.pid === pid 
       );
       if(existingItem !== -1) {
         state.orderProduct[existingItem].quantity += quantity;
       }else{
-        state.orderProduct.push({pid, quantity, name, price, thumb});
+        state.orderProduct.push({pid, quantity, name, price, priceType, thumb});
       }
       setToLocalStorage('order_product', state.orderProduct);
     },

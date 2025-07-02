@@ -1,31 +1,50 @@
 'use client'
 
-import OrderFormInput from "@/features/order/components/OrderFormInput";
-import { OrderData } from "@/features/order/type/orderType";
-import { getAllUser, getUserById } from "@/features/user/api/userApis";
-import { UserData } from "@/features/user/type/userTypes";
-import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
-import { CustomerGender, OrderStatus } from "@/shared/constant/common";
-import { Box, Typography, useTheme, Button, Paper } from "@mui/material"
-import moment from "moment";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
+import OrderFormInput from '@/features/order/components/OrderFormInput';
+import { OrderData } from '@/features/order/type/orderType';
+import { getAllProduct, getProductById } from '@/features/product/api/productApi';
+import { Product } from '@/features/product/type/productType';
+import { getAllUser, getUserById } from '@/features/user/api/userApis';
+import { OrderProductItem, UserData } from '@/features/user/type/userTypes';
+import { ControlledSelect } from '@/shared/components/ui/private/ControlledSelect';
+import { CustomerGender, OrderStatus, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
+import { Box, Typography, useTheme, Button, Paper, Divider } from '@mui/material'
+import moment from 'moment';
+import { useParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
+import { OrderManagementFormAddEditProduct } from './order-management-form-add-edit-product';
+import { OrderManagementFormListProduct } from './order-management-form-list-product';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { createOrder, getAllOrder, getOrderById } from '@/features/order/api/orderApi';
+import { toast } from 'react-toastify';
+import { removeAllOrderProduct } from '@/features/user/store/userSlice';
 
 export const OrderManagementFormAddEdit = () => {
-    const { register, formState: { errors }, reset, control } = useForm<OrderData>();
+    const { register, formState: { errors }, reset, control, handleSubmit, setValue} = useForm<OrderData>();
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
     console.log(id)
     // State cho nhân viên
-    const [staff, setStaff] = useState<UserData[]>();
+    const [staff, setStaff] = useState<UserData[] | []>([]);
+    const {orderProduct} = useAppSelector((state) => state.user);
+    // State quản lý mã đơn
+    const [lastCodeNumber, setLastCodeNumber] = useState<number>(0);
+    // State quản lý đơn hàng
+    const [orders, setOrders] = useState<OrderData[]>();
+    // State cho san pham
+    const [product, setProduct] = useState<Product>();
+    const [productOrder, setProductOrder] = useState<OrderProductItem[]>();
+    const [products, setProducts] = useState<Product[]>();
+    const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
     // State cho khách hàng
     const [users, setUsers] = useState<UserData[]>();
     const [user, setUser] = useState<UserData | null>(null);
     // State lựa chọn khách hàng
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
-    // Hiển thị thông tin nhân viên
+    // Hiển thị thông tin nhân viên & sản phẩm
     useEffect(() => {
         const fetchUsers = async () => {
             const response = await getAllUser();
@@ -36,12 +55,56 @@ export const OrderManagementFormAddEdit = () => {
                 setUsers(filteredUser);
             }
         }
+        const fetchProducts = async () => {
+            const response = await getAllProduct();
+            if(response.success) setProducts(response.data);
+        }
+        const fetchOrders = async () => {
+            const response = await getAllOrder();
+            if(response.success) setOrders(response.data);
+        }
         fetchUsers();
+        fetchProducts();
+        fetchOrders();
     },[]);
+    // Hiển thị thông tin chi tiết sản phẩm
+    useEffect(() => {
+        if(!selectedProduct) return;
+        const fetchProduct = async () => {
+            const response = await getProductById(selectedProduct as string);
+            if(response.success) setProduct(response.data);
+        }
+        fetchProduct();
+    },[selectedProduct]);
     // Xử lý lựa chọn khách hàng
     const handleSelectionChangeUser = (id: string | number) => {
         setSelectedUser(id as string)
     }
+    // Xử lý lựa chọn sản phẩm
+    const handleSelectionChangeProduct = (id: string | number) => {
+        setSelectedProduct(id as string);
+    }
+
+    // Tạo mã đơn
+    const handleGenerateCode = useCallback(() => {
+        if (orders?.length === 0) {
+            setValue('code', 'RYNAN25-01');
+            setLastCodeNumber(1);
+            return;
+        }
+        
+        let newNumber = lastCodeNumber + 1;
+        let newCode = `RYNAN25-0${newNumber}`;
+        
+        while (orders?.some((el) => el.code === newCode)) {
+            newNumber += 1;
+            newCode = `RYNAN25-0${newNumber}`;
+        }
+        
+        setLastCodeNumber(newNumber);
+        setValue('code', newCode);
+    }, [orders, lastCodeNumber, setValue]);
+
     useEffect(() => {
         const fetchUser = async () => {
           if (!selectedUser) return;
@@ -53,7 +116,7 @@ export const OrderManagementFormAddEdit = () => {
     }, [selectedUser]);
     // Hiển thị thông tin khách hàng
     const UserInfoRow = ({ label, value }: { label: string; value: string | undefined }) => (
-        <Box sx={{ display: 'flex', gap: 1, py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
+        <Box sx={{ display: 'flex', gap: 1, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
           <Typography variant='body1' sx={{ fontWeight: 500, minWidth: '80px' }}>
             {label}:
           </Typography>
@@ -62,11 +125,65 @@ export const OrderManagementFormAddEdit = () => {
           </Typography>
         </Box>
     );
-    
+    // Tính tổng đơn hàng
+    const totalOrder = orderProduct.reduce((sum, item) => {
+        return sum + (item.quantity * (item.price as number))
+    }, 0);
+    // Xử lý tạo đơn hàng
+    const handleCreateOrder = async (OrderData: OrderData) => {
+        try{
+            const newOrderData = {
+            code: OrderData.code,
+            products: orderProduct,
+            status: OrderData.status,
+            orderBy: selectedUser,
+            total: totalOrder,
+            paymentMethod: OrderData.paymentMethod,
+            paymentStatus: OrderData.paymentStatus,
+            paymentDueDate: OrderData.paymentDueDate,
+            note: OrderData.note,
+            staff: OrderData.staff,
+            expectedDeliveryDate: OrderData.expectedDeliveryDate
+            }
+            const response = await createOrder(newOrderData as OrderData);
+            if(response.success){
+                dispatch(removeAllOrderProduct());
+                toast.success(response.message);
+                setSelectedUser(null);
+                setSelectedProduct(null);
+                reset();
+            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage)
+        }
+    }
+    // Cập nhật thông tin đơn hàng
+    useEffect(() => {
+        const fetchOrder = async () => {
+            if(!id) return;
+            const response = await getOrderById(id as string);
+            if(response.success && response.data) {
+                reset({
+                    code: response.data.code || '',
+                    status: response.data.status || '',
+                    staff: response.data.staff || '',
+                    expectedDeliveryDate: (response.data.expectedDeliveryDate as string).split('T')[0] || '',
+                    paymentStatus: response.data.paymentStatus || '',
+                    paymentMethod: response.data.paymentMethod || '',
+                    paymentDueDate: (response.data.paymentDueDate as string).split('T')[0] || '',
+                    note: response.data.note || ''
+                });
+                setSelectedUser(response.data.orderBy);
+                setProductOrder(response.data.products as OrderProductItem[]);
+            }
+        }
+        fetchOrder();
+    }, [id, reset, products]);
     return (
         <Box sx={{ mb: 2,  borderRadius: 0,  }}>
             {/* Form */}
-            <form>
+            <form onSubmit={handleSubmit(handleCreateOrder)}>
                 <Box >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
                         <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
@@ -85,21 +202,44 @@ export const OrderManagementFormAddEdit = () => {
                                         
                                     }}
                                 >
-                                    <OrderFormInput
-                                        label='Mã đơn hàng'
-                                        important
-                                        placeholder='Thêm mã khách hàng'
-                                        register={register as UseFormRegister<OrderData>}
-                                        errors={errors as FieldErrors<OrderData>}
-                                        id='code'
-                                        validate={{ required: 'Mã đơn hàng không được để trống' }}
-                                        sx={{
-                                            width: '70%'
-                                        }}
-                                    />
-                                    <Button sx={{background: theme.palette.primary.main, color: theme.palette.text.secondary}}>
-                                        <Typography>Tạo mã</Typography>
-                                    </Button>
+                                    {id ? 
+                                    (
+                                        <OrderFormInput
+                                            label='Mã đơn hàng'
+                                            important
+                                            disabled
+                                            placeholder='Thêm mã khách hàng'
+                                            register={register as UseFormRegister<OrderData>}
+                                            errors={errors as FieldErrors<OrderData>}
+                                            id='code'
+                                            validate={{ required: 'Mã đơn hàng không được để trống' }}
+                                            sx={{
+                                                width: '100%'
+                                            }}
+                                        />
+                                    )
+                                    :
+                                    (
+                                        <>
+                                        <OrderFormInput
+                                            label='Mã đơn hàng'
+                                            important
+                                            placeholder='Thêm mã khách hàng'
+                                            register={register as UseFormRegister<OrderData>}
+                                            errors={errors as FieldErrors<OrderData>}
+                                            id='code'
+                                            validate={{ required: 'Mã đơn hàng không được để trống' }}
+                                            sx={{
+                                                width: '70%'
+                                            }}
+                                        />
+                                        <Button onClick={handleGenerateCode} sx={{background: theme.palette.primary.main, color: theme.palette.text.secondary}}>
+                                            <Typography>Tạo mã</Typography>
+                                        </Button>
+                                        </>
+                                    )   
+                                    }
+                                    
                                 </Box>
                                 <ControlledSelect
                                     label='Trạng thái đơn hàng'
@@ -113,14 +253,12 @@ export const OrderManagementFormAddEdit = () => {
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
                                     <ControlledSelect
                                         label='Nhân viên xử lý'
+                                        placeholder='Lựa chọn nhân viên xử lý'
                                         important
                                         sx={{ width: '50%' }}
                                         name='staff'
                                         control={control}
-                                        options={staff?.map((el) => ({
-                                            _id: el._id,
-                                            name: el.name
-                                        })) || []}
+                                        options={staff}
                                         rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
                                     />
                                     <OrderFormInput
@@ -136,19 +274,6 @@ export const OrderManagementFormAddEdit = () => {
                                         }}
                                     />
                                 </Box>
-                                <OrderFormInput
-                                    label='Ghi chú'
-                                    important
-                                    placeholder='Ghi chú'
-                                    register={register as UseFormRegister<OrderData>}
-                                    errors={errors as FieldErrors<OrderData>}
-                                    id='note'
-                                    multiline
-                                    rows={5}
-                                    sx={{
-                                        width: '100%'
-                                    }}
-                                />
                             </Box>
                         </Paper>
                         <Paper sx={{ width: '50%', display: 'flex', borderRadius: 0, flexDirection: 'column', gap: 1, backgroundColor: theme.palette.background.default }}>
@@ -165,7 +290,7 @@ export const OrderManagementFormAddEdit = () => {
                                     onSelectionChange={handleSelectionChangeUser}
                                     important
                                     sx={{ width: '100%' }}
-                                    name='staff'
+                                    name='orderBy'
                                     control={control}
                                     options={users?.map((el) => ({
                                         _id: el._id,
@@ -173,191 +298,163 @@ export const OrderManagementFormAddEdit = () => {
                                     })) || []}
                                     rules={{ required: 'Vui lòng chọn thông tin khách hàng' }}
                                 />
-                                <Box sx={{ mt: 2 }}>
+                                <Box sx={{ mt: 1 }}>
                                 <UserInfoRow label='Họ và tên' value={user?.name} />
                                 <UserInfoRow label='Giới tính' value={CustomerGender.find((el) => el._id === user?.gender)?.name} />
                                 <UserInfoRow label='SĐT' value={user?.phone} />
                                 <UserInfoRow label='Email' value={user?.email} />
                                 <UserInfoRow label='Địa chỉ' value={user?.address?.detail} />
                                 <UserInfoRow label='Ngày sinh' value={moment(user?.dateOfBirth).format('DD/MM/YYYY')} />
+                                <UserInfoRow label='Mã số thuế' value={user?.tax_code as string} />
+                                <UserInfoRow label='Thông tin xuất hóa đơn' value={user?.invoice_address as string} />
                                 </Box>
                             </Box>
                         </Paper>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
                         <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                            <OrderManagementFormAddEditProduct
+                                handleSelectionChangeProduct={handleSelectionChangeProduct}
+                                product={product as Product}
+                                products={products as Product[]}
+                                orderProduct={orderProduct}
+                            />
+                        </Paper>
+                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                    Thêm sản phẩm
+                                    Danh sách sản phẩm
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
-                                {/* Mã đơn hàng */}
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        
-                                    }}
-                                >
-                                    <OrderFormInput
-                                        label='Mã đơn hàng'
-                                        important
-                                        placeholder='Thêm mã khách hàng'
-                                        register={register as UseFormRegister<OrderData>}
-                                        errors={errors as FieldErrors<OrderData>}
-                                        id='code'
-                                        validate={{ required: 'Mã đơn hàng không được để trống' }}
-                                        sx={{
-                                            width: '70%'
-                                        }}
-                                    />
-                                    <Button sx={{background: theme.palette.primary.main, color: theme.palette.text.secondary}}>
-                                        <Typography>Tạo mã</Typography>
-                                    </Button>
+                            <OrderManagementFormListProduct orderProduct={orderProduct}/>
+                        </Paper>
+                    </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
+                        <Paper sx={{ 
+                            width: '50%', 
+                            borderRadius: 0, 
+                            backgroundColor: theme.palette.background.default 
+                        }}>
+                            <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
+                                <Typography variant='body2' sx={{ 
+                                    color: theme.palette.primary.main, 
+                                    mx: 2, 
+                                    fontWeight: 'bold' 
+                                }}>
+                                    Thông tin thanh toán
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
+                                {/* Tóm tắt đơn hàng */}
+                                <Box>
+                                    <Typography variant='body1' sx={{ mb: 1, fontWeight: 'bold' }}>
+                                        Tóm tắt đơn hàng
+                                    </Typography>
+                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant='body1'>
+                                            Tạm tính:
+                                        </Typography>
+                                        <Typography variant='body1'>
+                                            {totalOrder.toLocaleString()} VNĐ
+                                        </Typography>
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant='body1'>
+                                            Phí vận chuyển:
+                                        </Typography>
+                                        <Typography variant='body1'>
+                                            0 VNĐ
+                                        </Typography>
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant='body1'>
+                                            Giảm giá:
+                                        </Typography>
+                                        <Typography variant='body1' color='success.main'>
+                                            0 VNĐ
+                                        </Typography>
+                                    </Box>
+                                    
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                        <Typography variant='body1'>
+                                            Thuế (VAT 10%):
+                                        </Typography>
+                                        <Typography variant='body1'>
+                                            0 VNĐ
+                                        </Typography>
+                                    </Box>
+                                    <Divider sx={{ my: 1 }} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                                        <Typography variant='body2' fontWeight='bold'>
+                                            Tổng cộng:
+                                        </Typography>
+                                        <Typography variant='body2' fontWeight='bold' color='primary.main'>
+                                            {totalOrder.toLocaleString()} VNĐ
+                                        </Typography>
+                                    </Box>
                                 </Box>
+                                {/* Trạng thái thanh toán */}
                                 <ControlledSelect
-                                    label='Trạng thái đơn hàng'
+                                    label='Trạng thái thanh toán'
                                     important
-                                    sx={{ width: '100%' }}
-                                    name='status'
+                                    name='paymentStatus'
                                     control={control}
-                                    options={OrderStatus}
-                                    rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
+                                    options={PaymentStatuses}
+                                    rules={{ required: 'Vui lòng chọn trạng thái thanh toán' }}
                                 />
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
-                                    <ControlledSelect
-                                        label='Nhân viên xử lý'
-                                        important
-                                        sx={{ width: '50%' }}
-                                        name='staff'
-                                        control={control}
-                                        options={staff?.map((el) => ({
-                                            _id: el._id,
-                                            name: el.name
-                                        })) || []}
-                                        rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
-                                    />
-                                    <OrderFormInput
-                                        label='Ngày dự kiến giao hàng'
-                                        type='date'
-                                        important
-                                        register={register as UseFormRegister<OrderData>}
-                                        errors={errors as FieldErrors<OrderData>}
-                                        id='expectedDeliveryDate'
-                                        validate={{ required: 'Ngày dự kiến giao hàng không được để trống' }}
-                                        sx={{
-                                            width: '50%'
-                                        }}
-                                    />
-                                </Box>
+
+                                {/* Hình thức thanh toán */}
+                                <ControlledSelect
+                                    label='Hình thức thanh toán'
+                                    important
+                                    name='paymentMethod'
+                                    control={control}
+                                    options={PaymentMethods}
+                                    rules={{ required: 'Vui lòng chọn hình thức thanh toán' }}
+                                />
+                                {/* Hạn thanh toán */}
+                                <OrderFormInput
+                                    label='Hạn thanh toán'
+                                    type='date'
+                                    important
+                                    register={register as UseFormRegister<OrderData>}
+                                    errors={errors as FieldErrors<OrderData>}
+                                    id='paymentDueDate'
+                                    validate={{ required: 'Hạn thanh toán không được để trống' }}
+                                />
+                                {/* Ghi chú */}
                                 <OrderFormInput
                                     label='Ghi chú'
+                                    type='5'
                                     important
-                                    placeholder='Ghi chú'
                                     register={register as UseFormRegister<OrderData>}
                                     errors={errors as FieldErrors<OrderData>}
                                     id='note'
                                     multiline
-                                    rows={5}
-                                    sx={{
-                                        width: '100%'
-                                    }}
+                                    rows={10}
                                 />
                             </Box>
                         </Paper>
                         <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                    Thông tin đơn hàng
+                                    Danh sách sản phẩm tồn tại trong giỏ hàng
                                 </Typography>
                             </Box>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
-                                {/* Mã đơn hàng */}
-                                <Box
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'space-between',
-                                        alignItems: 'center',
-                                        
-                                    }}
-                                >
-                                    <OrderFormInput
-                                        label='Mã đơn hàng'
-                                        important
-                                        placeholder='Thêm mã khách hàng'
-                                        register={register as UseFormRegister<OrderData>}
-                                        errors={errors as FieldErrors<OrderData>}
-                                        id='code'
-                                        validate={{ required: 'Mã đơn hàng không được để trống' }}
-                                        sx={{
-                                            width: '70%'
-                                        }}
-                                    />
-                                    <Button sx={{background: theme.palette.primary.main, color: theme.palette.text.secondary}}>
-                                        <Typography>Tạo mã</Typography>
-                                    </Button>
-                                </Box>
-                                <ControlledSelect
-                                    label='Trạng thái đơn hàng'
-                                    important
-                                    sx={{ width: '100%' }}
-                                    name='status'
-                                    control={control}
-                                    options={OrderStatus}
-                                    rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
-                                />
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
-                                    <ControlledSelect
-                                        label='Nhân viên xử lý'
-                                        important
-                                        sx={{ width: '50%' }}
-                                        name='staff'
-                                        control={control}
-                                        options={staff?.map((el) => ({
-                                            _id: el._id,
-                                            name: el.name
-                                        })) || []}
-                                        rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
-                                    />
-                                    <OrderFormInput
-                                        label='Ngày dự kiến giao hàng'
-                                        type='date'
-                                        important
-                                        register={register as UseFormRegister<OrderData>}
-                                        errors={errors as FieldErrors<OrderData>}
-                                        id='expectedDeliveryDate'
-                                        validate={{ required: 'Ngày dự kiến giao hàng không được để trống' }}
-                                        sx={{
-                                            width: '50%'
-                                        }}
-                                    />
-                                </Box>
-                                <OrderFormInput
-                                    label='Ghi chú'
-                                    important
-                                    placeholder='Ghi chú'
-                                    register={register as UseFormRegister<OrderData>}
-                                    errors={errors as FieldErrors<OrderData>}
-                                    id='note'
-                                    multiline
-                                    rows={5}
-                                    sx={{
-                                        width: '100%'
-                                    }}
-                                />
-                            </Box>
+                            <OrderManagementFormListProduct orderProduct={productOrder as OrderProductItem[]} productsData={products}  edit='true' qid={id as string}/>
                         </Paper>
                     </Box>
                 </Box>
 
                 {/* Submit buttons */}
                 <Box sx={{ mt: 3, display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                    <Button variant="outlined" onClick={() => reset()}>
+                    <Button variant='outlined' onClick={() => reset()}>
                         Reset Form
                     </Button>
-                    <Button type="submit" variant="contained">
+                    <Button type='submit' variant='contained'>
                         Lưu thông tin
                     </Button>
                 </Box>

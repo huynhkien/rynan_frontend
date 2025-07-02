@@ -29,6 +29,7 @@ export interface SelectPrivateProps {
   important?: boolean;
   placeholder?: string; 
   sx?: SxProps<Theme>;
+  disabled?:boolean
 }
 
 export interface ControlledSelectProps<T extends FieldValues> extends Omit<SelectPrivateProps, 'value' | 'changeValue'> {

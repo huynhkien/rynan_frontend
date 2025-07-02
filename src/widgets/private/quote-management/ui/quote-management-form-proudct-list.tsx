@@ -23,7 +23,7 @@ import { QuoteFormProductList } from '@/features/quote/type/quoteType';
 import { QuoteManagementFormProductEdit } from './quote-management-form-product-edit';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { removeItemQuoteProduct } from '@/features/user/store/userSlice';
-import { deleteQuote } from '@/features/quote/api/quoteApi';
+import { deleteProductQuote } from '@/features/quote/api/quoteApi';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -57,10 +57,13 @@ export const QuoteManagementFormProductList = ({product, render, id}: QuoteFormP
       };
     }
     // Xóa sản phẩm trong dữ liệu
-    const handleDeleteById = async(id: string) => {
+    const handleDeleteById = async(pid: string) => {
       if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
-        const response = await deleteQuote(id);
-        if(response.success) toast.success(response.message);
+        const response = await deleteProductQuote(id as string, pid);
+        if(response.success) {
+          toast.success(response.message);
+          render();
+        };
       };
     }
 

@@ -43,9 +43,6 @@ export const QuoteManagementFormAddEdit = () => {
         }
         fetchQuotes();
     }, []);
-
-    
-
     
     // Hiển thị thông tin sản phẩm
     const fetchProducts = async() => {

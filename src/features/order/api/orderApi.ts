@@ -10,12 +10,12 @@ export const createOrder = async (data: OrderData): Promise<OrderResponse> =>
     
 });
 // Cập nhật đơn hàng
-export const updateOrder = async (data: FormData, id: string): Promise<OrderResponse> => 
+export const updateOrder = async (data: OrderData, id: string): Promise<OrderResponse> => 
   axiosInstance.put(OrderEndpoints.UPDATE(id), data, {
     withCredentials: true,
 });
 // Cập nhật sản phẩm trong đơn hàng
-export const updateProductOrder = async (data: OrderProductItem[], id: string, pid: string): Promise<OrderResponse> => 
+export const updateProductOrder = async (data: OrderProductItem, id: string, pid: string): Promise<OrderResponse> => 
   axiosInstance.put(OrderEndpoints.UPDATE_PRODUCT_ORDER(id, pid), data, {
     withCredentials: true,
 });

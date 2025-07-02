@@ -53,7 +53,7 @@ export interface OrderManagementFormAddProductProps {
     product?: Product;
     orderProduct?: OrderProductItem[],
     edit?: string;
-    quoteId?: string;
+    oid?: string;
     pid?: string;
 }
 export interface OrderProductProps {
@@ -61,6 +61,6 @@ export interface OrderProductProps {
     id?: string;
     edit?: string
     productsData?: Product[];
-    qid?: string
+    oid?: string;
 }
 export type OrderFormInputProps = FormInputProps<OrderData>;

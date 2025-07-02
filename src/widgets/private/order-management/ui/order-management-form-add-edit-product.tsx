@@ -1,10 +1,11 @@
 'use client'
-import { getOrderById } from "@/features/order/api/orderApi"
+import { getAllOrder, getOrderById, updateProductOrder } from "@/features/order/api/orderApi"
 import { OrderManagementFormAddProductProps } from "@/features/order/type/orderType"
 import { getProductById } from "@/features/product/api/productApi"
 import ProductFormInput from "@/features/product/components/ProductFormInput"
 import { Product, ProductData } from "@/features/product/type/productType"
 import { addProductToOrder } from "@/features/user/store/userSlice"
+import { OrderProductItem } from "@/features/user/type/userTypes"
 import { Button } from "@/shared/components"
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect"
 import { PriceType } from "@/shared/constant/common"
@@ -14,9 +15,8 @@ import { useEffect, useState } from "react"
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form"
 import { toast } from "react-toastify"
 
-export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct, products, product, orderProduct, edit, quoteId, pid} : OrderManagementFormAddProductProps) => {
+export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct, products, product, orderProduct, edit, oid, pid} : OrderManagementFormAddProductProps) => {
     const { register, formState: { errors }, control, setValue, watch, reset, } = useForm<ProductData>();
-    console.log(product);
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const [priceProduct, setPriceProduct] = useState<number>();
@@ -70,6 +70,12 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
         toast.success('Thêm sản phẩm thành công')
     }
     // Xử lý cập nhật sản phẩm
+    const fetchAllOrder = async () => {
+        return await getAllOrder();
+    }
+    useEffect(() => {
+        fetchAllOrder();
+    }, [])
     useEffect(() => {
         if(!pid) return;
         const fetchProduct = async () => {
@@ -79,9 +85,9 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
         fetchProduct();
     },[pid])
     useEffect(() => {
-        if(!pid || !quoteId) return;
+        if(!pid || !oid) return;
         const fetchProductQuote = async() => {
-            const response = await getOrderById(quoteId as string);
+            const response = await getOrderById(oid as string);
             console.log(response.data);
             const filteredProduct = response.data?.products.find((el) => el.pid === pid)
             if(response.success && response.data){
@@ -94,8 +100,27 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
         }
         fetchProductQuote();
 
-    },[pid, quoteId, setValue])
-   
+    },[pid, oid, setValue]);
+    const handleUpdateProduct = async () => {
+        try {
+            const newDataUpdate = {
+            pid: pid,
+            name: productUpdate?.name_vn,
+            priceType: priceType,
+            price: priceProduct,
+            quantity: quantityAsNumber,
+            }
+            const response = await updateProductOrder(newDataUpdate as OrderProductItem, oid as string , pid as string);
+            if(response.success) {
+                toast.success(response.message);
+                fetchAllOrder();
+            }
+            }catch(error: unknown){
+                const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+                toast.error(errorMessage)
+            }
+    }
+    
    
     
 
@@ -108,7 +133,7 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
             </Box>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
                 {/* Chọn sản phẩm */}
-                {quoteId && pid ?
+                {oid && pid ?
                 <ControlledSelect
                     label='Chọn sản phẩm'
                     onSelectionChange={handleSelectionChangeProduct}
@@ -182,7 +207,7 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
                         width: '100%'
                     }}
                 />
-                <Button handleOnClick={handleAddProduct} name={edit ? 'Cập nhật' : 'Thêm sản phẩm'} />
+                <Button handleOnClick={pid ? handleUpdateProduct : handleAddProduct} name={edit ? 'Cập nhật' : 'Thêm sản phẩm'} />
             </Box>
        </Box>
     )

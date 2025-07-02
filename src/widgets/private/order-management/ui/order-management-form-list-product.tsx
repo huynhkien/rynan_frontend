@@ -1,5 +1,5 @@
 'use client'
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import {
   Table,
   TableBody,
@@ -23,6 +23,7 @@ import { toast } from 'react-toastify';
 import { OrderProductProps } from '@/features/order/type/orderType';
 import { PriceType } from '@/shared/constant/common';
 import { OrderManagementFormAddEditProduct } from './order-management-form-add-edit-product';
+import { deleteProductOrder, getAllOrder } from '@/features/order/api/orderApi';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -36,7 +37,7 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const OrderManagementFormListProduct = ({orderProduct, id, edit, productsData,  qid}: OrderProductProps) => {
+export const OrderManagementFormListProduct = ({orderProduct, id, edit, productsData, oid}: OrderProductProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortBy, setSortBy] = useState<string>('name');
@@ -67,9 +68,25 @@ export const OrderManagementFormListProduct = ({orderProduct, id, edit, products
     const handleCloseDialog = () => {
         setIsEditProduct(null);
     };
-    
-
-   
+    // Xử lý xóa sản phẩm trong đơn hàng
+    const fetchAllOrder = async () => {
+            return await getAllOrder();
+        }
+    useEffect(() => {
+        fetchAllOrder();
+    }, [])
+    const handleDeleteProductOrder = async (pid: string) => {
+        try {
+            const response = await deleteProductOrder(oid as string , pid);
+            if(response.success) {
+                toast.success(response.message);
+                fetchAllOrder();
+              }
+            }catch(error: unknown){
+                const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+                toast.error(errorMessage)
+        }
+    }
 return (
     <Box sx={{ width: '100%', height: "100%" }}>
         <TableContainer sx={{ 
@@ -190,7 +207,7 @@ return (
                                 color='error'
                                 aria-label={`Xóa ${item.name}`}
                                 size='small'
-                                onClick={() => handleDeleteProduct(item?.pid)}
+                                onClick={edit ? () => handleDeleteProductOrder(item?.pid as string) :  () => handleDeleteProduct(item?.pid)}
                             >
                                 <Delete />
                             </IconButton>
@@ -232,7 +249,7 @@ return (
             }}
         >
             <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            <OrderManagementFormAddEditProduct edit='true' quoteId={qid} products={productsData}  pid={isEditProduct as string}/>
+            <OrderManagementFormAddEditProduct edit='true' oid={oid} products={productsData}  pid={isEditProduct as string}/>
         </Dialog>
       </Fragment>
     </Box>

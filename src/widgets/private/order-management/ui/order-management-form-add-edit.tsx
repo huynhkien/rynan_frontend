@@ -16,7 +16,7 @@ import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
 import { OrderManagementFormAddEditProduct } from './order-management-form-add-edit-product';
 import { OrderManagementFormListProduct } from './order-management-form-list-product';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
-import { createOrder, getAllOrder, getOrderById } from '@/features/order/api/orderApi';
+import { createOrder, getAllOrder, getOrderById, updateOrder } from '@/features/order/api/orderApi';
 import { toast } from 'react-toastify';
 import { removeAllOrderProduct } from '@/features/user/store/userSlice';
 
@@ -26,7 +26,6 @@ export const OrderManagementFormAddEdit = () => {
     const dispatch = useAppDispatch();
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
-    console.log(id)
     // State cho nhân viên
     const [staff, setStaff] = useState<UserData[] | []>([]);
     const {orderProduct} = useAppSelector((state) => state.user);
@@ -45,6 +44,10 @@ export const OrderManagementFormAddEdit = () => {
     // State lựa chọn khách hàng
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
     // Hiển thị thông tin nhân viên & sản phẩm
+    const fetchOrders = async () => {
+        const response = await getAllOrder();
+        if(response.success) setOrders(response.data);
+    }
     useEffect(() => {
         const fetchUsers = async () => {
             const response = await getAllUser();
@@ -59,10 +62,7 @@ export const OrderManagementFormAddEdit = () => {
             const response = await getAllProduct();
             if(response.success) setProducts(response.data);
         }
-        const fetchOrders = async () => {
-            const response = await getAllOrder();
-            if(response.success) setOrders(response.data);
-        }
+        
         fetchUsers();
         fetchProducts();
         fetchOrders();
@@ -133,17 +133,17 @@ export const OrderManagementFormAddEdit = () => {
     const handleCreateOrder = async (OrderData: OrderData) => {
         try{
             const newOrderData = {
-            code: OrderData.code,
-            products: orderProduct,
-            status: OrderData.status,
-            orderBy: selectedUser,
-            total: totalOrder,
-            paymentMethod: OrderData.paymentMethod,
-            paymentStatus: OrderData.paymentStatus,
-            paymentDueDate: OrderData.paymentDueDate,
-            note: OrderData.note,
-            staff: OrderData.staff,
-            expectedDeliveryDate: OrderData.expectedDeliveryDate
+                code: OrderData.code,
+                products: orderProduct,
+                status: OrderData.status,
+                orderBy: selectedUser,
+                total: totalOrder,
+                paymentMethod: OrderData.paymentMethod,
+                paymentStatus: OrderData.paymentStatus,
+                paymentDueDate: OrderData.paymentDueDate,
+                note: OrderData.note,
+                staff: OrderData.staff,
+                expectedDeliveryDate: OrderData.expectedDeliveryDate
             }
             const response = await createOrder(newOrderData as OrderData);
             if(response.success){
@@ -174,16 +174,57 @@ export const OrderManagementFormAddEdit = () => {
                     paymentDueDate: (response.data.paymentDueDate as string).split('T')[0] || '',
                     note: response.data.note || ''
                 });
+                setValue('orderBy', selectedUser as string);
                 setSelectedUser(response.data.orderBy);
                 setProductOrder(response.data.products as OrderProductItem[]);
             }
         }
         fetchOrder();
-    }, [id, reset, products]);
+    }, [id, reset, products, setValue, selectedUser]);
+
+    const handleUpdateOrder = async (data: OrderData) => {
+        const mergedProductsData = [...productOrder as OrderProductItem[], ...orderProduct];
+        const temp: Record<string, OrderProductItem> = {};
+        mergedProductsData.forEach((item) => {
+            if(temp[item.pid]) {
+                temp[item.pid].quantity += item.quantity;
+            } else {
+                temp[item.pid] = {...item};
+            }
+        });
+        const productsData = Object.values(temp);
+        console.log(productsData);
+        try{
+            const newOrderData = {
+                code: data.code,
+                products: orderProduct,
+                status: data.status,
+                orderBy: selectedUser,
+                total: totalOrder,
+                paymentMethod: data.paymentMethod,
+                paymentStatus: data.paymentStatus,
+                paymentDueDate: data.paymentDueDate,
+                note: data.note,
+                staff: data.staff,
+                expectedDeliveryDate: data.expectedDeliveryDate
+            }
+            const response = await updateOrder(newOrderData as OrderData, id as string);
+            if(response.success) {
+                toast.success(response.message);
+                fetchOrders();
+            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage);
+            fetchOrders();
+        }
+    }
     return (
         <Box sx={{ mb: 2,  borderRadius: 0,  }}>
             {/* Form */}
-            <form onSubmit={handleSubmit(handleCreateOrder)}>
+            <form onSubmit={handleSubmit(
+                id ? handleUpdateOrder : handleCreateOrder,
+            )}>
                 <Box >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
                         <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
@@ -444,7 +485,7 @@ export const OrderManagementFormAddEdit = () => {
                                     Danh sách sản phẩm tồn tại trong giỏ hàng
                                 </Typography>
                             </Box>
-                            <OrderManagementFormListProduct orderProduct={productOrder as OrderProductItem[]} productsData={products}  edit='true' qid={id as string}/>
+                            <OrderManagementFormListProduct orderProduct={productOrder as OrderProductItem[]} productsData={products}  edit='true' oid={id as string}/>
                         </Paper>
                     </Box>
                 </Box>

@@ -347,3 +347,17 @@ export const OrderStatus = [
         name: 'Nhận hàng thành công' 
     },  
 ]
+// Phương thức thanh toán
+export const PaymentMethods = [
+  { _id: 'COD', name: 'Tiền mặt' },
+  { _id: 'BANK_TRANSFER', name: 'Chuyển khoản' },
+  { _id: 'SCOD', name: 'SCOD' },
+  { _id: 'ATM', name: 'Thẻ ATM nội địa' },
+  { _id: 'CREDIT_CARD', name: 'Thẻ tín dụng / Ghi nợ' }
+] 
+// Trạng thái thanh toán
+export const PaymentStatuses = [
+  { _id: 'PAID', name: 'Đã thanh toán' },
+  { _id: 'UNPAID', name: 'Chưa thanh toán' },
+  { _id: 'PARTIALLY_PAID', name: 'Thanh toán một phần' }
+] 

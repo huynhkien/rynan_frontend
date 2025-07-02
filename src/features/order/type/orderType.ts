@@ -1,3 +1,5 @@
+import { Product } from "@/features/product/type/productType";
+import { OrderProductItem } from "@/features/user/type/userTypes";
 import { FormInputProps } from "@/types/components/input";
 
 export interface OrderData extends Record<string, unknown> {
@@ -7,11 +9,12 @@ export interface OrderData extends Record<string, unknown> {
     location?: OrderLocationData;
     products: OrderProductData[];
     total: number;
-    payment?: string;
+    paymentMethod?: string;
+    paymentStatus?: string;
     note?: string;
     staff?: string;
-    expectedDeliveryDate?: string | Date
-    recipient: OrderRecipientData;
+    expectedDeliveryDate?: string | Date;
+    paymentDueDate?: string | Date;
     createdAt?: string | Date;
     code: string;
 }
@@ -29,6 +32,7 @@ interface OrderProductData {
     name: string;
     quantity: number;
     price: number;
+    priceType: string;
     thumb: string;
 
 }
@@ -42,5 +46,21 @@ export interface OrdersResponse {
     message?: string;
     data?: OrderData[];
 }
-
+//
+export interface OrderManagementFormAddProductProps {
+    handleSelectionChangeProduct?: (id: string  | number) => void;
+    products?: Product[];
+    product?: Product;
+    orderProduct?: OrderProductItem[],
+    edit?: string;
+    quoteId?: string;
+    pid?: string;
+}
+export interface OrderProductProps {
+    orderProduct: OrderProductItem[];
+    id?: string;
+    edit?: string
+    productsData?: Product[];
+    qid?: string
+}
 export type OrderFormInputProps = FormInputProps<OrderData>;

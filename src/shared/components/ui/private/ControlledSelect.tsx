@@ -17,6 +17,7 @@ const Select = ({
   changeValue, 
   options, 
   label, 
+  disabled,
   important,
   placeholder = "Lựa chọn",
   sx,
@@ -85,6 +86,7 @@ const Select = ({
       <SelectItem
         fullWidth
         variant="outlined"
+        disabled={disabled}
         value={value || ''}
         onChange={handleChange}
         open={open}

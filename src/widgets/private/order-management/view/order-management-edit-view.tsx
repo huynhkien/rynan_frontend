@@ -1,9 +1,9 @@
 'use client'
 import { Box, useTheme } from "@mui/material"
-import { OrderManagementFormList } from "../ui/order-management-form-list"
 import { Breadcrumb } from "@/shared/components"
+import { OrderManagementFormAddEdit } from "../ui/order-management-form-add-edit";
 
-export const OrderManagementView = () => {
+export const OrderManagementEditView = () => {
     const theme = useTheme();
     return (
         <>
@@ -18,10 +18,15 @@ export const OrderManagementView = () => {
                     breadcrumb={[{
                         name: 'Quản lý đơn hàng',
                         url: '/admin/order-management',
-                    }]}
+                    },
+                    {
+                        name: 'Cập nhật thông tin đơn hàng',
+                        url: '/admin/order-management/'
+                    }
+                ]}
                 />
             </Box>
-            <OrderManagementFormList/>
+            <OrderManagementFormAddEdit/>
         </>
     )
 }

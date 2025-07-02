@@ -59,6 +59,7 @@ export interface ProductData extends Record<string, unknown> {
     isActive: string;
     tags: ProductTags[];
     price_reference: number;
+    price?: number | string;
     specification: string;
     specifications: string;
     provide_nutrition: string;

@@ -6,18 +6,51 @@ export interface UpdateSupplier{
     render: () => void
 }
 
+export interface SupplierDataAddress {
+    province: 
+    {
+        code: number,
+        name: string
+    },
+    district: {
+        code: number,
+        name: string
+    },
+    ward: {
+        code: number,
+        name: string
+    },
+    detail: string,
+    addressAdd: string
+}
+interface BankAccount {
+    bank_name: string;
+    account_number: string;
+}
 export interface SupplierData extends Record<string, unknown> {
+    _id?: string;
     name: string;
-    description: string;
+    note: string;
     code: string;
-    specification: string;
     createdAt?: string | Date;
+    contact_person: string;
+    phone: string;
+    email: string;
+    tax_code: string;
+    isActive: string;
+    address: SupplierDataAddress;
+    bank_account: BankAccount;
 }
 
+export interface SuppliersResponse{
+    success: boolean, 
+    message?: string,
+    data?: SupplierData[] ;
+}
 export interface SupplierResponse{
     success: boolean, 
     message?: string,
-    data?: SupplierData[] | SupplierData;
+    data?: SupplierData ;
 }
 
 export type SupplierFormInputProps = FormInputProps<SupplierData>;

@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/configs/axios";
 import { SupplierEndpoints } from "./supplierEndpoints";
-import { SupplierData, SupplierResponse } from "../type/supplierType";
+import { SupplierData, SupplierResponse, SuppliersResponse } from "../type/supplierType";
 
 // Thêm nguyên liệu
 export const createSupplier = async (data: SupplierData): Promise<SupplierResponse> => 
@@ -14,7 +14,7 @@ export const updateSupplier = async (data: SupplierData, id: string): Promise<Su
     withCredentials: true,
 });
 // Hiển thị tất cả nguyên liệu
-export const getAllSupplier = async(): Promise<SupplierResponse> => 
+export const getAllSupplier = async(): Promise<SuppliersResponse> => 
     axiosInstance.get(SupplierEndpoints.GET_ALL);
 // Lấy nguyên liệu theo id
 export const getSupplierById = async(id: string): Promise<SupplierResponse> => 

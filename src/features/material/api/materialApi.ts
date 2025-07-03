@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { MaterialData, MaterialResponse } from "../type/materialType";
+import { MaterialData, MaterialResponse, MaterialsResponse } from "../type/materialType";
 import { MaterialEndpoints } from "./materialEndpoints";
 
 // Thêm nguyên liệu
@@ -14,7 +14,7 @@ export const updateMaterial = async (data: MaterialData, id: string): Promise<Ma
     withCredentials: true,
 });
 // Hiển thị tất cả nguyên liệu
-export const getAllMaterial = async(): Promise<MaterialResponse> => 
+export const getAllMaterial = async(): Promise<MaterialsResponse> => 
     axiosInstance.get(MaterialEndpoints.GET_ALL);
 // Lấy nguyên liệu theo id
 export const getMaterialById = async(id: string): Promise<MaterialResponse> => 

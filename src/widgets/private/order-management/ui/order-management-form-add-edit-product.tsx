@@ -1,30 +1,41 @@
 'use client'
-import { getAllOrder, getOrderById, updateProductOrder } from "@/features/order/api/orderApi"
-import { OrderManagementFormAddProductProps } from "@/features/order/type/orderType"
+import {getOrderById, updateProductOrder } from "@/features/order/api/orderApi"
+import {  OrderManagementFormAddProductProps } from "@/features/order/type/orderType"
 import { getProductById } from "@/features/product/api/productApi"
 import ProductFormInput from "@/features/product/components/ProductFormInput"
 import { Product, ProductData } from "@/features/product/type/productType"
 import { addProductToOrder } from "@/features/user/store/userSlice"
 import { OrderProductItem } from "@/features/user/type/userTypes"
-import { Button } from "@/shared/components"
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect"
 import { PriceType } from "@/shared/constant/common"
-import { useAppDispatch } from "@/shared/hooks/useAppHook"
-import { Box,  Typography, useTheme } from "@mui/material"
+import { useAppDispatch, useAppSelector} from "@/shared/hooks/useAppHook"
+import { Box,  Button,  Typography, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form"
 import { toast } from "react-toastify"
 
-export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct, products, product, orderProduct, edit, oid, pid} : OrderManagementFormAddProductProps) => {
-    const { register, formState: { errors }, control, setValue, watch, reset, } = useForm<ProductData>();
+export const OrderManagementFormAddEditProduct = ({
+    handleSelectionChangeProduct, 
+    products, 
+    product, 
+    orderProducts, 
+    edit, 
+    oid, 
+    pid, 
+    order, 
+    render,
+} : OrderManagementFormAddProductProps) => {
+    const { register, formState: { errors }, control, setValue, watch, } = useForm<ProductData>();
     const theme = useTheme();
     const dispatch = useAppDispatch();
+    const {orderProduct} = useAppSelector((state) => state.user);
     const [priceProduct, setPriceProduct] = useState<number>();
     const [productUpdate, setProductUpdate] = useState<Product>();
     const [priceType, setPriceType] = useState<string>();
     const selectedQuantity = watch('quantity');
     const quantityAsNumber = selectedQuantity ? parseInt(selectedQuantity.toString(), 10) : 0;
-    console.log(selectedQuantity);
+
+    
     // Xử lý lựa chọn giá khi thêm sản phẩm
     const handleSelectionChangePrice = (id: string | number ) => {
          const filteredPrice = product?.prices.find((el) => el.priceType === id)?.price;
@@ -36,6 +47,7 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
              setValue('price', 'Giá chưa cập nhật');
          }
     };
+    
     // Khi cập nhật sản phẩm
     const handleSelectionChangePriceUpdate = (id: string | number ) => {
          const filteredPrice = productUpdate?.prices.find((el) => el.priceType === id)?.price;
@@ -47,16 +59,22 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
              setValue('price', 'Giá chưa cập nhật');
          }
     };
+    
     // Xử lý thêm sản phẩm
     const handleAddProduct = () => {
         if (!product?._id || !product.name_vn || !product.thumb?.url || !priceProduct || !selectedQuantity) {
             toast.error('Thiếu thông tin sản phẩm!');
             return;
         }
-        const existingProduct = orderProduct?.find((el) => el.pid === product._id && el.priceType !== priceType)
+        const existingProduct = orderProducts?.find((el) => el.pid === product._id && el.priceType !== priceType)
         if(existingProduct){
             toast.error('Sản phẩm chỉ chứa một loại giá duy nhất. Vui lòng chọn lại loại giá để tạo đơn đặt hàng');
             return;
+        }
+        const existingProductOrder = order?.products.find((el) => el.pid === product._id && el.priceType !== priceType);
+        if(order && existingProductOrder) {
+                toast.error('Sản phẩm chỉ chứa một loại giá duy nhất. Vui lòng chọn lại loại giá để tạo đơn đặt hàng');
+                return;
         }
         dispatch(addProductToOrder({
             pid: product._id,
@@ -66,16 +84,10 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
             quantity: quantityAsNumber,
             priceType: priceType
         }));
-        reset();
         toast.success('Thêm sản phẩm thành công')
     }
+    
     // Xử lý cập nhật sản phẩm
-    const fetchAllOrder = async () => {
-        return await getAllOrder();
-    }
-    useEffect(() => {
-        fetchAllOrder();
-    }, [])
     useEffect(() => {
         if(!pid) return;
         const fetchProduct = async () => {
@@ -84,6 +96,7 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
         }
         fetchProduct();
     },[pid])
+    
     useEffect(() => {
         if(!pid || !oid) return;
         const fetchProductQuote = async() => {
@@ -95,34 +108,38 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
                 setValue('quantity', filteredProduct?.quantity);
                 setValue('price', filteredProduct?.price);
                 setValue('priceType', filteredProduct?.priceType);
+                setPriceType(filteredProduct?.priceType);
+                setPriceProduct(filteredProduct?.price);
             }
-            
         }
         fetchProductQuote();
-
     },[pid, oid, setValue]);
+    
     const handleUpdateProduct = async () => {
         try {
             const newDataUpdate = {
-            pid: pid,
-            name: productUpdate?.name_vn,
-            priceType: priceType,
-            price: priceProduct,
-            quantity: quantityAsNumber,
+                pid: pid,
+                name: productUpdate?.name_vn,
+                priceType: priceType,
+                price: priceProduct,
+                quantity: quantityAsNumber,
+            }
+            if(orderProduct && orderProduct.find((el) => el.priceType !== priceType)){
+                toast.error('Loại giá cập nhập với loại giá vừa thêm không trùng khớp. Vui lòng lựa chọn lại!!!');
+                return;
             }
             const response = await updateProductOrder(newDataUpdate as OrderProductItem, oid as string , pid as string);
             if(response.success) {
                 toast.success(response.message);
-                fetchAllOrder();
+                if (render) {
+                    render();
+                }
             }
-            }catch(error: unknown){
-                const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
-                toast.error(errorMessage)
-            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            toast.error(errorMessage)
+        }
     }
-    
-   
-    
 
     return (
        <Box>
@@ -164,7 +181,6 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
                     searchable
                     rules={{ required: 'Vui lòng chọn thông tin khách hàng' }}
                 />    
-                
                 }
                 <ProductFormInput
                     label='Số lượng'
@@ -207,7 +223,9 @@ export const OrderManagementFormAddEditProduct = ({handleSelectionChangeProduct,
                         width: '100%'
                     }}
                 />
-                <Button handleOnClick={pid ? handleUpdateProduct : handleAddProduct} name={edit ? 'Cập nhật' : 'Thêm sản phẩm'} />
+                <Button sx={{backgroundColor: theme.palette.primary.main, py:2, color: theme.palette.text.secondary}} onClick={pid ? handleUpdateProduct : handleAddProduct}>
+                    {pid ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'}
+                </Button>
             </Box>
        </Box>
     )

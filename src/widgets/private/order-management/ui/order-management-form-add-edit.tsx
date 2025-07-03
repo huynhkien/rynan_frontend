@@ -33,6 +33,7 @@ export const OrderManagementFormAddEdit = () => {
     const [lastCodeNumber, setLastCodeNumber] = useState<number>(0);
     // State quản lý đơn hàng
     const [orders, setOrders] = useState<OrderData[]>();
+    const [orderData, setOrderData] = useState<OrderData>();
     // State cho san pham
     const [product, setProduct] = useState<Product>();
     const [productOrder, setProductOrder] = useState<OrderProductItem[]>();
@@ -48,8 +49,7 @@ export const OrderManagementFormAddEdit = () => {
         const response = await getAllOrder();
         if(response.success) setOrders(response.data);
     }
-    useEffect(() => {
-        const fetchUsers = async () => {
+    const fetchUsers = async () => {
             const response = await getAllUser();
             if(response.success && response.data){
                 const filteredStaff = response.data.filter((el) => ['2002', '2004', '2006'].includes(el.role || ''));
@@ -62,7 +62,7 @@ export const OrderManagementFormAddEdit = () => {
             const response = await getAllProduct();
             if(response.success) setProducts(response.data);
         }
-        
+    useEffect(() => {
         fetchUsers();
         fetchProducts();
         fetchOrders();
@@ -159,29 +159,35 @@ export const OrderManagementFormAddEdit = () => {
         }
     }
     // Cập nhật thông tin đơn hàng
-    useEffect(() => {
-        const fetchOrder = async () => {
-            if(!id) return;
-            const response = await getOrderById(id as string);
-            if(response.success && response.data) {
-                reset({
-                    code: response.data.code || '',
-                    status: response.data.status || '',
-                    staff: response.data.staff || '',
-                    expectedDeliveryDate: (response.data.expectedDeliveryDate as string).split('T')[0] || '',
-                    paymentStatus: response.data.paymentStatus || '',
-                    paymentMethod: response.data.paymentMethod || '',
-                    paymentDueDate: (response.data.paymentDueDate as string).split('T')[0] || '',
-                    note: response.data.note || ''
-                });
-                setValue('orderBy', selectedUser as string);
-                setSelectedUser(response.data.orderBy);
-                setProductOrder(response.data.products as OrderProductItem[]);
-            }
+    const fetchOrder = useCallback(async () => {
+        if(!id) return;
+        const response = await getOrderById(id as string);
+        if(response.success && response.data) {
+            setOrderData(response.data);
+            reset({
+                code: response.data.code || '',
+                status: response.data.status || '',
+                staff: response.data.staff || '',
+                expectedDeliveryDate: (response.data.expectedDeliveryDate as string).split('T')[0] || '',
+                paymentStatus: response.data.paymentStatus || '',
+                paymentMethod: response.data.paymentMethod || '',
+                paymentDueDate: (response.data.paymentDueDate as string).split('T')[0] || '',
+                note: response.data.note || ''
+            });
+            setValue('orderBy', response.data.orderBy || '');
+            setSelectedUser(response.data.orderBy);
+            setProductOrder(response.data.products as OrderProductItem[]);
         }
-        fetchOrder();
-    }, [id, reset, products, setValue, selectedUser]);
+    }, [id, reset, setValue]);
 
+    useEffect(() => {
+        fetchOrder();
+    }, [fetchOrder]);
+    // Cập nhật lại tôi đơn hàng
+    const orderProductTotal =productOrder?.reduce((sum, item) => {
+        return sum + ((item.price as number )* item.quantity)
+    },0);
+    const orderTotalUpdate = totalOrder + (orderProductTotal as number);
     const handleUpdateOrder = async (data: OrderData) => {
         const mergedProductsData = [...productOrder as OrderProductItem[], ...orderProduct];
         const temp: Record<string, OrderProductItem> = {};
@@ -193,11 +199,10 @@ export const OrderManagementFormAddEdit = () => {
             }
         });
         const productsData = Object.values(temp);
-        console.log(productsData);
         try{
             const newOrderData = {
                 code: data.code,
-                products: orderProduct,
+                products: productsData,
                 status: data.status,
                 orderBy: selectedUser,
                 total: totalOrder,
@@ -208,15 +213,17 @@ export const OrderManagementFormAddEdit = () => {
                 staff: data.staff,
                 expectedDeliveryDate: data.expectedDeliveryDate
             }
+            console.log(newOrderData);
             const response = await updateOrder(newOrderData as OrderData, id as string);
             if(response.success) {
                 toast.success(response.message);
-                fetchOrders();
+                dispatch(removeAllOrderProduct());
+                fetchOrder();
             }
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage);
-            fetchOrders();
+            fetchOrder();
         }
     }
     return (
@@ -358,7 +365,8 @@ export const OrderManagementFormAddEdit = () => {
                                 handleSelectionChangeProduct={handleSelectionChangeProduct}
                                 product={product as Product}
                                 products={products as Product[]}
-                                orderProduct={orderProduct}
+                                orderProducts={orderProduct}
+                                order={orderData}
                             />
                         </Paper>
                         <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
@@ -397,7 +405,7 @@ export const OrderManagementFormAddEdit = () => {
                                             Tạm tính:
                                         </Typography>
                                         <Typography variant='body1'>
-                                            {totalOrder.toLocaleString()} VNĐ
+                                            {id ? orderTotalUpdate.toLocaleString() : totalOrder.toLocaleString()} VNĐ
                                         </Typography>
                                     </Box>
                                     
@@ -433,7 +441,7 @@ export const OrderManagementFormAddEdit = () => {
                                             Tổng cộng:
                                         </Typography>
                                         <Typography variant='body2' fontWeight='bold' color='primary.main'>
-                                            {totalOrder.toLocaleString()} VNĐ
+                                            {id ? orderTotalUpdate.toLocaleString() : totalOrder.toLocaleString()} VNĐ
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -479,14 +487,16 @@ export const OrderManagementFormAddEdit = () => {
                                 />
                             </Box>
                         </Paper>
-                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
-                            <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
-                                <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                    Danh sách sản phẩm tồn tại trong giỏ hàng
-                                </Typography>
-                            </Box>
-                            <OrderManagementFormListProduct orderProduct={productOrder as OrderProductItem[]} productsData={products}  edit='true' oid={id as string}/>
-                        </Paper>
+                        {id && (
+                            <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                                <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
+                                    <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
+                                        Danh sách sản phẩm tồn tại trong giỏ hàng
+                                    </Typography>
+                                </Box>
+                                <OrderManagementFormListProduct orderProduct={productOrder as OrderProductItem[]} productsData={products}  edit='true' oid={id as string} renderOrder={fetchOrder}/>
+                            </Paper>
+                        )}
                     </Box>
                 </Box>
 

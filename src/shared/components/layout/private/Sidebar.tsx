@@ -49,7 +49,7 @@ const menuItems: MenuItem[] = [
   { text: 'Kho hàng', icon: <Warehouse />, path: '/admin',
     subItems: [
       { text: 'Nguyên liệu', icon: <Label/>, path: '/admin/material-management' },
-      { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/receipt-management' },
+      { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/supplier-management' },
       { text: 'Nhập kho', icon: <AddHome/>, path: '/admin/receipt-management' },
       { text: 'Xuất kho', icon: <AddHomeWork/>, path: '/admin/receipt-management' },
       { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/quote-management' },

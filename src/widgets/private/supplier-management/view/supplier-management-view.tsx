@@ -3,7 +3,7 @@ import { Box, useTheme } from "@mui/material"
 import { Breadcrumb } from "@/shared/components"
 import { SupplierManagementFormList } from "../ui/supplier-management-form-list";
 
-export const MaterialManagementView = () => {
+export const SupplierManagementView = () => {
     const theme = useTheme();
     return (
         <>
@@ -16,7 +16,7 @@ export const MaterialManagementView = () => {
                 <Breadcrumb
                     type='Admin'
                     breadcrumb={[{
-                        name: 'Quản lý danh sách nguyên liệu',
+                        name: 'Quản lý danh sách nhà cung cấp',
                         url: '/admin/receipt-management',
                     },
                 ]}

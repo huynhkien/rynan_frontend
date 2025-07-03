@@ -7,9 +7,8 @@ import { Product } from '@/features/product/type/productType';
 import { getAllUser, getUserById } from '@/features/user/api/userApis';
 import { OrderProductItem, UserData } from '@/features/user/type/userTypes';
 import { ControlledSelect } from '@/shared/components/ui/private/ControlledSelect';
-import { CustomerGender, OrderStatus, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
+import {OrderStatus, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
 import { Box, Typography, useTheme, Button, Paper, Divider } from '@mui/material'
-import moment from 'moment';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
@@ -19,6 +18,7 @@ import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { createOrder, getAllOrder, getOrderById, updateOrder } from '@/features/order/api/orderApi';
 import { toast } from 'react-toastify';
 import { removeAllOrderProduct } from '@/features/user/store/userSlice';
+import { OrderManagementFormListUser } from './order-management-form-list-user';
 
 export const OrderManagementFormAddEdit = () => {
     const { register, formState: { errors }, reset, control, handleSubmit, setValue} = useForm<OrderData>();
@@ -114,17 +114,6 @@ export const OrderManagementFormAddEdit = () => {
         };
         fetchUser();
     }, [selectedUser]);
-    // Hiển thị thông tin khách hàng
-    const UserInfoRow = ({ label, value }: { label: string; value: string | undefined }) => (
-        <Box sx={{ display: 'flex', gap: 1, py: 1, borderBottom: `1px solid ${theme.palette.divider}` }}>
-          <Typography variant='body1' sx={{ fontWeight: 500, minWidth: '80px' }}>
-            {label}:
-          </Typography>
-          <Typography variant='body1' sx={{ color: theme.palette.text.primary }}>
-            {value || 'Trống'}
-          </Typography>
-        </Box>
-    );
     // Tính tổng đơn hàng
     const totalOrder = orderProduct.reduce((sum, item) => {
         return sum + (item.quantity * (item.price as number))
@@ -347,14 +336,7 @@ export const OrderManagementFormAddEdit = () => {
                                     rules={{ required: 'Vui lòng chọn thông tin khách hàng' }}
                                 />
                                 <Box sx={{ mt: 1 }}>
-                                <UserInfoRow label='Họ và tên' value={user?.name} />
-                                <UserInfoRow label='Giới tính' value={CustomerGender.find((el) => el._id === user?.gender)?.name} />
-                                <UserInfoRow label='SĐT' value={user?.phone} />
-                                <UserInfoRow label='Email' value={user?.email} />
-                                <UserInfoRow label='Địa chỉ' value={user?.address?.detail} />
-                                <UserInfoRow label='Ngày sinh' value={moment(user?.dateOfBirth).format('DD/MM/YYYY')} />
-                                <UserInfoRow label='Mã số thuế' value={user?.tax_code as string} />
-                                <UserInfoRow label='Thông tin xuất hóa đơn' value={user?.invoice_address as string} />
+                                    <OrderManagementFormListUser user={user as UserData}/>
                                 </Box>
                             </Box>
                         </Paper>

@@ -74,6 +74,13 @@ export const isActive = [{
     _id: 'Ngừng bán',
     name: 'Ngừng bán'
 }]
+export const isActiveSupplier = [{
+    _id: 'Hoạt động',
+    name: 'Hoạt động',
+},{
+    _id: 'Ngừng Hoạt động',
+    name: 'Ngừng Hoạt động'
+}]
 // Các loại giá của một sản phẩm
 export const PriceType = [
     {
@@ -361,3 +368,26 @@ export const PaymentStatuses = [
   { _id: 'UNPAID', name: 'Chưa thanh toán' },
   { _id: 'PARTIALLY_PAID', name: 'Thanh toán một phần' }
 ] 
+// Thông tin ngân hàng
+export const BANK_LIST = [
+  { _id: "vietcombank", name: "Ngân hàng TMCP Ngoại thương Việt Nam (Vietcombank)" },
+  { _id: "vietinbank", name: "Ngân hàng TMCP Công thương Việt Nam (VietinBank)" },
+  { _id: "bidv", name: "Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV)" },
+  { _id: "agribank", name: "Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam (Agribank)" },
+  { _id: "techcombank", name: "Ngân hàng TMCP Kỹ Thương Việt Nam (Techcombank)" },
+  { _id: "vpbank", name: "Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank)" },
+  { _id: "acb", name: "Ngân hàng TMCP Á Châu (ACB)" },
+  { _id: "mbbank", name: "Ngân hàng TMCP Quân đội (MB Bank)" },
+  { _id: "sacombank", name: "Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank)" },
+  { _id: "shb", name: "Ngân hàng TMCP Sài Gòn – Hà Nội (SHB)" },
+  { _id: "tpbank", name: "Ngân hàng TMCP Tiên Phong (TPBank)" },
+  { _id: "hdbank", name: "Ngân hàng TMCP Phát triển TP.HCM (HDBank)" },
+  { _id: "vib", name: "Ngân hàng TMCP Quốc tế Việt Nam (VIB)" },
+  { _id: "ocb", name: "Ngân hàng TMCP Phương Đông (OCB)" },
+  { _id: "eximbank", name: "Ngân hàng TMCP Xuất Nhập Khẩu Việt Nam (Eximbank)" },
+  { _id: "seabank", name: "Ngân hàng TMCP Đông Nam Á (SeABank)" },
+  { _id: "baovietbank", name: "Ngân hàng TMCP Bảo Việt (BaoVietBank)" },
+  { _id: "pgbank", name: "Ngân hàng TMCP Xăng dầu Petrolimex (PGBank)" },
+  { _id: "namabank", name: "Ngân hàng TMCP Nam Á (Nam A Bank)" },
+  { _id: "lpbank", name: "Ngân hàng TMCP Bưu điện Liên Việt (LPBank)" }
+];

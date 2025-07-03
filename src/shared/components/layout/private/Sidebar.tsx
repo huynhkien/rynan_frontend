@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts } from '@mui/icons-material';
+import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -39,17 +39,25 @@ const menuItems: MenuItem[] = [
     ]
   },
   { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', },
-  { text: 'Báo giá', icon: <RequestQuote />, path: '/admin', badge: 5 ,
+  { text: 'Báo giá', icon: <RequestQuote />, path: '/admin',
     subItems: [
       { text: 'Tìm kiếm thông tin khách', icon: <Person/>, path: '/admin/quote-management' },
       { text: 'Báo giá', icon: <RequestQuote/>, path: '/admin/quote-management' },
     ]
   },
   { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin/order-management' },
+  { text: 'Kho hàng', icon: <Warehouse />, path: '/admin',
+    subItems: [
+      { text: 'Nguyên liệu', icon: <Label/>, path: '/admin/material-management' },
+      { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/receipt-management' },
+      { text: 'Nhập kho', icon: <AddHome/>, path: '/admin/receipt-management' },
+      { text: 'Xuất kho', icon: <AddHomeWork/>, path: '/admin/receipt-management' },
+      { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/quote-management' },
+    ]
+   },
   { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
   { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
   { text: 'Bình luận', icon: <Comment />, path: '/admin' },
-  { text: 'Kho hàng', icon: <Warehouse />, path: '/admin' },
 ];
 
 const bottomItems: MenuItem[] = [

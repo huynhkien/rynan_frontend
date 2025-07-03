@@ -51,10 +51,12 @@ export interface OrderManagementFormAddProductProps {
     handleSelectionChangeProduct?: (id: string  | number) => void;
     products?: Product[];
     product?: Product;
-    orderProduct?: OrderProductItem[],
+    orderProducts?: OrderProductItem[],
     edit?: string;
     oid?: string;
     pid?: string;
+    order?: OrderData;
+    render?: () => void;
 }
 export interface OrderProductProps {
     orderProduct: OrderProductItem[];
@@ -62,5 +64,6 @@ export interface OrderProductProps {
     edit?: string
     productsData?: Product[];
     oid?: string;
+    renderOrder?: () => void;
 }
 export type OrderFormInputProps = FormInputProps<OrderData>;

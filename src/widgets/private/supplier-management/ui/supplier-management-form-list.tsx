@@ -377,6 +377,11 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
+                          {item.tax_code}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
                           {BANK_LIST.find((el) => el._id === item.bank_account.bank_name)?.name}
                         </Typography>
                       </TableCell>
@@ -392,7 +397,7 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.note}
+                          {item?.note || 'Không ghi chú'}
                         </Typography>
                       </TableCell>
                       <TableCell>

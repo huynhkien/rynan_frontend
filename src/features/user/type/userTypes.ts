@@ -1,3 +1,4 @@
+import { ReceiptMaterialData } from "@/features/receipt/type/receiptType";
 import { FormInputProps, InputImageProps } from "@/types/components/input";
 
 // UPdate
@@ -118,6 +119,7 @@ export interface UserState {
   cart: CartItem[];
   quoteProduct: QuoteProductItem[];
   orderProduct: OrderProductItem[];
+  materialReceipt: ReceiptMaterialData[];
 }
 
 export interface LoginPayload {

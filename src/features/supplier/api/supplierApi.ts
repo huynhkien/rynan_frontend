@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/configs/axios";
-import { SupplierEndpoints } from "./supplierEndpoints";
 import { SupplierData, SupplierResponse, SuppliersResponse } from "../type/supplierType";
+import { SupplierEndpoints } from "./supplierEndpoint";
 
 // Thêm nguyên liệu
 export const createSupplier = async (data: SupplierData): Promise<SupplierResponse> => 

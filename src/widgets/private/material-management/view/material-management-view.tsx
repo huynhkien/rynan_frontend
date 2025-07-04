@@ -17,7 +17,7 @@ export const MaterialManagementView = () => {
                     type='Admin'
                     breadcrumb={[{
                         name: 'Quản lý danh sách nguyên liệu',
-                        url: '/admin/receipt-management',
+                        url: '/admin/material-management',
                     },
                 ]}
                 />

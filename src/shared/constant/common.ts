@@ -391,3 +391,9 @@ export const BANK_LIST = [
   { _id: "namabank", name: "Ngân hàng TMCP Nam Á (Nam A Bank)" },
   { _id: "lpbank", name: "Ngân hàng TMCP Bưu điện Liên Việt (LPBank)" }
 ];
+// Xử lý duyệt
+export const ReceiptStatus = [
+  { _id: 'pending', name: 'Chờ xử lý' },
+  { _id: 'confirmed', name: 'Đã duyệt' },
+  { _id: 'cancelled', name: 'Đã hủy' }
+];

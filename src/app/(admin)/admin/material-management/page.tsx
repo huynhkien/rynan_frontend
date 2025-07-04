@@ -1,4 +1,4 @@
-import { MaterialManagementView } from "@/widgets/private/material-management/view/material-management-view"
+import { MaterialManagementView } from "@/widgets/private/material-management/view/material-management-view";
 
 const MaterialManagement = () => {
     return (

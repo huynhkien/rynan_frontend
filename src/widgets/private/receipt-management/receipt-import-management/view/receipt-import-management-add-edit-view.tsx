@@ -1,9 +1,9 @@
 'use client'
-import { Box, useTheme } from "@mui/material"
-import { ReceiptManagementFormAddEdit } from "../ui/receipt-management-form-add-edit"
 import { Breadcrumb } from "@/shared/components"
+import { ReceiptImportManagementFormAddEdit } from "../ui/receipt-import-management-form-add-edit"
+import { Box, useTheme } from "@mui/material"
 
-export const ReceiptManagementAddView = () => {
+export const ReceiptImportManagementAddEditView = () => {
     const theme = useTheme();
     return (
         <>
@@ -16,17 +16,17 @@ export const ReceiptManagementAddView = () => {
                 <Breadcrumb
                     type='Admin'
                     breadcrumb={[{
-                        name: 'Quản lý phiếu xuất & nhập',
-                        url: '/admin/receipt-management',
+                        name: 'Quản lý nhập kho',
+                        url: '/admin/receipt-management/import',
                     },
                     {
-                        name: 'Thêm phiếu xuất & nhập',
-                        url: '/admin/receipt-management/add'
-                    }
+                        name: 'Nhập kho',
+                        url: '/admin/receipt-management/import/add',
+                    },
                 ]}
                 />
             </Box>
-            <ReceiptManagementFormAddEdit/>
+            <ReceiptImportManagementFormAddEdit/>
         </>
     )
 }

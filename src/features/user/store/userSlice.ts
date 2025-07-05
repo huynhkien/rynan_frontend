@@ -3,13 +3,14 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as actions from './asyncAction';
 import { CartItem, LoginPayload, UserData, UserState } from '../type/userTypes';
 import { getFromLocalStorage, removeToLocalStorage, setToLocalStorage } from '../utils/helper';
-import { ReceiptMaterialData } from '@/features/receipt/type/receiptType';
+import { ReceiptMaterialData, ReceiptProductData } from '@/features/receipt/type/receiptType';
 
 // Khởi tạo trang thái giỏ hàng
 const initialCart: CartItem[] = getFromLocalStorage('cart', []);
 const initialProductQuote: QuoteProductItem[] = getFromLocalStorage('quote_product', []);
 const initialProductOrder: OrderProductItem[] = getFromLocalStorage('order_product', []);
 const initialMaterialReceipt: ReceiptMaterialData[] = getFromLocalStorage('material_receipt', []);
+const initialProductReceipt: ReceiptProductData[] = getFromLocalStorage('product_receipt', []);
 // Khởi tạo trạng thái người dùng
 const initialState: UserState = {
   isLogin: false,
@@ -20,7 +21,8 @@ const initialState: UserState = {
   cart: initialCart,
   quoteProduct: initialProductQuote,
   orderProduct: initialProductOrder,
-  materialReceipt: initialMaterialReceipt
+  materialReceipt: initialMaterialReceipt,
+  productReceipt: initialProductReceipt
 };
 
 export const userSlice = createSlice({
@@ -132,7 +134,7 @@ export const userSlice = createSlice({
         item => item.mid === mid 
       );
       if(existingItem !== -1) {
-        state.materialReceipt[existingItem].quantity += quantity;
+        return;
       }else{
         state.materialReceipt.push({mid, specification, quantity, name, price, batchNumber, expiryDate, manufacturingDate});
       }
@@ -166,6 +168,48 @@ export const userSlice = createSlice({
         manufacturingDate
       };
       setToLocalStorage('material_receipt', state.materialReceipt);
+    }
+},
+    // Xử lý thêm sản phâm trong kho
+    addProductToReceipt: (state, action: PayloadAction<ReceiptProductData>) => {
+      const {pid, name, quantity, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
+      const existingItem = state.productReceipt.findIndex(
+        item => item.pid === pid 
+      );
+      if(existingItem !== -1) {
+        return;
+      }else{
+        state.productReceipt.push({pid, specification, quantity, name, batchNumber, expiryDate, manufacturingDate});
+      }
+      setToLocalStorage('product_receipt', state.productReceipt);
+    },
+    
+    removeItemProductReceipt: (state, action) => {
+      const {pid} = action.payload;
+      state.productReceipt = state.productReceipt.filter(
+        item => !(item.pid === pid)
+      );
+      setToLocalStorage('product_receipt', state.productReceipt);
+    },
+    removeAllProductReceipt: (state) => {
+      state.productReceipt = [];
+      removeToLocalStorage('product_receipt');
+    },
+   updateProductByPid: (state, action: PayloadAction<ReceiptProductData>) => {
+    const {pid, quantity, name, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
+    const existingItemIndex = state.productReceipt.findIndex(item => item.pid === pid);
+    
+    if(existingItemIndex !== -1) {
+      state.productReceipt[existingItemIndex] = {
+        pid, 
+        quantity, 
+        name, 
+        specification, 
+        batchNumber, 
+        expiryDate, 
+        manufacturingDate
+      };
+      setToLocalStorage('product_receipt', state.productReceipt);
     }
 },
   },
@@ -207,7 +251,11 @@ export const {
   addMaterialToReceipt,
   removeAllMaterialReceipt,
   removeItemMaterialReceipt,
-  updateMaterialByMid
+  updateMaterialByMid,
+  addProductToReceipt,
+  removeAllProductReceipt,
+  removeItemProductReceipt,
+  updateProductByPid
 } 
   = userSlice.actions;
 export default userSlice.reducer;

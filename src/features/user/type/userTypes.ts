@@ -1,4 +1,4 @@
-import { ReceiptMaterialData } from "@/features/receipt/type/receiptType";
+import { ReceiptMaterialData, ReceiptProductData } from "@/features/receipt/type/receiptType";
 import { FormInputProps, InputImageProps } from "@/types/components/input";
 
 // UPdate
@@ -120,6 +120,7 @@ export interface UserState {
   quoteProduct: QuoteProductItem[];
   orderProduct: OrderProductItem[];
   materialReceipt: ReceiptMaterialData[];
+  productReceipt: ReceiptProductData[];
 }
 
 export interface LoginPayload {

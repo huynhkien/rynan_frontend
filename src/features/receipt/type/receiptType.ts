@@ -1,4 +1,5 @@
 import { MaterialData } from "@/features/material/type/materialType";
+import { Product } from "@/features/product/type/productType";
 import { Specification } from "@/features/specification/type/specificationType";
 import { SupplierData } from "@/features/supplier/type/supplierType";
 import { UserData } from "@/features/user/type/userTypes";
@@ -7,25 +8,26 @@ import { FormInputProps } from "@/types/components/input";
 export interface ReceiptData extends Record<string, unknown> {
     _id?: string;
     staff?: string;
-    status: string;
-    supplier: string;
-    products: ReceiptProductData[];
-    materials: ReceiptMaterialData[];
-    typeReceipt: string;
+    status?: string;
+    supplier?: string;
+    products?: ReceiptProductData[];
+    materials?: ReceiptMaterialData[];
+    typeReceipt?: string;
     createdAt?: string | Date;
     code: string;
     note?: string;
     total: number;
     exportedTo?: string;
-    approvedBy: string;
-    paymentMethod: string;
-    paymentStatus: string;
+    approvedBy?: string;
+    paymentMethod?: string;
+    paymentStatus?: string;
+    produced_at?: string;
 }
 
 export interface ReceiptProductData extends Record<string, unknown> {
     pid?: string;
     name?: string;
-    quantity?: number;
+    quantity: number;
     specification?: string;
     batchNumber?: string; // Số lô hàng
     expiryDate?: string | Date, // Hạn sử dụng
@@ -51,7 +53,7 @@ export interface ReceiptResponse {
 }
 export interface ReceiptsResponse {
     success: boolean;
-    // message?: string;
+    message?: string;
     data?: ReceiptData[];
 }
 export interface ReceiptImportManagementFormAddEditMaterialProps {
@@ -74,8 +76,30 @@ export interface ReceiptImportManagementFormAddEditMaterialItemProps{
     materialReceipt?: ReceiptMaterialData[];
     isEditMaterialState?: string;
 }
+export interface ReceiptImportManagementFormAddEditProductItemProps{
+    products?: Product[];
+    product?: Product;
+    handleSelectProduct?: (id: string | number) => void;
+    specifications?: Specification[];
+    productReceipt?: ReceiptProductData[];
+    isEditProductState?: string;
+}
+export interface ReceiptImportManagementFormAddEditProductProps {
+    products: Product[];
+    product: Product;
+    receipts?: ReceiptData[];
+    users: UserData[];
+    handleSelectUser: (id: string | number) => void;
+    handleSelectProduct: (id: string | number) => void;
+    specifications: Specification[];
+    productReceipt?: ReceiptProductData[];
+}
 export interface ReceiptImportManagementFormListMaterialItemProps {
     materialReceipt: ReceiptMaterialData[];
+    specifications: Specification[];
+}
+export interface ReceiptImportManagementFormListProductItemProps {
+    productReceipt: ReceiptProductData[];
     specifications: Specification[];
 }
 export type ReceiptFormInputProps = FormInputProps<ReceiptData>;

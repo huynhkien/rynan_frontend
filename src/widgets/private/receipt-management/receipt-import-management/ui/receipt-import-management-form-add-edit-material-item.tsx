@@ -20,17 +20,25 @@ export const ReceiptImportManagementFormAddEditMaterialItem = ({isEditMaterialSt
     const selectedBatchNumber = watch('batchNumber');  
     const selectedExpiryDate = watch('expiryDate');  
     const selectedManufacturingDate = watch('manufacturingDate');
+    //  reset
+    const resetValue = () => {
+        setValue('price', 0);
+        setValue('name', '');
+        setValue('quantity', 0);
+        setValue('batchNumber', '');
+        setValue('expiryDate', '');
+        setValue('manufacturingDate', ''); 
+        setValue('batchNumber', ''); 
+    } 
     // Thêm material redux
     const handleAddMaterial = async () => {
         if(!material?._id ||!material.specification || !material?.name || !selectedQuantity || !selectedPrice || !selectedBatchNumber || !selectedExpiryDate || !selectedManufacturingDate  ){
             toast.error('Thiếu thông tin về nguyên liệu');
-            reset();
             return;
             
         }
         if(materialReceipt && materialReceipt?.find(el => el.mid === material._id)){
             toast.error('Vui lòng chọn loại nguyên liệu khác');
-            reset();
             return;
         }
         dispatch(addMaterialToReceipt({
@@ -44,7 +52,7 @@ export const ReceiptImportManagementFormAddEditMaterialItem = ({isEditMaterialSt
             manufacturingDate: selectedManufacturingDate
         }));
         toast.success('Thêm nguyên liệu thành công');
-        reset();
+        resetValue();
     }
     // Hiển thị giá trị quy cách
     useEffect(() => {

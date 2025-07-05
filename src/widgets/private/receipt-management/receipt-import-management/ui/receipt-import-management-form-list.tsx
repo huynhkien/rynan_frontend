@@ -20,36 +20,42 @@ import {
   Typography,
   Box,
   Checkbox,
+  Tabs,
+  Tab,
 } from '@mui/material';
 import { Add,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
-import { SupplierData } from '@/features/supplier/type/supplierType';
-import { deleteSupplier, getAllSupplier } from '@/features/supplier/api/supplierApi';
-import { BANK_LIST } from '@/shared/constant/common';
 import Link from 'next/link';
+import { ReceiptData } from '@/features/receipt/type/receiptType';
+import { deleteReceipt, getAllReceipt } from '@/features/receipt/api/receiptApi';
+import moment from 'moment';
 
 
-const headCells = [
-  { id: 'name', label: 'Tên nhà cung cấp', sortable: true },
-  { id: 'code', label: 'Mã code', sortable: false },
-  { id: 'contact_person', label: 'Người liên hệ', sortable: true },
-  { id: 'email', label: 'Email', sortable: false },
-  { id: 'phone', label: 'SĐT', sortable: false },
-  { id: 'address', label: 'Địa chỉ', sortable: false },
-  { id: 'tax_code', label: 'Mã số thuế', sortable: false },
-  { id: 'account_bank', label: 'Tài khoản', sortable: false },
-  { id: 'account_number', label: 'Số Tài khoản', sortable: false },
-  { id: 'isActive', label: 'Trạng thái', sortable: false },
-  { id: 'note', label: 'Ghi chú', sortable: false },
-  { id: 'actions', label: 'Thao tác', sortable: false }
-];
 
 type SortOrder = 'asc' | 'desc';
-
-export const ReceiptImportManagementFormList = () => {
+const headCellsProduct = [
+      { id: 'code', label: 'Mã phiếu nhập', sortable: true },
+      { id: 'staff', label: 'Nhân viên thực hiện', sortable: false },
+      { id: 'status', label: 'Trạng thái', sortable: true },
+      { id: 'supplier', label: 'Sản xuất tại', sortable: false },
+      { id: 'products', label: 'Sản phẩm', sortable: false },
+      { id: 'note', label: 'Ghi chú', sortable: false },
+      { id: 'actions', label: 'Thao tác', sortable: false }
+    ];
+const headCellsMaterial = [
+      { id: 'code', label: 'Mã phiếu nhập', sortable: true },
+      { id: 'staff', label: 'Nhân viên thực hiện', sortable: false },
+      { id: 'status', label: 'Trạng thái', sortable: true },
+      { id: 'supplier', label: 'Nhà cung cấp', sortable: false },
+      { id: 'materials', label: 'Nguyên liệu', sortable: false },
+      { id: 'note', label: 'Ghi chú', sortable: false },
+      { id: 'total', label: 'Tổng thanh toán', sortable: false },
+      { id: 'createdAt', label: 'Ngày tạo', sortable: false },
+      { id: 'actions', label: 'Thao tác', sortable: false }
+    ];
+const ReceiptImportManagementFormListMaterial = ({receipts, fetchAllReceipt}: {receipts:ReceiptData[]; fetchAllReceipt: () => void;}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [supplier, setSupplier] = useState<SupplierData[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -57,33 +63,21 @@ export const ReceiptImportManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
-    // Hiển thị thông tin quy cách
-    const fetchAllSupplier = async () => {
-        const response = await getAllSupplier();
-        if(response.success) {
-          setSupplier(response.data as SupplierData[]);
-        }
-      }
-
-    // hiển thị tất cả nhà cung cấp
-    useEffect(() => {
-      
-      fetchAllSupplier();
-    },[]);
-    // xóa nhà cung cấp
+    
+    // xóa phiếu nhập kho
     const handleDelete = async(id: string) => {
       try{
-        if(window.confirm('Bạn có chắc muốn xóa nhà cung cấp không?')){
-        const response = await deleteSupplier(id);
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+        const response = await deleteReceipt(id);
         if(response.success) {
           toast.success(response.message);
-          fetchAllSupplier();
+          fetchAllReceipt();
           return;
             }
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
-        fetchAllSupplier();
+        fetchAllReceipt();
       }
     };
 
@@ -103,10 +97,10 @@ export const ReceiptImportManagementFormList = () => {
     };
     // click chọn tất cả
     const handleAllCheckbox = () => {
-        if(selectedItems.length === supplier?.length){
+        if(selectedItems.length === receipts?.length){
             setSelectedItems([]);
         }else{
-            setSelectedItems(supplier.map(el => el._id as string));
+            setSelectedItems(receipts.map(el => el._id as string));
         }
     }
     // click chọn từng item
@@ -120,48 +114,36 @@ export const ReceiptImportManagementFormList = () => {
         });
     }
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === supplier?.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= supplier.length;
+    const isAllSelected = selectedItems.length === receipts?.length;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
 
     const filteredAndSortedData = useMemo(() => {
-        const filtered = supplier.filter(item => {
-        const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            item.name.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                            (item.address.addressAdd).toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                            item.email.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                            item.phone.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                            item.tax_code.toLowerCase().startsWith(searchTerm.toLowerCase()) ||
-                            item.contact_person.toLowerCase().startsWith(searchTerm.toLowerCase()) ;
+        const filtered = receipts?.filter(item => {
+        const matchesSearch =
+                            item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
         const matchesAlpha =
                   filterAlpha === 'all' ||
-                  item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  item.name.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  (item.address.addressAdd).toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  item.email.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  item.phone.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  item.tax_code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
-                  item.contact_person.toLowerCase().startsWith(filterAlpha.toLowerCase()) ;
+                  item.code.toLowerCase().startsWith(filterAlpha.toLowerCase());
         return matchesSearch && matchesAlpha;
         });
 
-    // Sắp xếp
-    if (sortBy && headCells.find(cell => cell.id === sortBy)?.sortable) {
-      filtered.sort((a, b) => {
-        const aValue = a[sortBy as keyof typeof a];
-        const bValue = b[sortBy as keyof typeof b];
-        
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          const comparison = aValue.localeCompare(bValue, 'vi');
-          return sortOrder === 'asc' ? comparison : -comparison;
-        }
-        
-        return 0;
-      });
-    }
+      // Sắp xếp
+      if (sortBy && headCellsMaterial.find(cell => cell.id === sortBy)?.sortable) {
+        filtered.sort((a, b) => {
+          const aValue = a[sortBy as keyof typeof a];
+          const bValue = b[sortBy as keyof typeof b];
+          
+          if (typeof aValue === 'string' && typeof bValue === 'string') {
+            const comparison = aValue.localeCompare(bValue, 'vi');
+            return sortOrder === 'asc' ? comparison : -comparison;
+          }
+          
+          return 0;
+        });
+      }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, supplier, filterAlpha]);
+    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha]);
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -180,11 +162,6 @@ return (
           <Box
             sx={{display: 'flex', gap: 2}}
           >
-            <Box sx={{p: 1, backgroundColor: theme.palette.primary.main}}>
-                <Link href='/admin/receipt-management/import/add' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
-                    <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
-                </Link>
-            </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
@@ -204,7 +181,7 @@ return (
             <Box >
                 <TextField
                     fullWidth
-                    label='Tìm kiếm nhà cung cấp'
+                    label='Tìm kiếm phiếu nhập kho'
                     variant='outlined'
                     size='small'
                      sx={{
@@ -243,7 +220,7 @@ return (
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} nhà cung cấp
+              Hiển thị: {filteredAndSortedData.length} phiếu nhập kho
             </Typography>
           </Box>
         </Box>
@@ -279,7 +256,7 @@ return (
                     />
                 </TableCell>
 
-                {headCells.map((headCell, index) => (
+                {headCellsMaterial.map((headCell, index) => (
                   <TableCell 
                     key={index}
                     sx={{ 
@@ -332,7 +309,7 @@ return (
                         </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
-                          {item.name}
+                          {item.code}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
@@ -343,47 +320,364 @@ return (
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical'
                         }}>
+                          {item.staff}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.status}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.supplier}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.materials?.length}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.note}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {item.total.toLocaleString()} VNĐ
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {moment(item?.createdAt).format('DD/MM/YYYY')}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        {/* Hành động */}
+                            <IconButton 
+                                color='success'
+                                aria-label={`Sửa ${item.name}`}
+                                size='small'
+                            >
+                                <Edit/>
+                            </IconButton>
+                            <IconButton 
+                                onClick={() => handleDelete(item._id as string)} 
+                                color='error'
+                                aria-label={`Xóa ${item.name}`}
+                                size='small'
+                            >
+                                <Delete />
+                            </IconButton>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50]}
+          component='div'
+          count={filteredAndSortedData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage='Số hàng mỗi trang:'
+          labelDisplayedRows={({ from, to, count }) => 
+            `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
+          }
+        />
+      </Paper>
+    </Box>
+  );
+};
+export const ReceiptImportManagementFormListProduct = ({receipts, fetchAllReceipt}: {receipts:ReceiptData[]; fetchAllReceipt: () => void;}) => {
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [sortBy, setSortBy] = useState<string>('name');
+    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const theme = useTheme();
+    
+    
+    // xóa phiếu nhập kho
+    const handleDelete = async(id: string) => {
+      try{
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+        const response = await deleteReceipt(id);
+        if(response.success) {
+          toast.success(response.message);
+          fetchAllReceipt();
+          return;
+            }
+        }
+      }catch(error: unknown){
+        toast.error(`Lỗi: ${error}`);
+        fetchAllReceipt();
+      }
+    };
+
+    const handleChangePage = (event: unknown, newPage: number) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
+
+    const handleSort = (property: string) => {
+        const isAsc = sortBy === property && sortOrder === 'asc';
+        setSortOrder(isAsc ? 'desc' : 'asc');
+        setSortBy(property);
+    };
+    // click chọn tất cả
+    const handleAllCheckbox = () => {
+        if(selectedItems.length === receipts?.length){
+            setSelectedItems([]);
+        }else{
+            setSelectedItems(receipts.map(el => el._id as string));
+        }
+    }
+    // click chọn từng item
+    const handleCheckbox = (id: string) => {
+        setSelectedItems(prev => {
+            if(prev.includes(id)){
+                return prev.filter(item => item !== id)
+            }else{
+                return [...prev, id];
+            }
+        });
+    }
+    // Kiểm tra trạng thái checkbox "Chọn tất cả"
+    const isAllSelected = selectedItems.length === receipts?.length;
+    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
+
+    const filteredAndSortedData = useMemo(() => {
+        const filtered = receipts.filter(item => {
+        const matchesSearch =
+                            item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
+        const matchesAlpha =
+                  filterAlpha === 'all' ||
+                  item.code.toLowerCase().startsWith(filterAlpha.toLowerCase());
+        return matchesSearch && matchesAlpha;
+        });
+
+    // Sắp xếp
+    if (sortBy && headCellsProduct.find(cell => cell.id === sortBy)?.sortable) {
+      filtered.sort((a, b) => {
+        const aValue = a[sortBy as keyof typeof a];
+        const bValue = b[sortBy as keyof typeof b];
+        
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          const comparison = aValue.localeCompare(bValue, 'vi');
+          return sortOrder === 'asc' ? comparison : -comparison;
+        }
+        
+        return 0;
+      });
+    }
+
+    return filtered;
+    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha]);
+return (
+    <Box sx={{ width: '100%' }}>
+      {/* Toolbar với tìm kiếm và filter */}
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                py: 2
+            }}>
+          <Box>
+            <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
+            Quản lý nhập kho
+          </Typography>
+          </Box>
+          <Box
+            sx={{display: 'flex', gap: 2}}
+          >
+            {isIndeterminate && (
+                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                </Box>
+            )}
+          </Box>
+        </Box>
+        <Box
+            sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                
+            }}
+        >
+          <Box sx={{display: 'flex', gap: 2}}>
+            <Box >
+                <TextField
+                    fullWidth
+                    label='Tìm kiếm phiếu nhập kho'
+                    variant='outlined'
+                    size='small'
+                     sx={{
+                        color: '#000',
+                        '& .MuiOutlinedInput-input': { color: '#000' }, 
+                        '& .MuiInputLabel-root': { color: '#000' },     
+                        '& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#000',
+                        },
+                    }}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder='Nhập tên, mô tả,...'
+                />
+            </Box>
+            <Box>
+                <FormControl fullWidth size='small' sx={{ 
+                '& .MuiInputLabel-root': { color: '#000' }, 
+                '& .MuiSelect-select': { color: '#000' }, 
+                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
+                width: '200px'
+                }}>
+                <InputLabel>Lọc theo chữ cái</InputLabel>
+                <Select
+                    value={filterAlpha}
+                    label='Lọc theo chữ cái'
+                    onChange={(e) => setFilterAlpha(e.target.value)}
+                >
+                    <MenuItem value='all'>Tất cả</MenuItem>
+                    {alphabet.map((letter) => (
+                      <MenuItem key={letter} value={letter}>{letter}</MenuItem>
+                    ))}
+                </Select>
+                </FormControl>
+            </Box>
+          </Box>
+          <Box>
+            <Typography variant='body1' sx={{ mt: 1 }}>
+              Hiển thị: {filteredAndSortedData.length} phiếu nhập kho
+            </Typography>
+          </Box>
+        </Box>
+      </Paper>
+
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+        <TableContainer sx={{ 
+          '&::-webkit-scrollbar': {
+            display: 'none'
+          },
+        
+        }}>
+          <Table>
+            <TableHead>
+              <TableRow
+                sx={{
+                  backgroundColor: theme.palette.primary.main,
+                  fontWeight: theme.typography.fontWeightBold,
+                }}
+              >
+                <TableCell padding='checkbox'>
+                    <Checkbox
+                        sx={{
+                            '&.Mui-checked': {
+                            color: 'text.secondary',
+                            }
+                        }}
+                        inputProps={{
+                        'aria-label': 'select all desserts',
+                        }}
+                        checked={isAllSelected}
+                        onClick={handleAllCheckbox}
+                    />
+                </TableCell>
+
+                {headCellsProduct.map((headCell, index) => (
+                  <TableCell 
+                    key={index}
+                    sx={{ 
+                      color: theme.palette.text.secondary,
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    {headCell.sortable ? (
+                      <TableSortLabel
+                        active={sortBy === headCell.id}
+                        direction={sortBy === headCell.id ? sortOrder : 'asc'}
+                        onClick={() => handleSort(headCell.id)}
+                        sx={{ 
+                          color: theme.palette.text.secondary + ' !important',
+                          '&:hover': {
+                            color: theme.palette.text.primary + ' !important'
+                          }
+                        }}
+                      >
+                        {headCell.label}
+                      </TableSortLabel>
+                    ) : (
+                      headCell.label
+                    )}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredAndSortedData.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} align='center' sx={{ py: 4 }}>
+                    {searchTerm ? 'Không tìm thấy sản phẩm nào' : 'Danh sách trống'}
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredAndSortedData
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((item) => (
+                    <TableRow key={item._id} hover>
+                        <TableCell padding='checkbox'>
+                            <Checkbox
+                                color='primary'
+                                checked={selectedItems.includes(item?._id as string)}
+                                onChange={() => handleCheckbox(item?._id as string)}
+                                inputProps={{
+                                'aria-label': 'select all desserts',
+                                }}
+                            />
+                        </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
+                        <Typography variant='body1' noWrap>
                           {item.code}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.contact_person}
+                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                        <Typography variant='body1' sx={{ 
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical'
+                        }}>
+                          {item.staff}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.email}
+                          {item.status}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.phone}
+                          {item.produced_at}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.address.detail}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.tax_code}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {BANK_LIST.find((el) => el._id === item.bank_account.bank_name)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.bank_account.account_number}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.isActive}
+                          {item.products?.length}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
@@ -431,4 +725,69 @@ return (
       </Paper>
     </Box>
   );
+};
+
+export const ReceiptImportManagementFormList = () => {
+    const theme = useTheme();
+    const [tabIndex, setTabIndex] = useState<number>(0);
+    const [receipts, setReceipts] = useState<ReceiptData[] | []>([]);
+    // Hiển thị thông tin quy cách
+    const fetchAllReceipts = async () => {
+        const response = await getAllReceipt();
+        if(response.success) {
+          setReceipts(response.data as ReceiptData[]);
+        }
+      }
+      // hiển thị tất cả phiếu nhập kho
+    useEffect(() => {
+      fetchAllReceipts();
+    },[]);
+    // Hiển thị thông tin phiếu theo sản phẩm
+    const receiptsProduct = receipts.filter((el) => (el.products?.length as number) > 0);
+    // Hiển thị thông tin phiếu theo nguyên liệu
+    const receiptsMaterial= receipts.filter((el) => (el.materials?.length as number) > 0);
+    // Tab handler
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabIndex(newValue);
+    };
+
+    const getInfoTab = () => {
+        switch (tabIndex) {
+            case 0:
+                return (
+                    <ReceiptImportManagementFormListMaterial receipts={receiptsMaterial} fetchAllReceipt={fetchAllReceipts}/>
+                );
+            case 1:
+                return (
+                    <ReceiptImportManagementFormListProduct receipts={receiptsProduct} fetchAllReceipt={fetchAllReceipts}/>
+                );
+            default:
+                return null;
+        }
+    };
+
+    return (
+        <Box sx={{ mb: 2,  }}>
+            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.default, display: 'flex' , justifyContent: 'space-between' }}>
+                <Tabs
+                    value={tabIndex}
+                    onChange={handleTabChange}
+                    sx={{ width: { xs: '100%', md: '40%' }, py: 2,  }}
+                    variant="fullWidth"
+                    indicatorColor="primary"
+                    textColor="primary"
+                >
+                    <Tab sx={{color: theme.palette.text.primary}} label='Nhập kho nguyên liệu' />
+                    <Tab sx={{color: theme.palette.text.primary}} label='Nhập kho sản phẩm' />
+                    
+                </Tabs>
+                <Box sx={{m: 2.5, backgroundColor: theme.palette.primary.main, display: 'flex', alignItems: 'center'}}>
+                      <Link href='/admin/receipt-management/import/add' style={{textDecoration: 'none', padding: 1, display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
+                        <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
+                      </Link>
+                </Box>
+            </Paper>
+            <Box>{getInfoTab()}</Box>
+        </Box>
+    );
 };

@@ -1,9 +1,9 @@
 'use client'
 import { Breadcrumb } from "@/shared/components"
-import { ReceiptImportManagementFormAddEdit } from "../ui/receipt-import-management-form-add-edit"
 import { Box, useTheme } from "@mui/material"
+import { ReceiptImportManagementFormAddEditProduct } from "../ui/receipt-import-management-form-add-edit-product";
 
-export const ReceiptImportManagementAddEditView = () => {
+export const ReceiptImportManagementAddEditProductView = () => {
     const theme = useTheme();
     return (
         <>
@@ -20,13 +20,13 @@ export const ReceiptImportManagementAddEditView = () => {
                         url: '/admin/receipt-management/import',
                     },
                     {
-                        name: 'Nhập kho',
-                        url: '/admin/receipt-management/import/add',
+                        name: 'Nhập kho sản phẩm',
+                        url: '/admin/receipt-management/import/add/product',
                     },
                 ]}
                 />
             </Box>
-            <ReceiptImportManagementFormAddEdit/>
+            <ReceiptImportManagementFormAddEditProduct/>
         </>
     )
 }

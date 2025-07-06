@@ -162,6 +162,11 @@ return (
           <Box
             sx={{display: 'flex', gap: 2}}
           >
+             <Box sx={{p:1, backgroundColor: theme.palette.primary.main, display: 'flex', alignItems: 'center'}}>
+                      <Link href='/admin/receipt-management/import/add/material' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
+                        <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
+                      </Link>
+                </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
@@ -504,6 +509,11 @@ return (
           <Box
             sx={{display: 'flex', gap: 2}}
           >
+             <Box sx={{p: 1, backgroundColor: theme.palette.primary.main, display: 'flex', alignItems: 'center'}}>
+                      <Link href='/admin/receipt-management/import/add/product' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
+                        <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
+                      </Link>
+                </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
@@ -781,11 +791,6 @@ export const ReceiptImportManagementFormList = () => {
                     <Tab sx={{color: theme.palette.text.primary}} label='Nhập kho sản phẩm' />
                     
                 </Tabs>
-                <Box sx={{m: 2.5, backgroundColor: theme.palette.primary.main, display: 'flex', alignItems: 'center'}}>
-                      <Link href='/admin/receipt-management/import/add' style={{textDecoration: 'none', padding: 1, display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
-                        <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
-                      </Link>
-                </Box>
             </Paper>
             <Box>{getInfoTab()}</Box>
         </Box>

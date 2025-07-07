@@ -10,7 +10,7 @@ import { useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 
-export const ReceiptImportManagementFormAddEditMaterialItem = ({render, receipt, isEditMaterialState, specifications, materialReceipt, materials, material, handleSelectMaterial, materialId}: ReceiptImportManagementFormAddEditMaterialItemProps) => {
+export const ReceiptExportManagementFormAddEditMaterialItem = ({render, receipt, isEditMaterialState, specifications, materialReceipt, materials, material, handleSelectMaterial, materialId}: ReceiptImportManagementFormAddEditMaterialItemProps) => {
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const { register, formState: { errors }, control, watch, reset, setValue} = useForm<ReceiptMaterialData>();
@@ -182,8 +182,8 @@ export const ReceiptImportManagementFormAddEditMaterialItem = ({render, receipt,
                 errors={errors as FieldErrors<ReceiptMaterialData>}
             />
             <ReceiptMaterialFormInput
-                label='Giá nguyên liệu nhập từ nhà cung cấp'
-                placeholder='Giá nguyên liệu nhập từ nhà cung cấp'
+                label='Giá nguyên liệu'
+                placeholder='Giá nguyên liệu'
                 type='number'
                 id='price'
                 register={register as UseFormRegister<ReceiptMaterialData>}
@@ -191,8 +191,8 @@ export const ReceiptImportManagementFormAddEditMaterialItem = ({render, receipt,
                 validate={{ required: 'Giá ko không được để trống' }}
             />
             <ReceiptMaterialFormInput
-                label='Số lượng nguyên liệu nhập từ nhà cung cấp'
-                placeholder='Số lượng nguyên liệu nhập từ nhà cung cấp'
+                label='Số lượng nguyên liệu'
+                placeholder='Số lượng nguyên liệu'
                 type='number'
                 id='quantity'
                 register={register as UseFormRegister<ReceiptMaterialData>}

@@ -23,6 +23,7 @@ import {  ReceiptImportManagementFormListProductItemProps } from '@/features/rec
 import moment from 'moment';
 import { removeItemProductReceipt } from '@/features/user/store/userSlice';
 import { ReceiptImportManagementFormAddEditProductItem } from './receipt-import-management-form-add-edit-product-item';
+import { deleteProductReceipt } from '@/features/receipt/api/receiptApi';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -37,15 +38,14 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const ReceiptImportManagementFormListProductItem = ({productReceipt, specifications} : ReceiptImportManagementFormListProductItemProps) => {
+export const ReceiptImportManagementFormListProductItem = ({productReceipt, materialId, render, specifications, action} : ReceiptImportManagementFormListProductItemProps) => {
     const [page, setPage] = useState(0);
     const dispatch = useAppDispatch();
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [isEditProductState, setIsEditProductState] = useState<string | null>(null);
-    console.log(isEditProductState);
-    console.log(productReceipt);
+    const filteredHeadCells = action ? headCells.filter(cell => cell.id !== 'actions') : headCells;
     const theme = useTheme();
     // xóa sản phẩm theo trạng thái
     const handleDelete = async(id: string) => {
@@ -54,6 +54,20 @@ export const ReceiptImportManagementFormListProductItem = ({productReceipt, spec
             pid: id
           }));
           toast.success('Xóa sản phẩm thành công')
+      };
+    }
+    // xóa nguyên liệu trong dữ liệu
+    const handleDeletePid = async(id: string) => {
+        if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
+          const response = await deleteProductReceipt(materialId as string, id)
+          if(response.success){
+            toast.success(response.message);
+            if(render){
+              render();
+            }
+          }else{
+            toast.error(response.message)
+          }
       };
     }
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -93,7 +107,7 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                {headCells.map((headCell, index) => (
+                {filteredHeadCells.map((headCell, index) => (
                   <TableCell 
                     key={index}
                     sx={{ 
@@ -136,7 +150,14 @@ return (
                   ?.map((item, index) => (
                     <TableRow key={index} hover>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
-                        <Typography variant='body1' noWrap>
+                        <Typography variant='body1'
+                          sx={{
+                            maxWidth: '100px',
+                            overflow: 'hidden',
+                            whiteSpace: 'nowrap',
+                            textOverflow: 'ellipsis'
+                          }}
+                        >
                           {item.name}
                         </Typography>
                       </TableCell>
@@ -171,9 +192,8 @@ return (
                           {moment(item.expiryDate).format('DD/MM/YYYY')}
                         </Typography>
                       </TableCell>
-                      
-                      
-                      <TableCell>
+                      {!action &&
+                        <TableCell>
                         {/* Hành động */}
                             <IconButton 
                                 color='success'
@@ -187,11 +207,12 @@ return (
                                 color='error'
                                 aria-label={`Xóa ${item.name_vn}`}
                                 size='small'
-                                onClick={() => handleDelete(item.specification as string)}
+                                onClick={materialId ? () => handleDeletePid(item.pid as string) : () => handleDelete(item.pid as string)}
                             >
                                 <Delete />
                             </IconButton>
                       </TableCell>
+                      }
                     </TableRow>
                   ))
               )}
@@ -229,7 +250,7 @@ return (
             }}
         >
             <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            <ReceiptImportManagementFormAddEditProductItem isEditProductState={isEditProductState as string} productReceipt={productReceipt} specifications={specifications} />
+            <ReceiptImportManagementFormAddEditProductItem materialId={materialId} isEditProductState={isEditProductState as string} productReceipt={productReceipt} specifications={specifications} render={render} />
         </Dialog>
       </Fragment>
     </Box>

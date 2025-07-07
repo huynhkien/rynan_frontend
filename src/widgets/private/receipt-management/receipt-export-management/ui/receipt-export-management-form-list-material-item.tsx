@@ -22,8 +22,8 @@ import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { ReceiptImportManagementFormListMaterialItemProps } from '@/features/receipt/type/receiptType';
 import moment from 'moment';
 import { removeItemMaterialReceipt } from '@/features/user/store/userSlice';
-import { ReceiptImportManagementFormAddEditMaterialItem } from './receipt-import-management-form-add-edit-material-item';
 import { deleteMaterialReceipt } from '@/features/receipt/api/receiptApi';
+import { ReceiptExportManagementFormAddEditMaterialItem } from './receipt-export-management-form-add-edit-material-item';
 
 const headCells = [
   { id: 'name', label: 'Tên nguyên liệu', sortable: true },
@@ -39,7 +39,7 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const ReceiptImportManagementFormListMaterialItem = ({receipt, render,materialReceipt, specifications, materialId, action} : ReceiptImportManagementFormListMaterialItemProps) => {
+export const ReceiptExportManagementFormListMaterialItem = ({receipt, render,materialReceipt, specifications, materialId, action} : ReceiptImportManagementFormListMaterialItemProps) => {
     const [page, setPage] = useState(0);
     const dispatch = useAppDispatch();
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -47,7 +47,7 @@ export const ReceiptImportManagementFormListMaterialItem = ({receipt, render,mat
     console.log(materialReceipt);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [isEditMaterialState, setIsEditMaterialState] = useState<string | null>(null);
-    const filteredHeadCells = action ? headCells.filter(cell => cell.id !== 'actions') : headCells;
+    const filteredHeadCells = action ? headCells.filter(el => el.id !== 'actions') : headCells;
     // const [isEditmaterialReceipt, setIsEditmaterialReceipt] = useState<string | null>(null);
     const theme = useTheme();
     // xóa nguyên liệu theo trạng thái
@@ -200,8 +200,6 @@ return (
                           {moment(item.expiryDate).format('DD/MM/YYYY')}
                         </Typography>
                       </TableCell>
-                      
-                      
                       {!action &&
                       <TableCell>
                         {/* Hành động */}
@@ -260,7 +258,7 @@ return (
             }}
         >
             <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            <ReceiptImportManagementFormAddEditMaterialItem isEditMaterialState={isEditMaterialState as string} materialReceipt={materialReceipt} specifications={specifications} materialId={materialId} render={render} receipt={receipt}/>
+            <ReceiptExportManagementFormAddEditMaterialItem isEditMaterialState={isEditMaterialState as string} materialReceipt={materialReceipt} specifications={specifications} materialId={materialId} render={render} receipt={receipt}/>
         </Dialog>
       </Fragment>
     </Box>

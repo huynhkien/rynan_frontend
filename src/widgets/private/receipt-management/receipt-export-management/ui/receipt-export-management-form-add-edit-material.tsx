@@ -1,28 +1,26 @@
-import { createReceiptImport, getAllReceipt, getReceiptById, updateReceipt } from "@/features/receipt/api/receiptApi";
+import { createReceiptExport,getAllReceipt, getReceiptById, updateReceipt } from "@/features/receipt/api/receiptApi";
 import ReceiptFormInput from "@/features/receipt/components/ReceiptFormInput";
 import { ReceiptData, ReceiptMaterialData } from "@/features/receipt/type/receiptType";
 import { removeAllMaterialReceipt } from "@/features/user/store/userSlice";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
-import { PaymentMethods, PaymentStatuses, ReceiptStatus } from "@/shared/constant/common";
+import { deliveryMethods, PaymentMethods, PaymentStatuses, ReceiptStatus } from "@/shared/constant/common";
 import { useAppDispatch, useAppSelector } from "@/shared/hooks/useAppHook";
 import { Box, Button, Divider, Paper, Typography, useTheme } from "@mui/material";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
-import { ReceiptImportManagementFormAddEditMaterialItem } from "./receipt-import-management-form-add-edit-material-item";
-import { ReceiptImportManagementFormListMaterialItem } from "./receipt-import-management-form-list-material-item";
 import { useCallback, useEffect, useState } from "react";
-import { ReceiptImportManagementFormListSupplier } from "./receipt-import-management-form-list-supplier";
 import { UserData } from "@/features/user/type/userTypes";
 import { getAllUser } from "@/features/user/api/userApis";
-import { getAllSupplier, getSupplierById } from "@/features/supplier/api/supplierApi";
-import { SupplierData } from "@/features/supplier/type/supplierType";
 import { MaterialData } from "@/features/material/type/materialType";
 import { getAllMaterial, getMaterialById } from "@/features/material/api/materialApi";
 import { Specification } from "@/features/specification/type/specificationType";
 import { getAllSpecification } from "@/features/specification/api/specificationApi";
 import { useParams } from "next/navigation";
+import { ReceiptExportManagementFormAddEditMaterialItem } from "./receipt-export-management-form-add-edit-material-item";
+import { ReceiptExportManagementFormListUser } from "./receipt-export-management-form-list-user";
+import { ReceiptExportManagementFormListMaterialItem } from "./receipt-export-management-form-list-material-item";
 
-export const ReceiptImportManagementFormAddEditMaterial = () => {
+export const ReceiptExportManagementFormAddEditMaterial = () => {
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const {materialReceipt} = useAppSelector((state) => state.user); 
@@ -30,12 +28,10 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
     const [users, setUsers] = useState<UserData[]>();
     const [receipts, setReceipts] = useState<ReceiptData[]>();
     const [receipt, setReceipt] = useState<ReceiptData>();
-    const [suppliers, setSuppliers] = useState<SupplierData[]>();
-    const [supplier, setSupplier] = useState<SupplierData>();
     const [materials, setMaterials] = useState<MaterialData[]>();
     const [material, setMaterial] = useState<MaterialData>();
     const [specifications, setSpecifications] = useState<Specification[]>();
-    const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
+    const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const [selectedMaterial, setSelectedMaterial] = useState<string | null>(null);
     // State quản lý mã 
     const [lastCodeNumber, setLastCodeNumber] = useState<number>(0);
@@ -50,11 +46,6 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
         const response = await getAllReceipt();
         if(response.success) setReceipts(response.data);
     }
-    // Hiển thị thông tin nhà cung cấp
-    const fetchSuppliers = async() => {
-        const response = await getAllSupplier();
-        if(response.success) setSuppliers(response.data);
-    }
     // Hiển thị thông tin nguyên liệu
     const fetchMaterials = async () => {
         const response = await getAllMaterial();
@@ -66,14 +57,7 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
         if(response.success) setSpecifications(response.data);
     } 
     // Hiển thị thông tin chi tiết nhà cung cấp
-    useEffect(() => {
-        if(!selectedSupplier) return;
-        const fetchSupplier = async() => {
-            const response = await getSupplierById(selectedSupplier as string);
-            if(response.success) setSupplier(response.data);
-        }
-        fetchSupplier();
-    },[selectedSupplier])
+   
     // Hiển thị thông tin chi tiết nhà vật liệu
     useEffect(() => {
         if(!selectedMaterial) return;
@@ -86,14 +70,14 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
     useEffect(() => {
         fetchUsers();
         fetchReceipts();
-        fetchSuppliers();
         fetchMaterials();
         fetchSpecifications();
     },[]);
     // Lựa chọn nhà cung cấp
-    const handleSelectSupplier = (id: string | number) => {
-        setSelectedSupplier(id as string);
+    const handleSelectUser = (id: string | number) => {
+        setSelectedUser(id as string);
     }
+
     // Lựa chọn vật liệu
     const handleSelectMaterial = (id: string | number) => {
         setSelectedMaterial(id as string);
@@ -106,39 +90,43 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
     // Tạo mã đơn
     const handleGenerateCode = useCallback(() => {
         if (receipts?.length === 0) {
-            setValue('code', 'RYNAN25-RIM01');
+            setValue('code', 'RYNAN25-REM01');
             setLastCodeNumber(1);
             return;
         }
         
         let newNumber = lastCodeNumber + 1;
-        let newCode = `RYNAN25-RIM0${newNumber}`;
+        let newCode = `RYNAN25-REM0${newNumber}`;
         
         while (receipts?.some((el) => el.code === newCode)) {
             newNumber += 1;
-            newCode = `RYNAN25-RIM0${newNumber}`;
+            newCode = `RYNAN25-REM0${newNumber}`;
         }
         
         setLastCodeNumber(newNumber);
         setValue('code', newCode);
     }, [receipts, lastCodeNumber, setValue]);
     // Xử lý tạo đơn hàng
-    const handleAddReceiptImport = async(data: ReceiptData) => {
+    const handleAddReceiptExport = async(data: ReceiptData) => {
         try{
             const newDataReceipt = {
                 staff: data.staff,
                 status: 'pending',
-                supplier: data.supplier,
+                exportedTo: selectedUser,
                 materials: materialReceipt,
-                typeReceipt: 'import',
+                typeReceipt: 'export',
                 code: data.code,
                 total: parseInt(totalMaterial.toString(), 10),
                 paymentMethod: data.paymentMethod,
                 paymentStatus: data.paymentStatus,
+                deliveryDate: data.deliveryDate,
+                deliveryMethod: data.deliveryMethod,
+                paymentDueDate: data.paymentDueDate,
+                produced_at: data.produced_at,
                 note: data.note
             }
             console.log(newDataReceipt)
-            const response = await createReceiptImport(newDataReceipt as ReceiptData);
+            const response = await createReceiptExport(newDataReceipt as ReceiptData);
             if(response.success){
                 toast.success(response.message);
                 dispatch(removeAllMaterialReceipt());
@@ -150,23 +138,27 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
             toast.error(errorMessage)
         }
     }
-    // Cập nhật thông tin nhập kho
-        // Hiển thị thông tin chi tiết nhập kho
-        const fetchReceipt =useCallback(async () => {
+    // Cập nhật thông tin xuất kho
+        // Hiển thị thông tin chi tiết xuất kho
+        const fetchReceipt = useCallback(async () => {
             if (!id) return;
             const response = await getReceiptById(id as string);
             if (response.success && response.data) {
                 reset({
                     code: response.data.code || '',
+                    produced_at: response.data.produced_at || '',
+                    deliveryMethod: response.data.deliveryMethod,
+                    deliveryDate: (response.data.deliveryDate as string).split('T')[0],
+                    paymentDueDate: (response.data.paymentDueDate as string).split('T')[0],
                     staff: response.data.staff || '',
-                    supplier: response.data.supplier || '',
+                    exportedTo: response.data.exportedTo || '',
                     note: response.data.note || '',
                     status: ReceiptStatus.find(el => el._id === response?.data?.status)?.name || '',
                     paymentMethod: response.data.paymentMethod || '',
                     paymentStatus: response.data.paymentStatus || '',
                 });
                     setReceipt(response.data);
-                    setSelectedSupplier(response.data.supplier as string);
+                    setSelectedUser(response.data.exportedTo as string)
             };
     }, [id, reset]); 
     useEffect(() => {
@@ -192,13 +184,17 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
             const newDataReceipt = {
                 staff: data.staff,
                 status: 'pending',
-                supplier: data.supplier,
+                exportedTo: selectedUser,
                 materials: materialsData,
-                typeReceipt: 'import',
+                typeReceipt: 'export',
                 code: data.code,
                 total: receiptTotalUpdate,
                 paymentMethod: data.paymentMethod,
                 paymentStatus: data.paymentStatus,
+                deliveryDate: data.deliveryDate,
+                deliveryMethod: data.deliveryMethod,
+                paymentDueDate: data.paymentDueDate,
+                produced_at: data.produced_at,
                 note: data.note
             }
             console.log(newDataReceipt)
@@ -215,7 +211,7 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
         }
     }
     return (
-         <form onSubmit={handleSubmit(id ? handleUpdateReceiptImport : handleAddReceiptImport)}
+         <form onSubmit={handleSubmit(id ? handleUpdateReceiptImport : handleAddReceiptExport)}
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
@@ -227,7 +223,7 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                     <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                Thông tin nhập kho
+                                Thông tin xuất kho
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
@@ -241,13 +237,13 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                             >
                                 {id ? 
                                 <ReceiptFormInput
-                                    label='Mã nhập kho'
+                                    label='Mã xuất kho'
                                     important
-                                    placeholder='Thêm mã nhập kho'
+                                    placeholder='Thêm mã xuất kho'
                                     register={register as UseFormRegister<ReceiptData>}
                                     errors={errors as FieldErrors<ReceiptData>}
                                     id='code'
-                                    validate={{ required: 'Mã nhập ko không được để trống' }}
+                                    validate={{ required: 'Mã xuất ko không được để trống' }}
                                     sx={{
                                         width: '100%'
                                     }}
@@ -256,13 +252,13 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                 :
                                 <>
                                     <ReceiptFormInput
-                                        label='Mã nhập kho'
+                                        label='Mã xuất kho'
                                         important
-                                        placeholder='Thêm mã nhập kho'
+                                        placeholder='Thêm mã xuất kho'
                                         register={register as UseFormRegister<ReceiptData>}
                                         errors={errors as FieldErrors<ReceiptData>}
                                         id='code'
-                                        validate={{ required: 'Mã nhập ko không được để trống' }}
+                                        validate={{ required: 'Mã xuất ko không được để trống' }}
                                         sx={{
                                             width: '70%'
                                         }}
@@ -273,6 +269,14 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                 </>  
                             }
                             </Box>
+                            <ReceiptFormInput
+                                label='Công ty'
+                                disabled
+                                id='produced_at'
+                                defaultValue={'Công ty Rynan Smart Agriculture'}
+                                register={register as UseFormRegister<ReceiptData>}
+                                errors={errors as FieldErrors<ReceiptData>}
+                            />
                             <Box sx={{display: 'flex', justifyContent: 'space-between', gap:2}}>
                                 <ControlledSelect
                                     label='Nhân viên xử lý'
@@ -295,6 +299,27 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                     defaultValue={ReceiptStatus.find((el) => el._id === 'pending')?.name}
                                 />
                             </Box>
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', gap:2}}>
+                                <ControlledSelect
+                                    label='Hình thức vận chuyển'
+                                    placeholder='Lựa chọn hình thức vận chuyển'
+                                    important
+                                    sx={{width: "50%"}}
+                                    name='deliveryMethod'
+                                    control={control}
+                                    options={deliveryMethods}
+                                    rules={{ required: 'Vui lòng chọn hình thức vận chuyển' }}
+                                />
+                                <ReceiptFormInput
+                                    label='Ngày dự kiến giao hàng'
+                                    type='date'
+                                    id='deliveryDate'
+                                    sx={{width: "50%"}}
+                                    register={register as UseFormRegister<ReceiptData>}
+                                    errors={errors as FieldErrors<ReceiptData>}
+                                    defaultValue={ReceiptStatus.find((el) => el._id === 'pending')?.name}
+                                />
+                            </Box>
                             <ReceiptFormInput
                                 label='Ghi chú'
                                 placeholder='Ghi chú(nếu có)'
@@ -302,32 +327,31 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                 register={register as UseFormRegister<ReceiptData>}
                                 errors={errors as FieldErrors<ReceiptData>}
                                 multiline
-                                rows={15}
+                                rows={5}
                             />
                         </Box>
                     </Paper>
                     <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                Thông tin nhà cung cấp
+                                Thông tin khách hàng
                             </Typography>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
-                            {/* Nhà cung cấp */}
+                            {/* Khách hàng */}
                             <ControlledSelect
-                                label='Lựa chọn nhà cung cấp'
-                                placeholder='Lựa chọn nhà cung cấp'
+                                label='Lựa chọn khách hàng'
+                                placeholder='Lựa chọn khách hàng'
                                 important
-                                onSelectionChange={handleSelectSupplier}
-                                name='supplier'
+                                onSelectionChange={handleSelectUser}
+                                name='exportedTo'
                                 control={control}
-                                options={suppliers?.map(el => ({
+                                options={users?.filter(el => ['2000'].includes(el.role as string))?.map(el => ({
                                     _id: el._id as string,
                                     name: el.name
                                 })) || []}
-                                rules={{ required: 'Vui lòng chọn nhà cung cấp' }}
                             />
-                            <ReceiptImportManagementFormListSupplier supplier = {supplier as SupplierData}/>
+                            <ReceiptExportManagementFormListUser user={users?.find(el => el._id === selectedUser) as UserData}/>
                         </Box>
                     </Paper>
                 </Box>
@@ -337,10 +361,10 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                     <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                Lựa chọn nguyên liệu cần nhập
+                                Lựa chọn nguyên liệu cần xuất
                             </Typography>
                         </Box>
-                        <ReceiptImportManagementFormAddEditMaterialItem materialReceipt={materialReceipt} handleSelectMaterial={handleSelectMaterial} materials={materials} material={material} specifications={specifications} receipt={receipt}/>
+                        <ReceiptExportManagementFormAddEditMaterialItem materialReceipt={materialReceipt} handleSelectMaterial={handleSelectMaterial} materials={materials} material={material} specifications={specifications} receipt={receipt}/>
                     </Paper>
                     <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
@@ -348,7 +372,7 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                 Thông tin nguyên liệu 
                             </Typography>
                         </Box>
-                        <ReceiptImportManagementFormListMaterialItem materialReceipt={materialReceipt} specifications={specifications as Specification[]}/>
+                        <ReceiptExportManagementFormListMaterialItem materialReceipt={materialReceipt} specifications={specifications as Specification[]}/>
                     </Paper>
                 </Box>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
@@ -437,6 +461,15 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                                     options={PaymentMethods}
                                     rules={{ required: 'Vui lòng chọn hình thức thanh toán' }}
                                 />
+                                {/* Hạn thanh toán */}
+                                 <ReceiptFormInput
+                                    label='Hạn thanh toán'
+                                    type='date'
+                                    id='paymentDueDate'
+                                    register={register as UseFormRegister<ReceiptData>}
+                                    errors={errors as FieldErrors<ReceiptData>}
+                                    defaultValue={ReceiptStatus.find((el) => el._id === 'pending')?.name}
+                                />
                             </Box>
                         </Paper>
                         <Paper sx={{ 
@@ -446,10 +479,10 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                         }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
-                                    Thông tin nguyên liệu tồn tại trong nhập kho
+                                    Thông tin nguyên liệu tồn tại trong xuất kho
                                 </Typography>
                             </Box>
-                            <ReceiptImportManagementFormListMaterialItem materialReceipt={receipt?.materials || []} specifications={specifications as Specification[]} materialId={id as string} render={fetchReceipt}/>
+                            <ReceiptExportManagementFormListMaterialItem materialReceipt={receipt?.materials || []} specifications={specifications as Specification[]} materialId={id as string} render={fetchReceipt}/>
                         </Paper>
                     </Box>
             </Box>

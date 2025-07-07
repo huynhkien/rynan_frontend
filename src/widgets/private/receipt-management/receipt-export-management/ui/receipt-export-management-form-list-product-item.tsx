@@ -19,17 +19,17 @@ import {
 import { Cancel, Delete, Edit} from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
-import { ReceiptImportManagementFormListMaterialItemProps } from '@/features/receipt/type/receiptType';
+import {  ReceiptImportManagementFormListProductItemProps } from '@/features/receipt/type/receiptType';
 import moment from 'moment';
-import { removeItemMaterialReceipt } from '@/features/user/store/userSlice';
-import { ReceiptImportManagementFormAddEditMaterialItem } from './receipt-import-management-form-add-edit-material-item';
-import { deleteMaterialReceipt } from '@/features/receipt/api/receiptApi';
+import { removeItemProductReceipt } from '@/features/user/store/userSlice';
+import { deleteProductReceipt } from '@/features/receipt/api/receiptApi';
+import { ReceiptExportManagementFormAddEditProductItem } from './receipt-export-management-form-add-edit-product-item';
 
 const headCells = [
-  { id: 'name', label: 'Tên nguyên liệu', sortable: true },
+  { id: 'name', label: 'Tên sản phẩm', sortable: true },
   { id: 'specification', label: 'Quy cách', sortable: true },
-  { id: 'price', label: 'Giá', sortable: true },
   { id: 'quantity', label: 'Số lượng', sortable: true },
+  { id: 'price', label: 'Giá', sortable: true },
   { id: 'batchNumber', label: 'Số lô', sortable: true },
   { id: 'manufacturingDate', label: 'Ngày sản xuất', sortable: true },
   { id: 'expiryDate', label: 'Hạn sử dụng', sortable: true },
@@ -39,30 +39,28 @@ const headCells = [
 
 type SortOrder = 'asc' | 'desc';
 
-export const ReceiptImportManagementFormListMaterialItem = ({receipt, render,materialReceipt, specifications, materialId, action} : ReceiptImportManagementFormListMaterialItemProps) => {
+export const ReceiptExportManagementFormListProductItem = ({productReceipt, materialId, render, specifications, action} : ReceiptImportManagementFormListProductItemProps) => {
     const [page, setPage] = useState(0);
     const dispatch = useAppDispatch();
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortBy, setSortBy] = useState<string>('name');
-    console.log(materialReceipt);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [isEditMaterialState, setIsEditMaterialState] = useState<string | null>(null);
+    const [isEditProductState, setIsEditProductState] = useState<string | null>(null);
     const filteredHeadCells = action ? headCells.filter(cell => cell.id !== 'actions') : headCells;
-    // const [isEditmaterialReceipt, setIsEditmaterialReceipt] = useState<string | null>(null);
     const theme = useTheme();
-    // xóa nguyên liệu theo trạng thái
+    // xóa sản phẩm theo trạng thái
     const handleDelete = async(id: string) => {
-        if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
-          dispatch(removeItemMaterialReceipt({
-            mid: id
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+          dispatch(removeItemProductReceipt({
+            pid: id
           }));
-          toast.success('Xóa nguyên liệu thành công')
+          toast.success('Xóa sản phẩm thành công')
       };
     }
     // xóa nguyên liệu trong dữ liệu
-    const handleDeleteRid = async(id: string) => {
+    const handleDeletePid = async(id: string) => {
         if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
-          const response = await deleteMaterialReceipt(materialId as string, id)
+          const response = await deleteProductReceipt(materialId as string, id)
           if(response.success){
             toast.success(response.message);
             if(render){
@@ -89,7 +87,7 @@ export const ReceiptImportManagementFormListMaterialItem = ({receipt, render,mat
     };
     // Đóng dialog
     const handleCloseDialog = () => {
-        setIsEditMaterialState(null);
+        setIsEditProductState(null);
     };
 
    
@@ -141,17 +139,17 @@ return (
               </TableRow>
             </TableHead>
             <TableBody>
-              {!materialReceipt || materialReceipt?.length === 0 ? (
+              {!productReceipt || productReceipt?.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} align='center' sx={{ py: 4 }}>
-                    Không có nguyên liệu
+                    Không có sản phẩm
                   </TableCell>
                 </TableRow>
               ) : (
-                materialReceipt
+                productReceipt
                   ?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  ?.map((item) => (
-                    <TableRow key={item.mid} hover>
+                  ?.map((item, index) => (
+                    <TableRow key={index} hover>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1'
                           sx={{
@@ -177,12 +175,12 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.price?.toLocaleString()} VNĐ
+                          {item.quantity}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.quantity}
+                          {item.price?.toLocaleString()} VNĐ
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
@@ -200,8 +198,6 @@ return (
                           {moment(item.expiryDate).format('DD/MM/YYYY')}
                         </Typography>
                       </TableCell>
-                      
-                      
                       {!action &&
                       <TableCell>
                         {/* Hành động */}
@@ -209,7 +205,7 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name_vn}`}
                                 size='small'
-                                onClick={() => setIsEditMaterialState(item.mid as string)}
+                                onClick={() => setIsEditProductState(item.pid as string)}
                             >
                                   <Edit/>
                             </IconButton>
@@ -217,7 +213,7 @@ return (
                                 color='error'
                                 aria-label={`Xóa ${item.name_vn}`}
                                 size='small'
-                                onClick={materialId ? () => handleDeleteRid(item.mid as string) : () => handleDelete(item.mid as string)}
+                                onClick={materialId ? () => handleDeletePid(item.pid as string) : () => handleDelete(item.pid as string)}
                             >
                                 <Delete />
                             </IconButton>
@@ -232,7 +228,7 @@ return (
         <TablePagination
           rowsPerPageOptions={[10, 25, 50]}
           component='div'
-          count={materialReceipt?.length || 0}
+          count={productReceipt?.length || 0}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -245,7 +241,7 @@ return (
       </Paper>
       <Fragment>
         <Dialog
-            open={isEditMaterialState !== null}
+            open={isEditProductState !== null}
             onClose={handleCloseDialog}
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
@@ -260,7 +256,7 @@ return (
             }}
         >
             <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            <ReceiptImportManagementFormAddEditMaterialItem isEditMaterialState={isEditMaterialState as string} materialReceipt={materialReceipt} specifications={specifications} materialId={materialId} render={render} receipt={receipt}/>
+            <ReceiptExportManagementFormAddEditProductItem materialId={materialId} isEditProductState={isEditProductState as string} productReceipt={productReceipt} specifications={specifications} render={render} />
         </Dialog>
       </Fragment>
     </Box>

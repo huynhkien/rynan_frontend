@@ -22,13 +22,23 @@ import {
   Checkbox,
   Tabs,
   Tab,
+  Dialog,
 } from '@mui/material';
-import { Add,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
-import { ReceiptData } from '@/features/receipt/type/receiptType';
+import { ReceiptData,  ReceiptProductData } from '@/features/receipt/type/receiptType';
 import { deleteReceipt, getAllReceipt } from '@/features/receipt/api/receiptApi';
 import moment from 'moment';
+import { getAllUser } from '@/features/user/api/userApis';
+import { UserData } from '@/features/user/type/userTypes';
+import { ReceiptStatus } from '@/shared/constant/common';
+import { SupplierData } from '@/features/supplier/type/supplierType';
+import { getAllSupplier } from '@/features/supplier/api/supplierApi';
+import { ReceiptImportManagementFormListProductItem } from './receipt-import-management-form-list-product-item';
+import { Specification } from '@/features/specification/type/specificationType';
+import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { ReceiptImportManagementFormListMaterialItem } from './receipt-import-management-form-list-material-item';
 
 
 
@@ -40,6 +50,7 @@ const headCellsProduct = [
       { id: 'supplier', label: 'Sản xuất tại', sortable: false },
       { id: 'products', label: 'Sản phẩm', sortable: false },
       { id: 'note', label: 'Ghi chú', sortable: false },
+      { id: 'createdAt', label: 'Ngày tạo', sortable: false },
       { id: 'actions', label: 'Thao tác', sortable: false }
     ];
 const headCellsMaterial = [
@@ -53,13 +64,14 @@ const headCellsMaterial = [
       { id: 'createdAt', label: 'Ngày tạo', sortable: false },
       { id: 'actions', label: 'Thao tác', sortable: false }
     ];
-const ReceiptImportManagementFormListMaterial = ({receipts, fetchAllReceipt}: {receipts:ReceiptData[]; fetchAllReceipt: () => void;}) => {
+const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, fetchAllReceipt, specifications}: {receipts:ReceiptData[]; fetchAllReceipt: () => void; users: UserData[], suppliers: SupplierData[], specifications?: Specification[]} ) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [isShowMaterial, setIsShowMaterial] = useState<string| null>(null);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
@@ -120,10 +132,16 @@ const ReceiptImportManagementFormListMaterial = ({receipts, fetchAllReceipt}: {r
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts?.filter(item => {
         const matchesSearch =
-                            item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
+                  item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  users.find(el => el._id === item.staff)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  suppliers.find(el => el._id === item.supplier)?.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  ReceiptStatus.find(el => el._id === item.status)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ; 
         const matchesAlpha =
                   filterAlpha === 'all' ||
-                  item.code.toLowerCase().startsWith(filterAlpha.toLowerCase());
+                  item.code.toLowerCase().includes(filterAlpha.toLowerCase()) ||
+                  users.find(el => el._id === item.staff)?.name.toLowerCase().includes(filterAlpha.toLowerCase()) ||
+                  suppliers.find(el => el._id === item.supplier)?.name.toLowerCase().includes(filterAlpha.toLowerCase()) || 
+                  ReceiptStatus.find(el => el._id === item.status)?.name.toLowerCase().includes(filterAlpha.toLowerCase()) ; 
         return matchesSearch && matchesAlpha;
         });
 
@@ -143,7 +161,11 @@ const ReceiptImportManagementFormListMaterial = ({receipts, fetchAllReceipt}: {r
       }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha]);
+    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha, users, suppliers]);
+    // Đóng dialog
+    const handleCloseDialog = async () => {
+      setIsShowMaterial(null)
+    }
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -325,27 +347,36 @@ return (
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical'
                         }}>
-                          {item.staff}
+                          {users.find(el => el._id === item.staff)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.status}
+                          {ReceiptStatus.find(el => el._id === item.status)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.supplier}
+                          {suppliers.find(el => el._id === item.supplier)?.name}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                      <TableCell
+                        sx={{ 
+                            verticalAlign: 'middle', 
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.hover
+                            }
+                          }} 
+                          onClick={() => setIsShowMaterial(item?._id as string)}
+                      >
                         <Typography variant='body1'>
                           {item.materials?.length}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.note}
+                          {item.note || 'Không có ghi chú'}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
@@ -355,7 +386,7 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {moment(item?.createdAt).format('DD/MM/YYYY')}
+                          {moment(item?.createdAt).format('DD/MM/YYYY HH:mm:ss')}
                         </Typography>
                       </TableCell>
                       <TableCell>
@@ -365,7 +396,9 @@ return (
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
                             >
-                                <Edit/>
+                                <Link href={`/admin/receipt-management/import/edit/material/${item._id}`} style={{color: theme.palette.success.main}}>
+                                  <Edit/>
+                                </Link>
                             </IconButton>
                             <IconButton 
                                 onClick={() => handleDelete(item._id as string)} 
@@ -395,11 +428,47 @@ return (
             `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
           }
         />
-      </Paper>
+      </Paper>    
+      <TablePagination
+          rowsPerPageOptions={[10, 25, 50]}
+          component='div'
+          count={filteredAndSortedData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+          labelRowsPerPage='Số hàng mỗi trang:'
+          labelDisplayedRows={({ from, to, count }) => 
+            `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
+          }
+        />
+      {/* Dialog hiển thị sản phẩm */}
+      <Dialog
+        open={isShowMaterial !==null}
+        onClose={handleCloseDialog}
+        aria-labelledby="product-dialog-title"
+        aria-describedby="product-dialog-description"
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+                style: {
+                    width: '50%',
+                    height: '50%',
+                    maxWidth: '1000px',
+                    position: 'relative',
+                    borderRadius: 0
+                },
+        }}
+      >
+        <Box sx={{ position: 'relative' }}>
+          <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
+          {isShowMaterial && <ReceiptImportManagementFormListMaterialItem action='show' materialReceipt={(receipts.find(el => el._id === isShowMaterial)?.materials)} specifications={specifications as Specification[]}/>}
+        </Box>
+      </Dialog>  
     </Box>
   );
 };
-export const ReceiptImportManagementFormListProduct = ({receipts, fetchAllReceipt}: {receipts:ReceiptData[]; fetchAllReceipt: () => void;}) => {
+export const ReceiptImportManagementFormListProduct = ({receipts, users, fetchAllReceipt, specifications}: {receipts:ReceiptData[]; fetchAllReceipt: () => void; users: UserData[], specifications?: Specification[]}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -407,6 +476,7 @@ export const ReceiptImportManagementFormListProduct = ({receipts, fetchAllReceip
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
     
@@ -467,10 +537,14 @@ export const ReceiptImportManagementFormListProduct = ({receipts, fetchAllReceip
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts.filter(item => {
         const matchesSearch =
-                            item.code.toLowerCase().includes(searchTerm.toLowerCase()) ;
+                  item.code.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  users.find(el => el._id === item.staff)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                  ReceiptStatus.find(el => el._id === item.status)?.name.toLowerCase().includes(searchTerm.toLowerCase()) ; 
         const matchesAlpha =
                   filterAlpha === 'all' ||
-                  item.code.toLowerCase().startsWith(filterAlpha.toLowerCase());
+                  item.code.toLowerCase().includes(filterAlpha.toLowerCase()) || 
+                  users.find(el => el._id === item.staff)?.name.toLowerCase().includes(filterAlpha.toLowerCase()) ||
+                  ReceiptStatus.find(el => el._id === item.status)?.name.toLowerCase().includes(filterAlpha.toLowerCase()) ; 
         return matchesSearch && matchesAlpha;
         });
 
@@ -490,7 +564,11 @@ export const ReceiptImportManagementFormListProduct = ({receipts, fetchAllReceip
     }
 
     return filtered;
-    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha]);
+    }, [searchTerm, sortBy, sortOrder, receipts, filterAlpha, users]);
+    // Đóng dialog
+    const handleCloseDialog = async () => {
+            setIsShowProduct(null);
+    }
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -672,12 +750,12 @@ return (
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical'
                         }}>
-                          {item.staff}
+                          {users.find(el => el._id === item.staff)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.status}
+                          {ReceiptStatus.find(el => el._id === item.status)?.name}
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
@@ -685,7 +763,16 @@ return (
                           {item.produced_at}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                      <TableCell
+                        sx={{ 
+                            verticalAlign: 'middle', 
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.hover
+                            }
+                          }} 
+                          onClick={() => setIsShowProduct(item?._id as string)}
+                      >
                         <Typography variant='body1'>
                           {item.products?.length}
                         </Typography>
@@ -695,6 +782,11 @@ return (
                           {item?.note || 'Không ghi chú'}
                         </Typography>
                       </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')}
+                        </Typography>
+                      </TableCell>
                       <TableCell>
                         {/* Hành động */}
                             <IconButton 
@@ -702,7 +794,9 @@ return (
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
                             >
-                                <Edit/>
+                                <Link href={`/admin/receipt-management/import/edit/product/${item._id}`} style={{color: theme.palette.success.main}}>
+                                  <Edit/>
+                                </Link>
                             </IconButton>
                             <IconButton 
                                 onClick={() => handleDelete(item._id as string)} 
@@ -733,6 +827,29 @@ return (
           }
         />
       </Paper>
+      {/* Dialog hiển thị sản phẩm */}
+            <Dialog
+              open={isShowProduct !==null}
+              onClose={handleCloseDialog}
+              aria-labelledby="product-dialog-title"
+              aria-describedby="product-dialog-description"
+              maxWidth="lg"
+              fullWidth
+              PaperProps={{
+                      style: {
+                          width: '50%',
+                          height: '50%',
+                          maxWidth: '1000px',
+                          position: 'relative',
+                          borderRadius: 0
+                      },
+              }}
+            >
+              <Box sx={{ position: 'relative' }}>
+                <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
+                {isShowProduct && <ReceiptImportManagementFormListProductItem action='show' productReceipt={(receipts.find(el => el._id === isShowProduct)?.products as ReceiptProductData[]) } specifications={specifications as Specification[]}/>}
+              </Box>
+            </Dialog>
     </Box>
   );
 };
@@ -740,22 +857,56 @@ return (
 export const ReceiptImportManagementFormList = () => {
     const theme = useTheme();
     const [tabIndex, setTabIndex] = useState<number>(0);
-    const [receipts, setReceipts] = useState<ReceiptData[] | []>([]);
+    const [receipts, setReceipts] = useState<ReceiptData[] | [] >([]);
+    const [users, setUsers] = useState<UserData[] | [] >([]);
+    const [suppliers, setSuplliers] = useState<SupplierData[] | []>([]);
+    const [specifications, setSpecifications] = useState<Specification[] | []>([]);
     // Hiển thị thông tin quy cách
+
+    const fetchAllSpecifications = async () => {
+        const response = await getAllSpecification();
+        if(response.success) {
+          setSpecifications(response.data as Specification[]);
+        }
+      }
     const fetchAllReceipts = async () => {
         const response = await getAllReceipt();
         if(response.success) {
-          setReceipts(response.data as ReceiptData[]);
+          setReceipts(response.data?.filter(el => el.typeReceipt === 'import') || []);
         }
       }
-      // hiển thị tất cả phiếu nhập kho
+    // Hiển thị thông tin người dùng
+    const fetchUsers = async() => {
+      const response = await getAllUser();
+      if(response.success) setUsers(response.data || []);
+    }
+    // Hiển thị thông tin nhà cung cấp
+    const fetchSuppliers = async() => {
+      const response = await  getAllSupplier();
+      if(response.success) setSuplliers(response.data || []);
+    }
+    // hiển thị tất cả phiếu nhập kho
     useEffect(() => {
       fetchAllReceipts();
+      fetchUsers();
+      fetchSuppliers();
+      fetchAllSpecifications();
     },[]);
+    console.log(receipts);
     // Hiển thị thông tin phiếu theo sản phẩm
-    const receiptsProduct = receipts.filter((el) => (el.products?.length as number) > 0);
+    const receiptsProduct = useMemo(() => {
+      return receipts?.filter((receipt) => 
+        receipt.products && receipt.products.length > 0
+      ) || [];
+    }, [receipts]);
+
     // Hiển thị thông tin phiếu theo nguyên liệu
-    const receiptsMaterial= receipts.filter((el) => (el.materials?.length as number) > 0);
+    const receiptsMaterial = useMemo(() => {
+      return receipts?.filter((receipt) => 
+        receipt.materials && receipt.materials.length > 0
+      ) || [];
+    }, [receipts]);
+
     // Tab handler
     const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
         setTabIndex(newValue);
@@ -765,11 +916,11 @@ export const ReceiptImportManagementFormList = () => {
         switch (tabIndex) {
             case 0:
                 return (
-                    <ReceiptImportManagementFormListMaterial receipts={receiptsMaterial} fetchAllReceipt={fetchAllReceipts}/>
+                    <ReceiptImportManagementFormListMaterial suppliers={suppliers} receipts={receiptsMaterial} fetchAllReceipt={fetchAllReceipts} users={users} specifications={specifications}/>
                 );
             case 1:
                 return (
-                    <ReceiptImportManagementFormListProduct receipts={receiptsProduct} fetchAllReceipt={fetchAllReceipts}/>
+                    <ReceiptImportManagementFormListProduct receipts={receiptsProduct} fetchAllReceipt={fetchAllReceipts} users={users} specifications={specifications}/>
                 );
             default:
                 return null;

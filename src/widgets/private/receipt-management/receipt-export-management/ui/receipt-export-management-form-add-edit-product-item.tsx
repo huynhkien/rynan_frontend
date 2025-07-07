@@ -10,12 +10,14 @@ import { useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 
-export const ReceiptImportManagementFormAddEditProductItem = ({materialId, receipt, render, isEditProductState, products, productReceipt, handleSelectProduct, product, specifications}: ReceiptImportManagementFormAddEditProductItemProps) => {
+export const ReceiptExportManagementFormAddEditProductItem = ({materialId, receipt, render, isEditProductState, products, productReceipt, handleSelectProduct, product, specifications}: ReceiptImportManagementFormAddEditProductItemProps) => {
     const { register, formState: { errors }, reset, control, setValue, watch} = useForm<ReceiptProductData>();
     const theme = useTheme();
     const dispatch = useAppDispatch();
     const selectedQuantity = watch('quantity'); 
     const isNumberQuantity = selectedQuantity ? parseInt(selectedQuantity.toString(), 10) : 0;
+    const selectedPrice = watch('price');  
+    const isNumberPrice = selectedPrice ? parseInt(selectedPrice.toString(), 10) : 0;
     const selectedBatchNumber = watch('batchNumber');  
     const selectedExpiryDate = watch('expiryDate');  
     const selectedManufacturingDate = watch('manufacturingDate');
@@ -55,7 +57,7 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
                 (existedProduct.expiryDate as string).split('T')[0] !== selectedExpiryDate ||
                 (existedProduct.manufacturingDate as string).split('T')[0] !== selectedManufacturingDate;
             if (isMismatch) {
-                toast.error('Vui lòng nhập đúng thông tin đã tồn tại cho sản phẩm này');
+                toast.error('Vui lòng đúng thông tin đã tồn tại cho sản phẩm này');
                 return;
             }
         }
@@ -63,6 +65,7 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
             pid: product._id,
             name: product.name_vn,
             specification: product.specification,
+            price: isNumberPrice,
             quantity: isNumberQuantity,
             batchNumber: selectedBatchNumber,
             expiryDate: selectedExpiryDate,
@@ -146,8 +149,8 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
                 />
             :
                 <ControlledSelect
-                    label='sản phẩm cần nhập'
-                    placeholder='Lựa chọn mguyên liệu cần nhập'
+                    label='Sản phẩm xuất'
+                    placeholder='Lựa chọn sản phẩm cần xuất'
                     name='pid'
                     onSelectionChange={handleSelectProduct}
                     control={control}
@@ -155,7 +158,7 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
                         _id: el?._id as string,
                         name: el?.name_vn
                     })) || []}
-                    rules={{ required: 'Vui lòng chọn sản phẩm cần nhập' }}
+                    rules={{ required: 'Vui lòng chọn sản phẩm cần' }}
                 />
             }
             <ReceiptProductFormInput
@@ -176,6 +179,15 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
                 validate={{ required: 'Số lượng ko không được để trống' }}
             />
             <ReceiptProductFormInput
+                label='Giá sản xuất'
+                placeholder='Giá sản xuất'
+                type='number'
+                id='price'
+                register={register as UseFormRegister<ReceiptProductData>}
+                errors={errors as FieldErrors<ReceiptProductData>}
+                validate={{ required: 'Giá ko không được để trống' }}
+            />
+            <ReceiptProductFormInput
                 label='Số lô hàng'
                 placeholder='Số lô hàng'
                 id='batchNumber'
@@ -184,18 +196,18 @@ export const ReceiptImportManagementFormAddEditProductItem = ({materialId, recei
                 validate={{ required: 'Số lô hàng ko không được để trống' }}
             />
             <ReceiptProductFormInput
-                label='Ngày sản xuất của sản phẩm nhập'
+                label='Ngày sản xuất của sản phẩm'
                 type='date'
-                placeholder='Ngày sản xuất của sản phẩm nhập'
+                placeholder='Ngày sản xuất của sản phẩm'
                 id='manufacturingDate'
                 register={register as UseFormRegister<ReceiptProductData>}
                 errors={errors as FieldErrors<ReceiptProductData>}
                 validate={{ required: 'Ngày sản xuất ko không được để trống' }}
             />
             <ReceiptProductFormInput
-                label='Hạn sử dụng của sản phẩm nhập'
+                label='Hạn sử dụng của sản phẩm'
                 type='date'
-                placeholder='Hạn sử dụng của sản phẩm nhập'
+                placeholder='Hạn sử dụng của sản phẩm'
                 id='expiryDate'
                 register={register as UseFormRegister<ReceiptProductData>}
                 errors={errors as FieldErrors<ReceiptProductData>}

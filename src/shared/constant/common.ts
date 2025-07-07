@@ -397,3 +397,12 @@ export const ReceiptStatus = [
   { _id: 'confirmed', name: 'Đã duyệt' },
   { _id: 'cancelled', name: 'Đã hủy' }
 ];
+// Hình thức vận chuyển
+export const deliveryMethods = [
+  { _id: 'pickup', name: 'Tự đến lấy hàng' },
+  { _id: 'ship', name: 'Giao hàng bởi công ty' },
+  { _id: 'third_party', name: 'Giao hàng bởi bên thứ ba' },
+  { _id: 'cod', name: 'Giao hàng và thu tiền (COD)' },
+  { _id: 'express', name: 'Giao hàng hỏa tốc' },
+  { _id: 'logistics', name: 'Vận chuyển qua đối tác logistics' },
+];

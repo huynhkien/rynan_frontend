@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/configs/axios";
 import { ReceiptEndpoints } from "./receiptEndpoints";
-import { ReceiptData, ReceiptProductData, ReceiptResponse, ReceiptsResponse } from "../type/receiptType";
+import { ReceiptData, ReceiptMaterialData, ReceiptProductData, ReceiptResponse, ReceiptsResponse } from "../type/receiptType";
 
 // Thêm phiếu nhập hàng 
 export const createReceiptImport = async (data: ReceiptData): Promise<ReceiptResponse> => 
@@ -30,9 +30,17 @@ export const updateProductReceipt = async (data: ReceiptProductData, id: string,
   axiosInstance.put(ReceiptEndpoints.UPDATE_PRODUCT_RECEIPT(id, pid), data, {
     withCredentials: true,
 });
+// Cập nhật nguyên liệu trong phiếu
+export const updateMaterialReceipt = async (data: ReceiptMaterialData, id: string, mid: string): Promise<ReceiptResponse> => 
+  axiosInstance.put(ReceiptEndpoints.UPDATE_MATERIAL_RECEIPT(id, mid), data, {
+    withCredentials: true,
+});
 // Xóa phiếu
 export const deleteReceipt = async(id: string): Promise<ReceiptResponse> => 
     axiosInstance.delete(ReceiptEndpoints.DELETE(id))
 // Xóa sản phẩm trong phiếu
 export const deleteProductReceipt = async(id: string, pid: string): Promise<ReceiptResponse> => 
     axiosInstance.delete(ReceiptEndpoints.DELETE_PRODUCT_RECEIPT(id, pid))
+// Xóa nguyên liệu trong phiếu
+export const deleteMaterialReceipt = async(id: string, mid: string): Promise<ReceiptResponse> => 
+    axiosInstance.delete(ReceiptEndpoints.DELETE_MATERIAL_RECEIPT(id, mid))

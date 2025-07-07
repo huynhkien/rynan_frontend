@@ -172,14 +172,14 @@ export const userSlice = createSlice({
 },
     // Xử lý thêm sản phâm trong kho
     addProductToReceipt: (state, action: PayloadAction<ReceiptProductData>) => {
-      const {pid, name, quantity, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
+      const {pid, name, price, quantity, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
       const existingItem = state.productReceipt.findIndex(
         item => item.pid === pid 
       );
       if(existingItem !== -1) {
         return;
       }else{
-        state.productReceipt.push({pid, specification, quantity, name, batchNumber, expiryDate, manufacturingDate});
+        state.productReceipt.push({pid, specification, price, quantity, name, batchNumber, expiryDate, manufacturingDate});
       }
       setToLocalStorage('product_receipt', state.productReceipt);
     },
@@ -196,13 +196,14 @@ export const userSlice = createSlice({
       removeToLocalStorage('product_receipt');
     },
    updateProductByPid: (state, action: PayloadAction<ReceiptProductData>) => {
-    const {pid, quantity, name, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
+    const {pid, quantity, name, price, specification, batchNumber, expiryDate, manufacturingDate} = action.payload;
     const existingItemIndex = state.productReceipt.findIndex(item => item.pid === pid);
     
     if(existingItemIndex !== -1) {
       state.productReceipt[existingItemIndex] = {
         pid, 
-        quantity, 
+        quantity,
+        price, 
         name, 
         specification, 
         batchNumber, 

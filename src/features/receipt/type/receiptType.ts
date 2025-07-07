@@ -22,12 +22,16 @@ export interface ReceiptData extends Record<string, unknown> {
     paymentMethod?: string;
     paymentStatus?: string;
     produced_at?: string;
+    deliveryDate?: string | Date,
+    deliveryMethod?: string;
+    paymentDueDate: string;
 }
 
 export interface ReceiptProductData extends Record<string, unknown> {
     pid?: string;
     name?: string;
     quantity: number;
+    price?: number;
     specification?: string;
     batchNumber?: string; // Số lô hàng
     expiryDate?: string | Date, // Hạn sử dụng
@@ -43,7 +47,7 @@ export interface ReceiptMaterialData extends Record<string, unknown> {
     batchNumber?: string; // Số lô hàng
     expiryDate?: string | Date, // Hạn sử dụng
     manufacturingDate?: string | Date // Ngày sản xuất
-
+    
 }
 
 export interface ReceiptResponse {
@@ -71,18 +75,24 @@ export interface ReceiptImportManagementFormAddEditMaterialProps {
 export interface ReceiptImportManagementFormAddEditMaterialItemProps{
     materials?: MaterialData[];
     material?: MaterialData;
+    materialId?: string;
     handleSelectMaterial?: (id: string | number) => void;
     specifications?: Specification[];
     materialReceipt?: ReceiptMaterialData[];
     isEditMaterialState?: string;
+    receipt?: ReceiptData;
+    render?: () => void;
 }
 export interface ReceiptImportManagementFormAddEditProductItemProps{
     products?: Product[];
     product?: Product;
+    materialId?: string;
     handleSelectProduct?: (id: string | number) => void;
     specifications?: Specification[];
     productReceipt?: ReceiptProductData[];
     isEditProductState?: string;
+    render?: () => void;
+    receipt?: ReceiptData;
 }
 export interface ReceiptImportManagementFormAddEditProductProps {
     products: Product[];
@@ -93,14 +103,23 @@ export interface ReceiptImportManagementFormAddEditProductProps {
     handleSelectProduct: (id: string | number) => void;
     specifications: Specification[];
     productReceipt?: ReceiptProductData[];
+    
 }
 export interface ReceiptImportManagementFormListMaterialItemProps {
-    materialReceipt: ReceiptMaterialData[];
+    materialReceipt?: ReceiptMaterialData[];
     specifications: Specification[];
+    materialId?: string;
+    render?: () => void;
+    receipt?: ReceiptData;
+    action?: string
 }
 export interface ReceiptImportManagementFormListProductItemProps {
     productReceipt: ReceiptProductData[];
     specifications: Specification[];
+    materialId?: string;
+    render?: () => void;
+    receipt?: ReceiptData;
+    action?: string
 }
 export type ReceiptFormInputProps = FormInputProps<ReceiptData>;
 export type ReceiptMaterialFormInputProps = FormInputProps<ReceiptMaterialData>;

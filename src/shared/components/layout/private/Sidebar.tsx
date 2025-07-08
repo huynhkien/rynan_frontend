@@ -1,16 +1,16 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome } from '@mui/icons-material';
+import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
-
 
 // Types
 interface SubMenuItem {
   text: string;
   icon: React.ReactElement;
   path: string;
+  subItems?: SubMenuItem[]; // Cho phép lồng thêm subitem
 }
 
 interface MenuItem {
@@ -52,7 +52,29 @@ const menuItems: MenuItem[] = [
       { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/supplier-management' },
       { text: 'Nhập kho', icon: <AddHome/>, path: '/admin/receipt-management/import' },
       { text: 'Xuất kho', icon: <AddHomeWork/>, path: '/admin/receipt-management/export' },
-      { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/receipt-management' },
+      { 
+        text: 'Kiểm duyệt', 
+        icon: <AssignmentTurnedIn/>, 
+        path: '/admin/receipt-management/approve',
+        subItems: [
+          { 
+            text: 'Chưa duyệt', 
+            icon: <PendingActions/>, 
+            path: '/admin/receipt-management/approve/pending',
+          },
+          { 
+            text: 'Đã duyệt', 
+            icon: <CheckOutlined/>, 
+            path: '/admin/receipt-management/approve/confirm',
+          },
+          { 
+            text: 'Đã hủy', 
+            icon: <AutoDelete/>, 
+            path: '/admin/receipt-management/approve/cancel',
+          },
+        ]
+      },
+      { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/inventory-management' },
     ]
    },
   { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
@@ -73,10 +95,10 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
     setIsCollapsed(!isCollapsed);
   };
 
-  const toggleSubMenu = (itemText: string) => {
+  const toggleSubMenu = (itemKey: string) => {
     setOpenSubMenus(prev => ({
       ...prev,
-      [itemText]: !prev[itemText]
+      [itemKey]: !prev[itemKey]
     }));
   };
 
@@ -159,63 +181,122 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
     </Box>
   );
 
-  const renderSubMenuItem = (subItem: SubMenuItem, parentIndex: number, subIndex: number): React.ReactElement => {
-    const key = `${parentIndex}-${subIndex}`;
+  // Recursive function để render subitem có thể lồng nhiều cấp
+  const renderSubMenuItem = (
+    subItem: SubMenuItem, 
+    itemKey: string, 
+    level: number = 1
+  ): React.ReactElement => {
+    const hasSubItems = subItem.subItems && subItem.subItems.length > 0;
+    const isSubMenuOpen = openSubMenus[itemKey];
+    const paddingLeft = isCollapsed ? 1 : (level * 2) + 1;
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (hasSubItems && !isCollapsed) {
+        e.preventDefault();
+        toggleSubMenu(itemKey);
+      }
+    };
+
     const listItem = (
       <ListItem 
-        key={key}
+        key={itemKey}
+        onClick={handleClick}
         sx={{
           mb: 0.5,
           borderRadius: 2,
           mx: 1,
-          ml: isCollapsed ? 1 : 3,
+          ml: paddingLeft,
           justifyContent: isCollapsed ? 'center' : 'flex-start',
           px: isCollapsed ? 1 : 2,
+          cursor: hasSubItems && !isCollapsed ? 'pointer' : 'default',
           '&:hover': {
             bgcolor: 'rgba(255,255,255,0.1)',
           },
         }}
       >
-        <Link 
-          href={subItem.path} 
-          style={{ 
+        {hasSubItems && !isCollapsed ? (
+          <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
-            textDecoration: 'none', 
-            color: 'inherit', 
             width: '100%',
-            justifyContent: isCollapsed ? 'center' : 'flex-start'
-          }}
-        >
-          <ListItemIcon sx={{ 
-            color: 'inherit', 
-            minWidth: isCollapsed ? 'auto' : 40,
-            justifyContent: 'center'
+            justifyContent: 'space-between'
           }}>
-            {subItem.icon}
-          </ListItemIcon>
-          {!isCollapsed && (
-            <ListItemText 
-              primary={subItem.text} 
-              primaryTypographyProps={{
-                fontWeight: 400,
-                fontSize: '0.875rem'
-              }}
-            />
-          )}
-        </Link>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <ListItemIcon sx={{ 
+                color: 'inherit', 
+                minWidth: 40,
+                justifyContent: 'center'
+              }}>
+                {subItem.icon}
+              </ListItemIcon>
+              <ListItemText 
+                primary={subItem.text} 
+                primaryTypographyProps={{
+                  fontWeight: 400,
+                  fontSize: level > 1 ? '0.8rem' : '0.875rem'
+                }}
+              />
+            </Box>
+            {isSubMenuOpen ? <ExpandLess /> : <ExpandMore />}
+          </Box>
+        ) : (
+          <Link 
+            href={subItem.path} 
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              textDecoration: 'none', 
+              color: 'inherit', 
+              width: '100%',
+              justifyContent: isCollapsed ? 'center' : 'flex-start'
+            }}
+          >
+            <ListItemIcon sx={{ 
+              color: 'inherit', 
+              minWidth: isCollapsed ? 'auto' : 40,
+              justifyContent: 'center'
+            }}>
+              {subItem.icon}
+            </ListItemIcon>
+            {!isCollapsed && (
+              <ListItemText 
+                primary={subItem.text} 
+                primaryTypographyProps={{
+                  fontWeight: 400,
+                  fontSize: level > 1 ? '0.8rem' : '0.875rem'
+                }}
+              />
+            )}
+          </Link>
+        )}
       </ListItem>
     );
 
-    if (isCollapsed) {
-      return (
-        <Tooltip key={key} title={subItem.text} placement='right'>
-          {listItem}
-        </Tooltip>
-      );
-    }
+    const wrappedItem = isCollapsed ? (
+      <Tooltip key={itemKey} title={subItem.text} placement='right'>
+        {listItem}
+      </Tooltip>
+    ) : listItem;
 
-    return listItem;
+    return (
+      <React.Fragment key={itemKey}>
+        {wrappedItem}
+        {hasSubItems && !isCollapsed && (
+          <Collapse in={isSubMenuOpen} timeout="auto" unmountOnExit>
+            <List component="div" disablePadding>
+              {subItem.subItems!.map((nestedSubItem, nestedIndex) => 
+                renderSubMenuItem(
+                  nestedSubItem, 
+                  `${itemKey}-${nestedIndex}`, 
+                  level + 1
+                )
+              )}
+            </List>
+          </Collapse>
+        )}
+      </React.Fragment>
+    );
   };
 
   const renderMenuItem = (item: MenuItem, index: number): React.ReactElement => {
@@ -326,7 +407,7 @@ export const Sidebar = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
           <Collapse in={isSubMenuOpen} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
               {item.subItems!.map((subItem, subIndex) => 
-                renderSubMenuItem(subItem, index, subIndex)
+                renderSubMenuItem(subItem, `${item.text}-${subIndex}`, 1)
               )}
             </List>
           </Collapse>

@@ -37,6 +37,7 @@ export interface ReceiptProductData extends Record<string, unknown> {
     expiryDate?: string | Date, // Hạn sử dụng
     manufacturingDate?: string | Date // Ngày sản xuất
 
+
 }
 export interface ReceiptMaterialData extends Record<string, unknown> {
     mid?: string;
@@ -120,6 +121,12 @@ export interface ReceiptImportManagementFormListProductItemProps {
     render?: () => void;
     receipt?: ReceiptData;
     action?: string
+}
+export interface ReceiptApprovePendingManagementFormAddEditProps {
+    users?: UserData[];
+    rid?: string;
+    specifications?: Specification[];
+    fetchAllReceipt?: () => void;
 }
 export type ReceiptFormInputProps = FormInputProps<ReceiptData>;
 export type ReceiptMaterialFormInputProps = FormInputProps<ReceiptMaterialData>;

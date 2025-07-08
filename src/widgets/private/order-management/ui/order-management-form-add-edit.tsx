@@ -124,7 +124,7 @@ export const OrderManagementFormAddEdit = () => {
             const newOrderData = {
                 code: OrderData.code,
                 products: orderProduct,
-                status: OrderData.status,
+                status: 'Processing',
                 orderBy: selectedUser,
                 total: totalOrder,
                 paymentMethod: OrderData.paymentMethod,
@@ -136,11 +136,11 @@ export const OrderManagementFormAddEdit = () => {
             }
             const response = await createOrder(newOrderData as OrderData);
             if(response.success){
-                dispatch(removeAllOrderProduct());
-                toast.success(response.message);
-                setSelectedUser(null);
-                setSelectedProduct(null);
-                reset();
+                // dispatch(removeAllOrderProduct());
+                // toast.success(response.message);
+                // setSelectedUser(null);
+                // setSelectedProduct(null);
+                // reset();
             }
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
@@ -278,8 +278,11 @@ export const OrderManagementFormAddEdit = () => {
                                     }
                                     
                                 </Box>
+                                
+                                {id ?
                                 <ControlledSelect
                                     label='Trạng thái đơn hàng'
+                                    placeholder='Lựa chọn trạng thái đơn hàng'
                                     important
                                     sx={{ width: '100%' }}
                                     name='status'
@@ -287,6 +290,18 @@ export const OrderManagementFormAddEdit = () => {
                                     options={OrderStatus}
                                     rules={{ required: 'Vui lòng chọn trạng thái đơn hàng' }}
                                 />
+                                :
+                                <OrderFormInput
+                                    label='Trạng thái đơn hàng'
+                                    important
+                                    disabled
+                                    register={register as UseFormRegister<OrderData>}
+                                    errors={errors as FieldErrors<OrderData>}
+                                    id='status'
+                                    validate={{ required: 'Trạng thái đơn hàng không được để trống' }}
+                                    defaultValue={OrderStatus.find(el => el._id === 'Processing')?.name}
+                                />
+                                }
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
                                     <ControlledSelect
                                         label='Nhân viên xử lý'
@@ -310,7 +325,19 @@ export const OrderManagementFormAddEdit = () => {
                                             width: '50%'
                                         }}
                                     />
+
                                 </Box>
+                                      {/* Ghi chú */}
+                                    <OrderFormInput
+                                        label='Ghi chú'
+                                        type='5'
+                                        important
+                                        register={register as UseFormRegister<OrderData>}
+                                        errors={errors as FieldErrors<OrderData>}
+                                        id='note'
+                                        multiline
+                                        rows={10}
+                                    />
                             </Box>
                         </Paper>
                         <Paper sx={{ width: '50%', display: 'flex', borderRadius: 0, flexDirection: 'column', gap: 1, backgroundColor: theme.palette.background.default }}>
@@ -456,17 +483,7 @@ export const OrderManagementFormAddEdit = () => {
                                     id='paymentDueDate'
                                     validate={{ required: 'Hạn thanh toán không được để trống' }}
                                 />
-                                {/* Ghi chú */}
-                                <OrderFormInput
-                                    label='Ghi chú'
-                                    type='5'
-                                    important
-                                    register={register as UseFormRegister<OrderData>}
-                                    errors={errors as FieldErrors<OrderData>}
-                                    id='note'
-                                    multiline
-                                    rows={10}
-                                />
+                               
                             </Box>
                         </Paper>
                         {id && (

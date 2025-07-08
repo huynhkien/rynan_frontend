@@ -22,7 +22,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
-import { Delete, ExitToApp } from '@mui/icons-material';
+import { Delete, Error, ExitToApp, Warning } from '@mui/icons-material';
 import moment from 'moment';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
@@ -52,11 +52,11 @@ const headCellsMaterial = [
       { id: 'name', label: 'Tên nguyên liệu', sortable: true },
       { id: 'code', label: 'Mã code', sortable: true },
       { id: 'quantity', label: 'Số lượng', sortable: true },
-      { id: 'approvedBy', label: 'Nhân viên quản lý', sortable: false },
+      { id: 'approvedBy', label: 'Nhân viên quản lý', sortable: true },
       { id: 'specification', label: 'Quy cách', sortable: true },
       { id: 'location.shelf', label: 'Vị trí', sortable: true },
       { id: 'location.positionCode', label: 'Mã ví trí', sortable: true },
-      { id: 'createdAt', label: 'Ngày cập nhật', sortable: false },
+      { id: 'createdAt', label: 'Ngày cập nhật', sortable: true },
     ];
 const InventoryManagementFormListMaterial = ({inventory, users, specifications, materials} :  {inventory: InventoryData[], users: UserData[], specifications: Specification[], materials: MaterialData[]}) => {
     const [page, setPage] = useState(0);
@@ -106,32 +106,92 @@ const InventoryManagementFormListMaterial = ({inventory, users, specifications, 
     const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= inventory.length;
 
     const filteredAndSortedData = useMemo(() => {
-        const filtered = inventory?.filter(item => {
-        const matchesSearch =
-                  (item?._id as string).toLowerCase().includes(searchTerm.toLowerCase()) ; 
-        const matchesAlpha =
-                  filterAlpha === 'all' ||
-                  (item?._id as string).toLowerCase().includes(searchTerm.toLowerCase()) ;
-        return matchesSearch && matchesAlpha;
-        });
+      const filtered = inventory?.filter(item => {
+          // Lấy thông tin nguyên liệu từ materials array
+          const material = materials.find(el => el._id === item.materialId);
+          const user = users.find(el => el._id === item.approvedBy);
+          const specification = specifications.find(el => el._id === material?.specification);
+          
+          // Tìm kiếm theo nhiều trường
+          const matchesSearch = !searchTerm || 
+              (material?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (material?.code?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (user?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (item.location?.shelf?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (item.location?.positionCode?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (specification?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+              (item.currentStock?.toString().includes(searchTerm));
+          
+          // Lọc theo chữ cái
+          const matchesAlpha = filterAlpha === 'all' ||
+              (material?.name?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+              (material?.code?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+              (user?.name?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+              (item.location?.shelf?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+              (item.location?.positionCode?.toLowerCase().startsWith(filterAlpha.toLowerCase()));
+          
+          return matchesSearch && matchesAlpha;
+      });
 
       // Sắp xếp
       if (sortBy && headCellsMaterial.find(cell => cell.id === sortBy)?.sortable) {
-        filtered.sort((a, b) => {
-          const aValue = a[sortBy as keyof typeof a];
-          const bValue = b[sortBy as keyof typeof b];
-          
-          if (typeof aValue === 'string' && typeof bValue === 'string') {
-            const comparison = aValue.localeCompare(bValue, 'vi');
-            return sortOrder === 'asc' ? comparison : -comparison;
-          }
-          
-          return 0;
-        });
+          filtered.sort((a, b) => {
+              let aValue, bValue;
+              // Lấy giá trị để sắp xếp dựa trên trường được chọn
+              switch (sortBy) {
+                  case 'name':
+                      aValue = materials.find(el => el._id === a.materialId)?.name || '';
+                      bValue = materials.find(el => el._id === b.materialId)?.name || '';
+                      break;
+                  case 'code':
+                      aValue = materials.find(el => el._id === a.materialId)?.code || '';
+                      bValue = materials.find(el => el._id === b.materialId)?.code || '';
+                      break;
+                  case 'quantity':
+                      aValue = a.currentStock || 0;
+                      bValue = b.currentStock || 0;
+                      break;
+                  case 'approvedBy':
+                      aValue = users.find(el => el._id === a.approvedBy)?.name || '';
+                      bValue = users.find(el => el._id === b.approvedBy)?.name || '';
+                      break;
+                  case 'specification':
+                      const specA = specifications.find(el => el._id === materials.find(el => el._id === a.materialId)?.specification);
+                      const specB = specifications.find(el => el._id === materials.find(el => el._id === b.materialId)?.specification);
+                      aValue = specA?.name || '';
+                      bValue = specB?.name || '';
+                      break;
+                  case 'location.shelf':
+                      aValue = a.location?.shelf || '';
+                      bValue = b.location?.shelf || '';
+                      break;
+                  case 'location.positionCode':
+                      aValue = a.location?.positionCode || '';
+                      bValue = b.location?.positionCode || '';
+                      break;
+                  case 'createdAt':
+                      aValue = new Date(a.createdAt || 0).getTime();
+                      bValue = new Date(b.createdAt || 0).getTime();
+                      break;
+                  default:
+                      aValue = '';
+                      bValue = '';
+              }
+              
+              // So sánh giá trị
+              if (typeof aValue === 'string' && typeof bValue === 'string') {
+                  const comparison = aValue.localeCompare(bValue, 'vi');
+                  return sortOrder === 'asc' ? comparison : -comparison;
+              } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                  return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+              }
+              
+              return 0;
+          });
       }
 
-    return filtered;
-    }, [searchTerm, sortBy, sortOrder, inventory, filterAlpha]);
+      return filtered;
+  }, [searchTerm, sortBy, sortOrder, inventory, filterAlpha, materials, users, specifications]);
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -305,10 +365,16 @@ return (
                          {materials.find(el => el._id === item.materialId)?.code}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle'}}>
-                        <Typography variant='body1' >
-                         {item.currentStock}
-                        </Typography>
+                      <TableCell sx={{ verticalAlign: 'middle', display: 'flex', justifyContent: 'center'}}>
+                          <Typography variant='body1' >
+                              {item.currentStock}
+                              </Typography>
+                          {(Number(item.currentStock)) <= 50 && (
+                              <Error sx={{ color: 'error.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                          )}
+                          {(Number(item.currentStock)) <= 100 && Number(item.currentStock) >=50 && (
+                              <Warning sx={{ color: 'warning.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                          )}
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
@@ -405,33 +471,94 @@ const InventoryManagementFormListProduct = ({inventory, users, specifications, p
     const isAllSelected = selectedItems.length === inventory?.length;
     const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= inventory.length;
 
+    // Thay thế logic filteredAndSortedData trong InventoryManagementFormListProduct
     const filteredAndSortedData = useMemo(() => {
         const filtered = inventory.filter(item => {
-        const matchesSearch =
-                  (item?._id as string).toLowerCase().includes(searchTerm.toLowerCase()) ;
-        const matchesAlpha =
-                  filterAlpha === 'all' ||
-                  (item?._id as string).toLowerCase().includes(searchTerm.toLowerCase()) ;
-        return matchesSearch && matchesAlpha;
+            // Lấy thông tin sản phẩm từ products array
+            const product = products.find(el => el._id === item.productId);
+            const user = users.find(el => el._id === item.approvedBy);
+            const specification = specifications.find(el => el._id === product?.specification);
+            
+            // Tìm kiếm theo nhiều trường
+            const matchesSearch = !searchTerm || 
+                (product?.name_vn?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (product?.code?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (user?.name?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.location?.shelf?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (item.location?.positionCode?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (specification?.name?.toLowerCase().includes(searchTerm.toLowerCase()));
+            
+            // Lọc theo chữ cái
+            const matchesAlpha = filterAlpha === 'all' ||
+                (product?.name_vn?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+                (product?.code?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+                (user?.name?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+                (item.location?.shelf?.toLowerCase().startsWith(filterAlpha.toLowerCase())) ||
+                (item.location?.positionCode?.toLowerCase().startsWith(filterAlpha.toLowerCase()));
+            
+            return matchesSearch && matchesAlpha;
         });
 
-    // Sắp xếp
-    if (sortBy && headCellsProduct.find(cell => cell.id === sortBy)?.sortable) {
-      filtered.sort((a, b) => {
-        const aValue = a[sortBy as keyof typeof a];
-        const bValue = b[sortBy as keyof typeof b];
-        
-        if (typeof aValue === 'string' && typeof bValue === 'string') {
-          const comparison = aValue.localeCompare(bValue, 'vi');
-          return sortOrder === 'asc' ? comparison : -comparison;
+        // Sắp xếp
+        if (sortBy && headCellsProduct.find(cell => cell.id === sortBy)?.sortable) {
+            filtered.sort((a, b) => {
+                let aValue, bValue;
+                
+                // Lấy giá trị để sắp xếp dựa trên trường được chọn
+                switch (sortBy) {
+                    case 'name':
+                        aValue = products.find(el => el._id === a.productId)?.name_vn || '';
+                        bValue = products.find(el => el._id === b.productId)?.name_vn || '';
+                        break;
+                    case 'code':
+                        aValue = products.find(el => el._id === a.productId)?.code || '';
+                        bValue = products.find(el => el._id === b.productId)?.code || '';
+                        break;
+                    case 'quantity':
+                        aValue = a.currentStock || 0;
+                        bValue = b.currentStock || 0;
+                        break;
+                    case 'approvedBy':
+                        aValue = users.find(el => el._id === a.approvedBy)?.name || '';
+                        bValue = users.find(el => el._id === b.approvedBy)?.name || '';
+                        break;
+                    case 'specification':
+                        const specA = specifications.find(el => el._id === products.find(el => el._id === a.productId)?.specification);
+                        const specB = specifications.find(el => el._id === products.find(el => el._id === b.productId)?.specification);
+                        aValue = specA?.name || '';
+                        bValue = specB?.name || '';
+                        break;
+                    case 'location.shelf':
+                        aValue = a.location?.shelf || '';
+                        bValue = b.location?.shelf || '';
+                        break;
+                    case 'location.positionCode':
+                        aValue = a.location?.positionCode || '';
+                        bValue = b.location?.positionCode || '';
+                        break;
+                    case 'createdAt':
+                        aValue = new Date(a.createdAt || 0).getTime();
+                        bValue = new Date(b.createdAt || 0).getTime();
+                        break;
+                    default:
+                        aValue = '';
+                        bValue = '';
+                }
+                
+                // So sánh giá trị
+                if (typeof aValue === 'string' && typeof bValue === 'string') {
+                    const comparison = aValue.localeCompare(bValue, 'vi');
+                    return sortOrder === 'asc' ? comparison : -comparison;
+                } else if (typeof aValue === 'number' && typeof bValue === 'number') {
+                    return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
+                }
+                
+                return 0;
+            });
         }
-        
-        return 0;
-      });
-    }
 
-    return filtered;
-    }, [searchTerm, sortBy, sortOrder, inventory, filterAlpha]);
+        return filtered;
+    }, [searchTerm, sortBy, sortOrder, inventory, filterAlpha, products, users, specifications]);
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -605,10 +732,16 @@ return (
                          {products.find(el => el._id === item.productId)?.code}
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle'}}>
-                        <Typography variant='body1' >
-                         {item.currentStock}
-                        </Typography>
+                      <TableCell sx={{ verticalAlign: 'middle', display: 'flex', justifyContent: 'center'}}>
+                          <Typography variant='body1' >
+                              {item.currentStock}
+                              </Typography>
+                          {(Number(item.currentStock)) <= 50 && (
+                              <Error sx={{ color: 'error.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                          )}
+                          {(Number(item.currentStock)) <= 100 && Number(item.currentStock) >=50 && (
+                              <Warning sx={{ color: 'warning.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                          )}
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>

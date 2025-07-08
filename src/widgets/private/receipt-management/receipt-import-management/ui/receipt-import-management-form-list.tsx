@@ -429,19 +429,6 @@ return (
           }
         />
       </Paper>    
-      <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component='div'
-          count={filteredAndSortedData.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage='Số hàng mỗi trang:'
-          labelDisplayedRows={({ from, to, count }) => 
-            `${from}-${to} của ${count !== -1 ? count : `hơn ${to}`}`
-          }
-        />
       {/* Dialog hiển thị sản phẩm */}
       <Dialog
         open={isShowMaterial !==null}

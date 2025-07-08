@@ -171,7 +171,7 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
     }, [id, reset]); 
     useEffect(() => {
         fetchReceipt();
-    },[])
+    },[fetchReceipt]);
     // Cập nhật lại tôi đơn hàng
     const materialTotalId =receipt?.materials?.reduce((sum, item) => {
         return sum + ((item.price as number )* item.quantity)

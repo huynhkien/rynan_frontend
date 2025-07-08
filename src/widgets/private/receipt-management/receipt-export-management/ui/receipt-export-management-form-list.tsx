@@ -77,10 +77,10 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, fe
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
     
-    // xóa phiếu nhập kho
+    // xóa phiếu xuất kho
     const handleDelete = async(id: string) => {
       try{
-        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+        if(window.confirm('Bạn có chắc muốn xóa phiếu xuất kho không?')){
         const response = await deleteReceipt(id);
         if(response.success) {
           toast.success(response.message);
@@ -209,7 +209,7 @@ return (
             <Box >
                 <TextField
                     fullWidth
-                    label='Tìm kiếm phiếu nhập kho'
+                    label='Tìm kiếm phiếu xuất kho'
                     variant='outlined'
                     size='small'
                      sx={{
@@ -248,7 +248,7 @@ return (
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} phiếu nhập kho
+              Hiển thị: {filteredAndSortedData.length} phiếu xuất kho
             </Typography>
           </Box>
         </Box>
@@ -468,10 +468,10 @@ export const ReceiptExportManagementFormListProduct = ({receipts, users, fetchAl
     const theme = useTheme();
     
     
-    // xóa phiếu nhập kho
+    // xóa phiếu xuất kho
     const handleDelete = async(id: string) => {
       try{
-        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+        if(window.confirm('Bạn có chắc muốn xóa phiếu xuất kho không?')){
         const response = await deleteReceipt(id);
         if(response.success) {
           toast.success(response.message);
@@ -598,7 +598,7 @@ return (
             <Box >
                 <TextField
                     fullWidth
-                    label='Tìm kiếm phiếu nhập kho'
+                    label='Tìm kiếm phiếu xuất kho'
                     variant='outlined'
                     size='small'
                      sx={{
@@ -637,7 +637,7 @@ return (
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} phiếu nhập kho
+              Hiển thị: {filteredAndSortedData.length} phiếu xuất kho
             </Typography>
           </Box>
         </Box>
@@ -875,7 +875,7 @@ export const ReceiptExportManagementFormList = () => {
       const response = await  getAllSupplier();
       if(response.success) setSuplliers(response.data || []);
     }
-    // hiển thị tất cả phiếu nhập kho
+    // hiển thị tất cả phiếu xuất kho
     useEffect(() => {
       fetchAllReceipts();
       fetchUsers();

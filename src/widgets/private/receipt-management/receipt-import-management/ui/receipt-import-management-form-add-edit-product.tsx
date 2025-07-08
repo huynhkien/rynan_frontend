@@ -135,7 +135,7 @@ export const ReceiptImportManagementFormAddEditProduct = () => {
     }, [id, reset]); 
     useEffect(() => {
         fetchReceipt();
-    },[]);
+    },[fetchReceipt]);
     const handleUpdateProductImport = async(data: ReceiptData) => {
             const mergedProductsData = [...productReceipt as ReceiptProductData[], ...receipt?.products as ReceiptProductData[]];
             const temp: Record<string, ReceiptProductData> = {};

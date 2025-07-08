@@ -19,7 +19,7 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
     const theme = useTheme();
     const { register,  formState: { errors }, control, handleSubmit, reset } = useForm<InventoryData>();
     const [receipt, setReceipt] = useState<ReceiptData>();
-    
+    const [selectStatus, setSelectStatus] = useState<string | null>(null);
     // Hiển thị thông tin phiếu
     useEffect(() => {
         if(!rid) return;
@@ -28,7 +28,12 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
             if(response.success) setReceipt(response.data);
         }
         fetchReceipt();
-    },[rid])
+    },[rid]);
+    // Lựa chọn trạng thái
+    const handleSelectStatus = async(id: string | number) => {
+        setSelectStatus(id as string);
+    }
+    console.log(selectStatus);
     
     //  Xử lý duyệt phiếu
     const handleApprove = async (data: InventoryData) => {
@@ -176,6 +181,7 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                         label='Trạng thái xét duyệt'
                         placeholder='Lựa chọn trạng thái'
                         important
+                        onSelectionChange={handleSelectStatus}
                         sx={{width: "50%"}}
                         name='status'
                         control={control}
@@ -184,8 +190,8 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     />
                 </Box>
                 
-                {receipt?.typeReceipt ==='import' && receipt?.materials && receipt?.materials?.length > 0 && <Typography>Chọn vị trí cho nguyên liệu:</Typography>}
-                {receipt?.typeReceipt ==='import' && receipt?.materials && receipt?.materials?.length > 0 && receipt?.materials.map(el => (
+                {selectStatus === 'confirmed' && receipt?.typeReceipt ==='import' && receipt?.materials && receipt?.materials?.length > 0 && <Typography>Chọn vị trí cho nguyên liệu:</Typography>}
+                {selectStatus === 'confirmed' && receipt?.typeReceipt ==='import' && receipt?.materials && receipt?.materials?.length > 0 && receipt?.materials.map(el => (
                     <Box key={el.mid} sx={{display: 'flex', justifyContent: 'space-between', gap:2, alignItems: 'flex-end'}}>
                         <Box sx={{width: "33%"}}>
                             <Typography variant="body2" sx={{mb: 1, fontWeight: 'bold'}}>
@@ -234,8 +240,8 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     />
                 }
                 
-                {receipt?.typeReceipt ==='import' && receipt?.products && receipt?.products?.length > 0 &&  <Typography>Chọn vị trí cho sản phẩm:</Typography>}
-                {receipt?.typeReceipt ==='import' && receipt?.products && receipt?.products?.length > 0 && receipt?.products.map(el => (
+                {selectStatus === 'confirmed' && receipt?.typeReceipt ==='import' && receipt?.products && receipt?.products?.length > 0 &&  <Typography>Chọn vị trí cho sản phẩm:</Typography>}
+                {selectStatus === 'confirmed' && receipt?.typeReceipt ==='import' && receipt?.products && receipt?.products?.length > 0 && receipt?.products.map(el => (
                     <Box key={el.pid} sx={{display: 'flex', justifyContent: 'space-between', gap:2, alignItems: 'flex-end'}}>
                         <Box sx={{width: "33%"}}>
                             <Typography variant="body2" sx={{mb: 1, fontWeight: 'bold'}}>

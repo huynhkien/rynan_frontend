@@ -179,7 +179,7 @@ return (
             }}>
           <Box>
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
-            Quản lý xuất kho kho
+            Quản lý xuất kho 
           </Typography>
           </Box>
           <Box

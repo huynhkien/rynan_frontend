@@ -46,27 +46,27 @@ import { ReceiptApprovePendingManagementFormAddEdit } from './receipt-approve-pe
 type SortOrder = 'asc' | 'desc';
 const headCellsProduct = [
       { id: 'code', label: 'Mã phiếu nhập', sortable: true },
-      { id: 'staff', label: 'Nhân viên thực hiện', sortable: false },
+      { id: 'staff', label: 'Nhân viên thực hiện', sortable: true },
       { id: 'status', label: 'Trạng thái', sortable: true },
-      { id: 'users', label: 'Khách hàng', sortable: false },
-      { id: 'produced_at', label: 'Sản xuất', sortable: false },
-      { id: 'products', label: 'Sản phẩm', sortable: false },
-      { id: 'note', label: 'Ghi chú', sortable: false },
-      { id: 'total', label: 'Tổng thanh toán', sortable: false },
-      { id: 'createdAt', label: 'Ngày tạo', sortable: false },
-      { id: 'actions', label: 'Thao tác', sortable: false }
+      { id: 'users', label: 'Khách hàng', sortable: true },
+      { id: 'produced_at', label: 'Sản xuất', sortable: true },
+      { id: 'products', label: 'Sản phẩm', sortable: true },
+      { id: 'note', label: 'Ghi chú', sortable: true },
+      { id: 'total', label: 'Tổng thanh toán', sortable: true },
+      { id: 'createdAt', label: 'Ngày tạo', sortable: true },
+      { id: 'actions', label: 'Thao tác', sortable: true }
     ];
 const headCellsMaterial = [
       { id: 'code', label: 'Mã phiếu nhập', sortable: true },
-      { id: 'staff', label: 'Nhân viên thực hiện', sortable: false },
+      { id: 'staff', label: 'Nhân viên thực hiện', sortable: true },
       { id: 'status', label: 'Trạng thái', sortable: true },
-      { id: 'users', label: 'Khách hàng', sortable: false },
-      { id: 'supplier', label: 'Nhà cung cấp', sortable: false },
-      { id: 'materials', label: 'Nguyên liệu', sortable: false },
-      { id: 'note', label: 'Ghi chú', sortable: false },
-      { id: 'total', label: 'Tổng thanh toán', sortable: false },
-      { id: 'createdAt', label: 'Ngày tạo', sortable: false },
-      { id: 'actions', label: 'Thao tác', sortable: false }
+      { id: 'users', label: 'Khách hàng', sortable: true },
+      { id: 'supplier', label: 'Nhà cung cấp', sortable: true },
+      { id: 'materials', label: 'Nguyên liệu', sortable: true },
+      { id: 'note', label: 'Ghi chú', sortable: true },
+      { id: 'total', label: 'Tổng thanh toán', sortable: true },
+      { id: 'createdAt', label: 'Ngày tạo', sortable: true },
+      { id: 'actions', label: 'Thao tác', sortable: true }
     ];
 const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, specifications, fetchAllReceipt}: {fetchAllReceipt?: () => void; receipts:ReceiptData[]; users: UserData[], suppliers: SupplierData[], specifications?: Specification[]} ) => {
     const [page, setPage] = useState(0);

@@ -32,6 +32,7 @@ export interface Product {
     description: string;
     category: string;
     sold: string;
+    totalRatings: number;
     tags: ProductTags[];
     price_reference: number;
     specification: string;
@@ -45,8 +46,23 @@ export interface Product {
     provide_nutrition: string;
     crop: string;
     stage: string;
+    ratings: ProductRatingsData[];
 }
-
+interface ProductRatingsData {
+    star: number;
+    postedBy: string;
+    postedByName: string;
+    comment: string;
+    like: string,
+    replies: ProductRatingsRepliesData[];
+}
+interface ProductRatingsRepliesData {
+    replier: string,
+    replierName: string;
+    feedBack: string;
+    createdAt: string | Date;
+    postedBy: string;
+}
 export interface ProductData extends Record<string, unknown> {
     name_vn: string;
     name_eng: string;

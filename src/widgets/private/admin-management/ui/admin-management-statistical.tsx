@@ -20,6 +20,10 @@ import { InventoryData } from "@/features/inventory/type/inventoryType";
 import { getAllInventory } from "@/features/inventory/api/inventoryApi";
 import { getAllMaterial } from "@/features/material/api/materialApi";
 import { MaterialData } from "@/features/material/type/materialType";
+import { AdminManagementStatisticalQuote } from "./admin-management-statistical-quote";
+import { getAllQuote } from "@/features/quote/api/quoteApi";
+import { QuoteData } from "@/features/quote/type/quoteType";
+import { AdminManagementStatisticalRevenue } from "./admin-management-statistical-revenue";
 
 export const AdminManagementStatistical = () => {
     const [receipts, setReceipts] = useState<ReceiptData[] | []>([]);
@@ -27,7 +31,8 @@ export const AdminManagementStatistical = () => {
     const [products, setProducts] = useState<Product[] | []>([]); 
     const [users, setUsers] = useState<UserData[] | []>([]);
     const [inventory, setInventory] = useState<InventoryData[] | []>([]);
-    const [materials, setMaterials] = useState<MaterialData[] | []>([]);
+    const [materials, setMaterials] = useState<MaterialData[] | []>([]); 
+    const [quotes, setQuotes] = useState<QuoteData[] | []>([]); 
     // Hiển thị thông tin 
     const fetchReceipts = async() => {
         const response = await  getAllReceipt();
@@ -53,6 +58,10 @@ export const AdminManagementStatistical = () => {
         const response = await getAllMaterial();
         if(response.success) setMaterials(response.data || []);
     }
+    const fetchQuotes = async() => {
+        const response = await getAllQuote();
+        if(response.success) setQuotes(response.data || []);
+    }
     useEffect(() => {
         fetchReceipts();
         fetchOrders();
@@ -60,6 +69,7 @@ export const AdminManagementStatistical = () => {
         fetchUsers();
         fetchInventory();
         fetchMaterials();
+        fetchQuotes();
     },[]);
     return (
         <Box>
@@ -83,6 +93,12 @@ export const AdminManagementStatistical = () => {
             </Box>
             <Paper sx={{backgroundColor: theme.palette.primary.main, borderRadius: 0, my:3}}>
                 <AdminManagementStatisticalInventory inventory={inventory} products={products} materials={materials}/>
+            </Paper>
+            <Paper sx={{backgroundColor: theme.palette.primary.main, borderRadius: 0, my:3}}>
+                <AdminManagementStatisticalQuote quoteData={quotes}/>
+            </Paper>
+            <Paper sx={{backgroundColor: theme.palette.primary.main, borderRadius: 0, my:3}}>
+                <AdminManagementStatisticalRevenue products={products} orders={orders} users={users}/>
             </Paper>
                 
         </Box>

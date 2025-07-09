@@ -100,15 +100,15 @@ export const AdminManagementStatisticalOrder = ({
           <FormControl size='small' sx={{ minWidth: 120 }}>
             <InputLabel id='year-select-label'>Chọn năm</InputLabel>
             <Select
-              labelId='year-select-label'
-              value={selectedYear}
-              label='Chọn năm'
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              value={availableYears.includes(selectedYear) ? selectedYear : ''}
+              onChange={(e) => setSelectedYear(e.target.value as number)}
             >
-              {availableYears.map(year => (
-                <MenuItem key={year} value={year}>{year}</MenuItem>
+              {availableYears.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
               ))}
-            </Select>
+          </Select>
           </FormControl>
         </Box>
       </Box>

@@ -143,6 +143,12 @@ export const AdminManagementStatisticalReceipt = ({
     }
     return null;
   };
+  // Kiểm tra
+  const checkData = dailyData.every(item =>
+    Object.values(item)
+      .filter((_, index) => index > 0) 
+      .every(value => value === 0)
+  );
 return (
     <Box sx={{ p: 3 }}>
       <Box sx={{
@@ -199,24 +205,22 @@ return (
           <FormControl size='small' sx={{ minWidth: 120 }}>
             <InputLabel id='year-select-label'>Chọn năm</InputLabel>
             <Select
-              labelId='year-select-label'
-              value={selectedYear}
-              label='Chọn năm'
-              onChange={(e) => {
-                setSelectedYear(e.target.value as number);
-              }}
-              disabled={availableYears.length === 0}
+              value={availableYears.includes(selectedYear) ? selectedYear : ''}
+              onChange={(e) => setSelectedYear(e.target.value as number)}
             >
               {availableYears.map((year) => (
-                <MenuItem key={year} value={year}>{year}</MenuItem>
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
               ))}
             </Select>
           </FormControl>
+          
 
         </Box>
       </Box>
 
-      {dailyData.length === 0 ? (
+      {checkData ? (
         <Box sx={{
           display: 'flex',
           justifyContent: 'center',

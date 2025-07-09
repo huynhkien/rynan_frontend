@@ -38,7 +38,6 @@ export const AdminManagementStatisticalReceiptStatus = ({
       return orderMonth === selectedMonth && orderYear === selectedYear;
     });
   }, [receiptData, selectedMonth, selectedYear]);
-  console.log(filteredReceiptData);
   const orderStatusData: ReceiptStatusData[] = [
     { name: 'Đang xử lý', value: filteredReceiptData.filter(el => el.status === 'pending').length || 0,  color: '#FFA726' },
     { name: 'Đã duyệt', value: filteredReceiptData.filter(el => el.status === 'confirmed').length || 0, color: '#42A5F5' },
@@ -96,16 +95,16 @@ export const AdminManagementStatisticalReceiptStatus = ({
           {/* Lựa chọn năm */}
           <FormControl size='small' sx={{ minWidth: 120 }}>
             <InputLabel id='year-select-label'>Chọn năm</InputLabel>
-            <Select
-              labelId='year-select-label'
-              value={selectedYear}
-              label='Chọn năm'
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
-            >
-              {availableYears.map(year => (
-                <MenuItem key={year} value={year}>{year}</MenuItem>
-              ))}
-            </Select>
+                <Select
+                  value={availableYears.includes(selectedYear) ? selectedYear : ''}
+                  onChange={(e) => setSelectedYear(e.target.value as number)}
+                >
+                  {availableYears.map((year) => (
+                    <MenuItem key={year} value={year}>
+                      {year}
+                    </MenuItem>
+                  ))}
+              </Select>
           </FormControl>
         </Box>
       </Box>

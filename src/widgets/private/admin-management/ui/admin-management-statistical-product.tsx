@@ -11,7 +11,6 @@ export const AdminManagementStatisticalProduct = ({
 }: { products: Product[] }) => {
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  console.log(products);
   const availableMonths = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
 
   const availableYears = useMemo(() => {
@@ -119,15 +118,15 @@ export const AdminManagementStatisticalProduct = ({
           <FormControl size='small' sx={{ minWidth: 120 }}>
             <InputLabel id='year-select-label'>Chọn năm</InputLabel>
             <Select
-              labelId='year-select-label'
-              value={selectedYear}
-              label='Chọn năm'
-              onChange={(e) => setSelectedYear(Number(e.target.value))}
+              value={availableYears.includes(selectedYear) ? selectedYear : ''}
+              onChange={(e) => setSelectedYear(e.target.value as number)}
             >
-              {availableYears.map(year => (
-                <MenuItem key={year} value={year}>{year}</MenuItem>
+              {availableYears.map((year) => (
+                <MenuItem key={year} value={year}>
+                  {year}
+                </MenuItem>
               ))}
-            </Select>
+          </Select>
           </FormControl>
         </Box>
       </Box>

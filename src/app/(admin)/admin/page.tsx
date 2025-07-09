@@ -1,10 +1,10 @@
-import { Box } from "@mui/material"
+import { AdminManagementView } from "@/widgets/private/admin-management/view/admin-management-view"
 
 const Admin = () => {
     return (
-        <Box>
-            Admin
-        </Box>
+        <>
+            <AdminManagementView/>
+        </>
     )
 }
 export default Admin

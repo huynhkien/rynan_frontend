@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard, BarChart, Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete } from '@mui/icons-material';
+import { Dashboard,  Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -77,7 +77,6 @@ const menuItems: MenuItem[] = [
       { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/inventory-management' },
     ]
    },
-  { text: 'Thống kê', icon: <BarChart />, path: '/admin' },
   { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
   { text: 'Bình luận', icon: <Comment />, path: '/admin' },
 ];

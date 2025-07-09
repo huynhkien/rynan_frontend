@@ -87,3 +87,38 @@ export interface CustomInventoryTooltipProps {
     payload?: TooltipInventoryPayload[];
     label?: string;
 }
+// Trạng thái phiếu báo giá
+export interface QuoteStatusData {
+    name: string;
+    value: number;
+    color: string;
+}
+export interface TooltipQuotePayload {
+    name: string;
+    value: number;
+    payload: QuoteStatusData;
+}
+export interface CustomQuoteTooltipProps {
+    active?: boolean;
+    payload?: TooltipInventoryPayload[];
+    label?: string;
+}
+// doanh thu
+export interface RevenueStatusData {
+    name: string;
+    value: number;
+    color: string;
+    quantity: string;
+    products: { pid: string }[];
+
+}
+export interface TooltipRevenuePayload {
+    name: string;
+    value: number;
+    payload: RevenueStatusData;
+}
+export interface CustomRevenueTooltipProps {
+    active?: boolean;
+    payload?: TooltipRevenuePayload[];
+    label?: string;
+}

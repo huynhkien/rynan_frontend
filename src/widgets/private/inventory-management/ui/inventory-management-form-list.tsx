@@ -21,8 +21,10 @@ import {
   Checkbox,
   Tabs,
   Tab,
+  IconButton,
+  Collapse,
 } from '@mui/material';
-import { Delete, Error, ExitToApp, Warning } from '@mui/icons-material';
+import { Delete, Error, ExitToApp, KeyboardArrowDown, KeyboardArrowUp, Warning } from '@mui/icons-material';
 import moment from 'moment';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
@@ -66,8 +68,17 @@ const InventoryManagementFormListMaterial = ({inventory, users, specifications, 
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});
+    
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    // Hiển thị dropdown
+    const toggleRow = (_id: string) => {
+      setOpenRows(prev => ({
+        ...prev,
+        [_id]: !prev[_id]
+      }));
+    };
     
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -344,8 +355,16 @@ return (
                 filteredAndSortedData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
-                    <TableRow key={item._id} hover>
+                  <React.Fragment key={item._id}>
+                    <TableRow  hover>
                         <TableCell padding='checkbox'>
+                           <IconButton
+                                aria-label='expand row'
+                                size='small'
+                                onClick={() => toggleRow(item._id as string)}
+                              >
+                                {openRows[item._id as string] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                            </IconButton>
                             <Checkbox
                                 color='primary'
                                 checked={selectedItems.includes(item?._id as string)}
@@ -402,6 +421,44 @@ return (
                         </Typography>
                       </TableCell>
                     </TableRow>
+                    <TableRow>
+                      <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={headCellsMaterial.length + 1} >
+                        <Collapse in={openRows[item._id as string]} timeout='auto' unmountOnExit>
+                          <Box sx={{ margin: 1 }}>
+                            <Typography variant='body2' gutterBottom component='div'>
+                              Lịch sử nhập và xuất kho
+                            </Typography>
+                            <Table size='small' >
+                              <TableHead>
+                                <TableRow>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Nhân viên thực hiện</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Thời gian</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Hành động</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng thay đổi</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng trước đó</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng mới cập nhật</TableCell>
+                                  <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Ghi chú</TableCell>
+                                </TableRow>
+                              </TableHead>
+                              <TableBody>
+                                {item?.approvalHistory?.map((el) => (
+                                  <TableRow key={el._id}>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{users.find(u => u._id === el.approvedBy)?.name}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{moment(el.approvedAt).format('DD/MM/YYYY HH:mm:ss')}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.action === 'created' ? 'Thêm mới' : el.action ==='updated' ? 'Cập nhật mới' : 'Xuất kho'}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.quantityChange}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.previousStock}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.newStock}</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.notes}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </Box>
+                        </Collapse>
+                      </TableCell>
+                    </TableRow>
+                  </React.Fragment>
                   ))
               )}
             </TableBody>
@@ -433,7 +490,15 @@ const InventoryManagementFormListProduct = ({inventory, users, specifications, p
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});
     const theme = useTheme();
+    // Hiển thị dropdown
+    const toggleRow = (_id: string) => {
+      setOpenRows(prev => ({
+        ...prev,
+        [_id]: !prev[_id]
+      }));
+    };
     
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -711,64 +776,110 @@ return (
                 filteredAndSortedData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
-                    <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item?._id as string)}
-                                onChange={() => handleCheckbox(item?._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
+                    <React.Fragment key={item._id}>
+                      <TableRow hover>
+                          <TableCell padding='checkbox'>
+                            <IconButton
+                                aria-label='expand row'
+                                size='small'
+                                onClick={() => toggleRow(item._id as string)}
+                              >
+                                {openRows[item._id as string] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                            </IconButton>
+                              <Checkbox
+                                  color='primary'
+                                  checked={selectedItems.includes(item?._id as string)}
+                                  onChange={() => handleCheckbox(item?._id as string)}
+                                  inputProps={{
+                                  'aria-label': 'select all desserts',
+                                  }}
+                              />
+                          </TableCell>
+                                              <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {products.find(el => el._id === item.productId)?.name_vn}
+                          </Typography>
                         </TableCell>
-                                            <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {products.find(el => el._id === item.productId)?.name_vn}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle'}}>
-                        <Typography variant='body1' >
-                         {products.find(el => el._id === item.productId)?.code}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', display: 'flex', justifyContent: 'center'}}>
+                        <TableCell sx={{ verticalAlign: 'middle'}}>
                           <Typography variant='body1' >
-                              {item.currentStock}
+                          {products.find(el => el._id === item.productId)?.code}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', display: 'flex', justifyContent: 'center'}}>
+                            <Typography variant='body1' >
+                                {item.currentStock}
+                                </Typography>
+                            {(Number(item.currentStock)) <= 50 && (
+                                <Error sx={{ color: 'error.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                            )}
+                            {(Number(item.currentStock)) <= 100 && Number(item.currentStock) >=50 && (
+                                <Warning sx={{ color: 'warning.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
+                            )}
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {users.find(el => el._id === item.approvedBy)?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {specifications.find(el => el._id === products.find(el => el._id === item.productId)?.specification)?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {item.location?.shelf}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {item.location?.positionCode}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle' }}>
+                          <Typography variant='body1'>
+                            {moment(item.createdAt).format('DD/MM/YYYY')}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={headCellsMaterial.length + 1} >
+                          <Collapse in={openRows[item._id as string]} timeout='auto' unmountOnExit>
+                            <Box sx={{ margin: 1 }}>
+                              <Typography variant='body2' gutterBottom component='div'>
+                                Lịch sử nhập và xuất kho
                               </Typography>
-                          {(Number(item.currentStock)) <= 50 && (
-                              <Error sx={{ color: 'error.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
-                          )}
-                          {(Number(item.currentStock)) <= 100 && Number(item.currentStock) >=50 && (
-                              <Warning sx={{ color: 'warning.main', fontSize: theme.typography.fontSize }} titleAccess="Tồn kho thấp!" />
-                          )}
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {users.find(el => el._id === item.approvedBy)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {specifications.find(el => el._id === products.find(el => el._id === item.productId)?.specification)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.location?.shelf}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {item.location?.positionCode}
-                        </Typography>
-                      </TableCell>
-                       <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {moment(item.createdAt).format('DD/MM/YYYY')}
-                        </Typography>
-                      </TableCell>
-                    </TableRow>
+                              <Table size='small' >
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Nhân viên thực hiện</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Thời gian</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Hành động</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng thay đổi</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng trước đó</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Số lượng mới cập nhật</TableCell>
+                                    <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>Ghi chú</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {item?.approvalHistory?.map((el) => (
+                                    <TableRow key={el._id}>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{users.find(u => u._id === el.approvedBy)?.name}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{moment(el.approvedAt).format('DD/MM/YYYY HH:mm:ss')}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.action === 'created' ? 'Thêm mới' : el.action ==='updated' ? 'Cập nhật mới' : 'Xuất kho'}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.quantityChange}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.previousStock}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.newStock}</TableCell>
+                                      <TableCell sx={{fontSize: theme.typography.body1.fontSize}}>{el.notes}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </Box>
+                          </Collapse>
+                        </TableCell>
+                      </TableRow>
+                    </React.Fragment>
                   ))
               )}
             </TableBody>

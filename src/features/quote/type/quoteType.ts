@@ -27,3 +27,22 @@ export interface QuoteFormProductList {
     id?: string;
 }
 
+export interface UserProductInfoProps {
+    pid: string;
+    name: string;
+    totalQuantity: number;
+}
+export interface UserOrderInfoProps {
+    id: string;
+    name: string;
+    gender?: string;
+    phone?: string;
+    email?: string;
+    address?: string;
+    orderProductQuantity: number;
+    userProductInfo: UserProductInfoProps[],
+    orderTotal: number;
+    createdAt: string | Date;
+    lastOrder?: string | Date;
+}
+

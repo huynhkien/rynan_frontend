@@ -1,61 +1,92 @@
-'use client';
-
-import React, { useEffect, useState } from 'react';
-import { Paper, Box, useTheme, Typography } from '@mui/material';
+import React from 'react';
+import {
+  Box,
+  Typography,
+  useTheme,
+} from '@mui/material';
 import { UserData } from '@/features/user/type/userTypes';
-import { getUserById } from '@/features/user/api/userApis';
-import moment from 'moment';
 import { CustomerGender } from '@/shared/constant/common';
+import moment from 'moment';
 
-export const QuoteManagementFormUserList = ({ userId }: { userId: string }) => {
+export const QuoteManagementFormUserList: React.FC<{ user: UserData }> = ({ user }) => {
   const theme = useTheme();
-  const [user, setUser] = useState<UserData | null>(null);
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (!userId) return;
-      const response = await getUserById(userId);
-      if (response.success) setUser(response.data || null);
-      console.log(response.data);
-    };
-    fetchUser();
-  }, [userId]);
-
-  const UserInfoRow = ({ label, value }: { label: string; value: string | undefined }) => (
-    <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-      <Typography variant='body1' sx={{ fontWeight: 500, minWidth: '80px' }}>
+  const UserInfoRow: React.FC<{ label: string; value: string | undefined; icon?: React.ReactNode }> = ({ 
+    label, 
+    value, 
+    icon 
+  }) => (
+    <Box sx={{ 
+      display: 'flex', 
+      alignItems: 'center',
+      gap: 2, 
+      py: 2, 
+      px: 1,
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      '&:hover': {
+        backgroundColor: theme.palette.action.hover,
+        borderRadius: 1
+      }
+    }}>
+      {icon && (
+        <Box sx={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+        }}>
+          {icon}
+        </Box>
+      )}
+      <Typography 
+        variant='body1' 
+        sx={{ 
+          fontWeight: 600, 
+          minWidth: '140px',
+        }}
+      >
         {label}:
       </Typography>
-      <Typography variant='body1' sx={{ color: theme.palette.text.primary }}>
-        {value || 'Chưa cập nhật'}
+      <Typography 
+        variant='body1' 
+        sx={{ 
+          flex: 1,
+          wordBreak: 'break-word'
+        }}
+      >
+        {value || <span style={{ color: theme.palette.text.disabled, fontStyle: 'italic' }}>Chưa cập nhật</span>}
       </Typography>
     </Box>
   );
 
   return (
-    <Box sx={{ width: '100%', mt: 1 }}>
-      <Paper
-        sx={{
-          width: '100%',
-          overflow: 'hidden',
-          borderRadius: 0,
-          backgroundColor: theme.palette.background.default,
-          border: `1px solid ${theme.palette.divider}`,
-        }}
-      >
-        <Box sx={{ p: 2 }}>
-          <Typography variant='body2' sx={{ mb: 2, fontWeight: 600 }}>
-            Thông tin khách hàng
-          </Typography>
-          
-          <UserInfoRow label='Họ và tên' value={user?.name} />
-          <UserInfoRow label='Giới tính' value={CustomerGender.find((el) => el._id === user?.gender)?.name} />
-          <UserInfoRow label='SĐT' value={user?.phone} />
-          <UserInfoRow label='Email' value={user?.email} />
-          <UserInfoRow label='Địa chỉ' value={user?.address?.detail} />
-          <UserInfoRow label='Ngày sinh' value={moment(user?.dateOfBirth).format('DD/MM/YYYY')} />
+    <>
+        <Box
+            sx={{backgroundColor: theme.palette.primary.main, py:2}}
+        >
+            <Typography sx={{color: theme.palette.text.secondary, textAlign:'center'}} variant='body2'>Thông tin khách hàng</Typography>
         </Box>
-      </Paper>
-    </Box>
+        <Box sx={{ 
+        mt: 1,
+        '& > *:last-child': {
+            borderBottom: 'none'
+        }
+        }}>
+        
+        <UserInfoRow label='Họ và tên' value={user?.name} />
+        <UserInfoRow 
+            label='Giới tính' 
+            value={CustomerGender.find((el) => el._id === user?.gender)?.name} 
+        />
+        <UserInfoRow label='Số điện thoại' value={user?.phone} />
+        <UserInfoRow label='Email' value={user?.email} />
+        <UserInfoRow label='Địa chỉ' value={user?.address?.detail} />
+        <UserInfoRow 
+            label='Ngày sinh' 
+            value={user?.dateOfBirth ? moment(user.dateOfBirth).format('DD/MM/YYYY') : undefined} 
+        />
+        <UserInfoRow label='Mã số thuế' value={user?.tax_code as string} />
+        <UserInfoRow label='Thông tin xuất hóa đơn' value={user?.invoice_address as string} />
+        </Box>
+    </>
+
   );
 };

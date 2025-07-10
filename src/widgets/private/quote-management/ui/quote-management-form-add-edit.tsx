@@ -2,7 +2,7 @@
 
 import { getAllProduct } from "@/features/product/api/productApi";
 import { Product } from "@/features/product/type/productType";
-import { getAllUser} from "@/features/user/api/userApis";
+import { getAllUser, getUserById} from "@/features/user/api/userApis";
 import { addProductToQuote, removeAllQuoteProduct } from "@/features/user/store/userSlice";
 import { UserData, UserDataProps } from "@/features/user/type/userTypes";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
@@ -12,11 +12,11 @@ import { useParams } from "next/navigation";
 import { useEffect, useState} from "react";
 import { useForm} from "react-hook-form";
 import { QuoteManagementFormProductList } from "./quote-management-form-proudct-list";
-import { QuoteManagementFormUserList } from "./quote-management-form-user-list";
 import { createQuote, getAllQuote, getQuoteById, updateQuote } from "@/features/quote/api/quoteApi";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { QuoteData, QuoteProductData } from "@/features/quote/type/quoteType";
+import { QuoteManagementFormUserList } from "./quote-management-form-user-list";
 
 export const QuoteManagementFormAddEdit = () => {
     const {control} = useForm<UserDataProps>();
@@ -33,6 +33,7 @@ export const QuoteManagementFormAddEdit = () => {
     const [quoteProducts, setQuoteProducts] = useState<Product[] | []>([]);
     // State khi lựa chọn thông tin khách hàng
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
+    const [user, setUser] = useState<UserData>();
     // State cho sản phẩm đã được filter
     const [filteredProducts, setFilteredProducts] = useState<Product[] | []>([]);
     // Hiển thị thông tin báo giá
@@ -43,6 +44,15 @@ export const QuoteManagementFormAddEdit = () => {
         }
         fetchQuotes();
     }, []);
+    // Hiển thị thông tin khách hàng
+    useEffect(() => {
+        if(!selectedUser) return;
+        const fetchUser = async () => {
+            const response = await getUserById(selectedUser as string);
+            if(response.success) setUser(response.data)
+        }
+    fetchUser();
+    },[selectedUser]);
     
     // Hiển thị thông tin sản phẩm
     const fetchProducts = async() => {
@@ -260,9 +270,9 @@ export const QuoteManagementFormAddEdit = () => {
                             searchable={true}
                         />
                     </Box>
-                    {selectedUser && (
-                        <QuoteManagementFormUserList userId={selectedUser as string}/>
-                    )}
+                    <Box sx={{mt: 2}}>
+                        <QuoteManagementFormUserList user={user as UserData}/>
+                    </Box>
                 </Box>
             </Box>
             {/* Submit buttons */}

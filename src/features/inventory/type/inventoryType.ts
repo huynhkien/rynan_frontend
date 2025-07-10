@@ -1,5 +1,15 @@
 import { FormInputProps } from "@/types/components/input";
 
+interface approvalHistory {
+    approvedBy: string;
+    approvedAt: string | Date;
+    action: string;
+    quantityChange: string;
+    previousStock: string;
+    newStock: string;
+    notes: string;
+    _id: string;
+}
 export interface InventoryData extends Record<string, unknown> {
     _id?: string;
     rid?: string;
@@ -13,6 +23,7 @@ export interface InventoryData extends Record<string, unknown> {
     materials?: InventoryMaterialData[];
     createdAt?: string | Date;
     location?: InventoryLocationData;
+    approvalHistory?:approvalHistory[];
 }
 export interface InventoryProductData  {
     pid?: string;

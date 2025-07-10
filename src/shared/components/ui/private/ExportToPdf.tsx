@@ -9,11 +9,20 @@ import { Specification } from '@/features/specification/type/specificationType';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
 import { PictureAsPdfOutlined } from '@mui/icons-material';
+import moment from 'moment';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { TDocumentDefinitions } from 'pdfmake/interfaces';
 import { useEffect, useState } from 'react';
 
+// const fonts = {
+//   UTM_Avo: {
+//     normal: '/fonts/UTM-Avo.ttf',
+//     bold: '/fonts/UTM-AvoBold.ttf',
+//     italics: '/fonts/UTM-AvoItalic.ttf',
+//     bolditalics: '/fonts/UTM-AvoBold_Italic.ttf',
+//   }
+// };
 
 // Gắn font mặc định
 pdfMake.vfs = pdfFonts.vfs;
@@ -97,14 +106,70 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
     
     // Header row
     rows.push([
-      { text: 'STT', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Mã sản phẩm', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Mô tả hàng hóa / dịch vụ', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Cung cấp dinh dưỡng', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Cây trồng/Giai đoạn', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Quy cách/thùng', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'ĐVT', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
-      { text: 'Hình ảnh sản phẩm', fontSize: 6, bold: true, fillColor: '#e0e0e0', style: 'tableHeader' },
+      { 
+        text: 'STT', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0] 
+      },
+      { 
+        text: 'Mã sản phẩm', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'Mô tả hàng hóa / dịch vụ', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'Cung cấp dinh dưỡng', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'Cây trồng/Giai đoạn', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'Quy cách/thùng', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'ĐVT', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
+      { 
+        text: 'Hình ảnh sản phẩm', 
+        fontSize: 6, 
+        bold: true, 
+        fillColor: '#e0e0e0', 
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
+      },
       {
         stack: [
           { text: 'Giá bán lẻ', bold: true },
@@ -113,7 +178,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
         alignment: 'center',
         fontSize: 6,
         fillColor: '#e0e0e0',
-        style: 'tableHeader'
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
       },
       {
         stack: [
@@ -123,7 +189,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
         alignment: 'center',
         fontSize: 6,
         fillColor: '#e0e0e0',
-        style: 'tableHeader'
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
       },
       {
         stack: [
@@ -133,7 +200,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
         alignment: 'center',
         fontSize: 6,
         fillColor: '#e0e0e0',
-        style: 'tableHeader'
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
       },
       {
         stack: [
@@ -143,7 +211,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
         alignment: 'center',
         fontSize: 6,
         fillColor: '#e0e0e0',
-        style: 'tableHeader'
+        style: 'tableHeader',
+        margin: [0, 16, 0, 0]
       },
     ]);
 
@@ -162,22 +231,84 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
       }
 
       rows.push([
-        { text: (i + 1).toString(), fontSize: 6 },
-        { text: product.code || '', fontSize: 6 },
-        { text: product.name_vn || '', fontSize: 6 },
-        { text: product.provide_nutrition || 'Chưa thêm', fontSize: 6 },
-        { text: `${product.crop}/${product.stage}` || 'Chưa thêm', fontSize: 6 },
-        { text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', fontSize: 6 },
-        { text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', fontSize: 6 },
+        { 
+          text: (i + 1).toString(), 
+          fontSize: 6, 
+          alignment: 'center',
+          margin: [0, 16, 0, 0] 
+        },
+        { 
+          text: product.code || '', 
+          fontSize: 6, 
+          alignment: 'center',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.name_vn || '', 
+          fontSize: 6, 
+          alignment: 'left',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.provide_nutrition || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'left',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: `${product.crop}/${product.stage}` || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'left',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'center',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'center',
+          margin: [0, 16, 0, 0]
+        },
         productImage ? {
           image: productImage,
-          width: 100,
+          width: 40,
+          height: 40,
           alignment: 'center',
-        } : { text: '', fontSize: 6 },
-        { text: product.prices.find((el) => el.priceType === 'offeringPrice')?.price.toLocaleString() || 'Chưa thêm' , fontSize: 6 },
-        { text: product.prices.find((el) => el.priceType === 'dealerPrice')?.price.toLocaleString() || 'Chưa thêm', fontSize: 6 },
-        { text: product.prices.find((el) => el.priceType === 'storePrice')?.price.toLocaleString() || 'Chưa thêm', fontSize: 6 },
-        { text: product.prices.find((el) => el.priceType === 'referencePrice')?.price.toLocaleString() || 'Chưa thêm', fontSize: 6 }
+          margin: [0, 2, 0, 0] // margin nhỏ hơn cho ảnh
+        } : { 
+          text: 'Không có ảnh', 
+          fontSize: 6, 
+          alignment: 'center',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.prices.find((el) => el.priceType === 'offeringPrice')?.price.toLocaleString() || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'right',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.prices.find((el) => el.priceType === 'dealerPrice')?.price.toLocaleString() || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'right',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.prices.find((el) => el.priceType === 'storePrice')?.price.toLocaleString() || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'right',
+          margin: [0, 16, 0, 0]
+        },
+        { 
+          text: product.prices.find((el) => el.priceType === 'referencePrice')?.price.toLocaleString() || 'Chưa thêm', 
+          fontSize: 6, 
+          alignment: 'right',
+          margin: [0, 16, 0, 0]
+        }
       ]);
     }
 
@@ -231,35 +362,37 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                     {
                       columns: [
                         { text: 'Kính gửi:', fontSize: 6, width: 'auto' },
-                        { text: `${user?.name}`, fontSize: 6, bold: true, width: '*' , marginLeft: 40 }
+                        { text: `${user?.name}`, fontSize: 6, bold: true, width: '*' , marginLeft: 40,  }
+                        
                       ],
                       marginBottom: 3
                     },
                     {
                       columns: [
-                        { text: 'Địa chỉ:', fontSize: 6, width: 'auto' },
-                        { text: `${user?.address?.detail}`, fontSize: 6, bold: true, width: '*', marginLeft: 44 }
+                        { text: 'Địa chỉ:', fontSize: 6, width: 'auto', },
+                        { text: `${user?.address?.detail}`, fontSize: 6, bold: true, width: '*', marginLeft: 44, }
                       ],
                       marginBottom: 3
                     },
                     {
                       columns: [
-                        { text: 'Số điện thoại:', fontSize: 6, width: 'auto' },
-                        { text: `${user?.phone}`, fontSize: 6, bold: true, width: '*', marginLeft: 27 }
+                        { text: 'Số điện thoại:', fontSize: 6, width: 'auto' ,},
+                        { text: `${user?.phone}`, fontSize: 6, bold: true, width: '*', marginLeft: 27 ,}
                       ],
                       marginBottom: 3
                     },
                     {
                       columns: [
-                        { text: 'Email:', fontSize: 6, width: 'auto' },
-                        { text: `${user?.email}`, fontSize: 6, bold: true, width: '*',marginLeft: 47 }
+                        { text: 'Email:', fontSize: 6, width: 'auto' ,},
+                        { text: `${user?.email}`, fontSize: 6, bold: true, width: '*',marginLeft: 47 ,}
                       ],
                       marginBottom: 3
                     },
                     {
                       text: 'Công ty xin gửi đến Quý khách Hàng báo giá mới cho các sản phẩm và dịch vụ như sau:',
                       fontSize: 6,
-                      marginBottom: 3
+                      marginBottom: 3,
+                      
                     }
                   ],
                   border: [false, false, false, false],
@@ -268,16 +401,16 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                   stack: [
                     {
                       text: [
-                        { text: 'Số: ', fontSize: 6 },
-                        { text: 'RSA251', fontSize: 6, bold: true, marginLeft: 5 },
+                        { text: 'Số: ', fontSize: 6, },
+                        { text:`${quote.quotation}`, fontSize: 6, bold: true, marginLeft: 5, },
                       ],
                       marginBottom: 3,
                       alignment: 'right'
                     },
                     {
                       text: [
-                        { text: 'Ngày: ', fontSize: 6 },
-                        { text: '14/06/2025', fontSize: 6, bold: true, marginLeft: 5 },
+                        { text: 'Ngày: ', fontSize: 6, },
+                        { text: `${moment(quote.createdAt).format('DD/MM/YYYY')}`, fontSize: 6, bold: true, marginLeft: 5, },
                       ],
                       alignment: 'right'
                     },
@@ -294,7 +427,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
           text: '1. Chi tiết giá sản phẩm',
           fontSize: 6,
           bold: true,
-          marginBottom: 3
+          marginBottom: 3,
+          
         },
         {
           table: {
@@ -302,7 +436,32 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
             heights: Array(tableRows.length).fill(45),
             body: tableRows,
           },
-          layout: 'grid',
+          layout: {
+            hLineWidth: function () {
+              return 0.5; // Độ dày border ngang
+            },
+            vLineWidth: function () {
+              return 0.5; // Độ dày border dọc
+            },
+            hLineColor: function () {
+              return '#cccccc'; // Màu border ngang
+            },
+            vLineColor: function () {
+              return '#cccccc'; // Màu border dọc
+            },
+            paddingLeft: function () {
+              return 4; // Padding trái
+            },
+            paddingRight: function () {
+              return 4; // Padding phải
+            },
+            paddingTop: function () {
+              return 4; // Padding trên
+            },
+            paddingBottom: function () {
+              return 4; // Padding dưới
+            }
+          },
         },
         {
           text: '2. Ghi chú',
@@ -310,6 +469,7 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
           marginBottom: 3,
           bold: true,
           fontSize: 6
+          ,
         },
         {
           table: {
@@ -320,22 +480,22 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                   stack: [
                     {
                       columns: [
-                        { text: 'Địa điểm giao, nhận hàng: ', fontSize: 6, width: 'auto' },
-                        { text: 'Thỏa thuận', fontSize: 6, bold: true, width: '*', marginLeft: 33 },
+                        { text: 'Địa điểm giao, nhận hàng: ', fontSize: 6, width: 'auto', },
+                        { text: 'Thỏa thuận', fontSize: 6, bold: true, width: '*', marginLeft: 33, },
                       ],
                       marginBottom: 3
                     },
                     {
                       columns: [
-                        { text: 'Thời gian giao hàng: ', fontSize: 6, width: 'auto' },
-                        { text:  'sau 7-10 ngày kể từ ngày nhận được thanh toán', fontSize: 6, bold: true, marginLeft: 49, width: '*' },
+                        { text: 'Thời gian giao hàng: ', fontSize: 6, width: 'auto', },
+                        { text:  'sau 7-10 ngày kể từ ngày nhận được thanh toán', fontSize: 6, bold: true, marginLeft: 49, width: '*', },
                       ],
                       marginBottom: 3
                     },
                     {
                       columns: [
-                        { text: 'Phương thức thanh toán: ', fontSize: 6, width: 'auto' },
-                        { text: 'chuyển khoản 100% trị giá đơn hàng vào tài khoản của công ty chúng tôi trước khi nhận hàng', fontSize: 6, bold: true, width: '*', marginLeft: 36 },
+                        { text: 'Phương thức thanh toán: ', fontSize: 6, width: 'auto', },
+                        { text: 'chuyển khoản 100% trị giá đơn hàng vào tài khoản của công ty chúng tôi trước khi nhận hàng', fontSize: 6, bold: true, width: '*', marginLeft: 36, },
                       ],
                       marginBottom: 3,
                     },
@@ -345,6 +505,7 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                       bold: true,
                       marginBottom: 3,
                       marginLeft: 40
+                      ,
                     },
                     {
                       text: 'Ngân hàng TMCP Quân Đội - Chi nhánh Trà Vinh',
@@ -352,6 +513,7 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                       bold: true,
                       marginBottom: 3,
                       marginLeft: 40
+                      ,
                     },
                     {
                       text: 'STK: 112 111 678 9999',
@@ -359,18 +521,21 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                       marginBottom: 3,
                       marginLeft: 40,
                       bold: true
+                      ,
                     },
                     {
                       text: 'Báo giá sẽ được cập nhật theo giá thị trường và sẽ thông báo đến Quý khách hàng khi có sự thay đổi.',
                       fontSize: 6,
                       fillColor: '#FF0000' ,
                       bold: true,
-                      marginBottom: 3,
+                      marginBottom: 3
+                      ,
                     },
                     {
                       text: 'Cảm ơn quý khách hàng đã quan đến báo giá của Công ty. Xin vui lòng liên hệ với chúng tôi qua số điện thoại 0287 1099 389 để có thêm thông tin.',
                       fontSize: 6,
                       marginBottom: 3,
+                      
                     },
                     {
                       text: 'Kính chức Quý Hàng thành công và nhiều sức khỏe. Trân trọng!!!',
@@ -381,7 +546,8 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
                       fontSize: 6,
                       bold: true,
                       marginTop: 5,
-                      marginLeft: 360
+                      marginLeft: 360,
+                      
                     }
                   ],
                   border: [false, false, false, false],
@@ -400,7 +566,7 @@ export const ExportToPDF = ({qid}: {qid: string}) => {
           alignment: 'center',
         },
       },
-
+     
     };
 
     pdfMake.createPdf(docDefinition).download('bao_gia.pdf');

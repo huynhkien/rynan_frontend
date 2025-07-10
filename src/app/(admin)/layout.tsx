@@ -1,6 +1,6 @@
 'use client'
 import { Header } from '@/shared/components/layout/private/Header'
-import { Sidebar } from '@/shared/components/layout/private/Sidebar'
+import { SidebarAdmin } from '@/shared/components/layout/private/SidebarAdmin'
 import React, { useState } from 'react'
 
 const AdminLayout = ({ children }: { children: React.ReactNode }) => {
@@ -18,7 +18,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           width: isCollapsed ? '4.5%' : '15%'
         }}
       >
-        <Sidebar
+        <SidebarAdmin
           isCollapsed={isCollapsed}
           setIsCollapsed={setIsCollapsed}
         />

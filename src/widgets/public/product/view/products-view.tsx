@@ -21,7 +21,7 @@ export const ProductsView = () => {
     }
     useEffect(() => {
         fetchProduct();
-    })
+    },[])
     const handleSortChange = useCallback((value: string | number) => {
         setSort(value.toString()); 
     }, []);

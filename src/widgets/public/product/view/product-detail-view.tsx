@@ -6,20 +6,19 @@ import { ProductDetailTab } from "../ui/product-detail-tab"
 import { useParams } from "next/navigation"
 
 export const ProductDetailView = () => {
-    const params = useParams();
-    const slug = params.slug as string;
+    const {slug} = useParams();
     return (
         <>
         <Banner
                 category='Chi tiết sản phẩm'
                 breadcrumb={[
                     { name: 'Sản phẩm', url: '/products' },
-                    { name: 'Chi tiết sản phẩm', url: '/products/123' }
+                    { name: 'Chi tiết sản phẩm', url: `${slug}` }
                 ]}
             />
             <Container maxWidth='xl' sx={{py:5}}>
-                <ProductDetailInfo slug={slug}/>
-                <ProductDetailTab slug={slug}/>
+                <ProductDetailInfo slug={slug as string}/>
+                <ProductDetailTab slug={slug as string}/>
             </Container>
         </>
     )

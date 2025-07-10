@@ -7,10 +7,10 @@ import { ProductFilterCategory } from "../ui/product-filter-category"
 import { ProductFilterRating } from "../ui/product-filter-rating"
 import { ProductSort } from "../ui/product-sort"
 import { useCallback, useEffect, useState } from "react"
-import { Pagination } from "@/shared/components/ui/public/Pagination"
 import { ProductSortOption } from "@/shared/constant/common"
 import { getAllProduct } from "@/features/product/api/productApi"
 import { Product } from "@/features/product/type/productType"
+import { ProductPagination } from "../ui/product-pagination"
 
 export const ProductsView = () => {
     const [sort, setSort] = useState('');
@@ -39,7 +39,7 @@ export const ProductsView = () => {
                     width: '100%',
                     display: 'flex',
                     gap: 5,
-                    py:5
+                    py:5,
                 }}
             >
                 <Box sx={{
@@ -84,7 +84,7 @@ export const ProductsView = () => {
                             py:5
                         }}
                     >
-                        <Pagination/>
+                        <ProductPagination page={1} totalPage={2}/>
                     </Box>
                 </Box>
             </Container>

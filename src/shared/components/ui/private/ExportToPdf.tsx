@@ -1,585 +1,805 @@
-'use client';
-
-import { getAllProduct } from '@/features/product/api/productApi';
+import React, { useEffect, useState } from 'react';
+import { Document, Page, Text, View, StyleSheet, PDFDownloadLink, Image as ImagePDF, Font } from '@react-pdf/renderer';
 import { Product } from '@/features/product/type/productType';
-import { getQuoteById } from '@/features/quote/api/quoteApi';
 import { QuoteData } from '@/features/quote/type/quoteType';
-import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { UserData } from '@/features/user/type/userTypes';
 import { Specification } from '@/features/specification/type/specificationType';
 import { getAllUser } from '@/features/user/api/userApis';
-import { UserData } from '@/features/user/type/userTypes';
-import { PictureAsPdfOutlined } from '@mui/icons-material';
-import moment from 'moment';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { TDocumentDefinitions } from 'pdfmake/interfaces';
-import { useEffect, useState } from 'react';
+import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { getAllProduct } from '@/features/product/api/productApi';
+import { getQuoteById } from '@/features/quote/api/quoteApi';
+import { Error, PictureAsPdf, RestartAlt } from '@mui/icons-material';
+import theme from '@/shared/configs/theme';
 
-// const fonts = {
-//   UTM_Avo: {
-//     normal: '/fonts/UTM-Avo.ttf',
-//     bold: '/fonts/UTM-AvoBold.ttf',
-//     italics: '/fonts/UTM-AvoItalic.ttf',
-//     bolditalics: '/fonts/UTM-AvoBold_Italic.ttf',
-//   }
-// };
+// Đăng ký font UTM AVO với file bold riêng
+Font.register({
+  family: 'UTM-Avo',
+  fonts: [{ src: '/fonts/UTM Avo.ttf', fontWeight: 'normal' }],
+});
 
-// Gắn font mặc định
-pdfMake.vfs = pdfFonts.vfs;
+Font.register({
+  family: 'UTM-Avo-Bold',
+  fonts: [{ src: '/fonts/UTM AvoBold.ttf', fontWeight: 'bold' }],
+});
 
-// Hàm chuyển ảnh thành base64
-const getBase64ImageFromURL = (url: string): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.setAttribute('crossOrigin', 'anonymous');
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.drawImage(img, 0, 0);
-        const dataURL = canvas.toDataURL('image/png');
-        resolve(dataURL);
-      } else {
-        reject(new Error('Không tìm thấy context'));
-      }
-    };
-    img.onerror = () => reject(new Error('Không thể load ảnh'));
-    img.src = url;
-  });
-};
+const styles = StyleSheet.create({
+  page: {
+    fontFamily: 'UTM-Avo',
+    fontSize: 10,
+    paddingTop: 80,
+    paddingLeft: 40,
+    paddingRight: 40,
+    paddingBottom: 40,
+  },
+  header: {
+    position: 'absolute',
+    top: 15,
+    left: 135,
+    right: 0,
+  },
+  logo: {
+    width: 350,
+    height: 'auto',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  infoSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 3,
+    width: '100%'
+  },
+  infoLeft: {
+    width: '80%'
+  },
+  infoRight: {
+    width: '20%',
+    textAlign: 'right',
+    marginLeft: 100
+  },
+  infoRow: {
+    flexDirection: 'row',
+    marginBottom: 3,
+    paddingLeft: 15
+  },
+  // Label thường
+  label: {
+    width: 80,
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+    fontWeight: 'normal',
+  },
+  value: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo',
+    flex: 1,
+  },
+  value1: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+    flex: 1,
+  },
+  boldText: {
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo',
+  },
+  normalText: {
+    fontWeight: 'normal',
+    fontFamily: 'UTM-Avo',
+  },
+  description: {
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+  },
+  sectionTitle: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+    marginBottom: 3,
+    marginTop: 3,
+  },
+  table: {
+    width: 'auto',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    borderColor: '#cccccc',
+  },
+  tableRow: {
+    margin: 'auto',
+    flexDirection: 'row',
+    textAlign: 'center',
+  },
+  // Header columns với background và text bold
+  tableColHeader1: {
+    width: '4%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader2: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader3: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader4: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader5: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader6: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader7: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader8: {
+    width: '16%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader9: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader10: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader11: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  tableColHeader12: {
+    width: '8%',
+    display: 'flex',
+    justifyContent: 'center',
+    fontFamily: 'UTM-Avo-Bold',
+    alignItems: 'center',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    backgroundColor: '#e0e0e0',
+  },
+  // Data columns
+  tableCol1: {
+    width: '4%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol2: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol3: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol4: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol5: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol6: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol7: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol8: {
+    width: '16%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol9: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol10: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol11: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tableCol12: {
+    width: '8%',
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderLeftWidth: 0,
+    borderTopWidth: 0,
+    borderColor: '#cccccc',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // Table cell header - bold và đen
+  tableCellHeader: {
+    margin: 'auto',
+    marginTop: 3,
+    marginBottom: 3,
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+    textAlign: 'center',
+  },
+  // Table cell thường
+  tableCell: {
+    margin: 'auto',
+    marginTop: 5,
+    marginBottom: 5,
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+    textAlign: 'center',
+  },
+  tableCellLeft: {
+    margin: 5,
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+    textAlign: 'left',
+  },
+  tableCellRight: {
+    margin: 5,
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+    textAlign: 'right',
+  },
+  productImage: {
+    width: 30,
+    height: 30,
+    margin: 5,
+  },
+  noteItem: {
+    fontSize: 6,
+    marginBottom: 3,
+    flexDirection: 'row',
+    fontFamily: 'UTM-Avo',
+  },
+  noteItemMargin: {
+    fontSize: 6,
+    marginBottom: 3,
+    marginLeft: 40,
+    fontFamily: 'UTM-Avo',
+  },
+  noteItemMargin1: {
+    fontSize: 6,
+    marginBottom: 3,
+    marginLeft: 40,
+    fontFamily: 'UTM-Avo-Bold',
+  },
+  // Note item bold
+  noteItemBold: {
+    fontSize: 8,
+    marginBottom: 3,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo',
+  },
+  // Text highlight với màu đỏ và bold
+  highlight: {
+    color: '#FF0000',
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+  },
+  // Chữ ký - bold và đen
+  signature: {
+    textAlign: 'right',
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+    marginTop: 20,
+  },
+  footer: {
+    position: 'absolute',
+    bottom: 30,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: 6,
+    fontFamily: 'UTM-Avo',
+  },
+  // Style cho số báo giá và ngày
+  quotationInfo: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo',
+  },
+  quotationInfoText: {
+    fontSize: 6,
+    fontWeight: 'bold',
+    fontFamily: 'UTM-Avo-Bold',
+  },
+});
 
-export const ExportToPDF = ({qid}: {qid: string}) => {
+const QuotePDFDocument = ({ 
+  quote, 
+  quoteProducts, 
+  user, 
+  specifications 
+}: {
+  quote: QuoteData;
+  quoteProducts: Product[];
+  user: UserData;
+  specifications: Specification[];
+}) => (
+  <Document>
+    <Page size="A4" style={styles.page}>
+      {/* Header với logo */}
+      <View style={styles.header}>
+        <ImagePDF 
+          style={styles.logo} 
+          src='/logo/letterhead_2024-RYNAN AGRICULTURE- dung.png' 
+        />
+      </View>
+
+      {/* Tiêu đề chính - tô đen */}
+      <Text style={styles.title}>BẢNG BÁO GIÁ</Text>
+
+      {/* Thông tin khách hàng */}
+      <View style={styles.infoSection}>
+        <View style={styles.infoLeft}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Kính gửi:</Text>
+            <Text style={styles.value1}>{user.name || ''} </Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Địa chỉ:</Text>
+            <Text style={styles.value}>{user.address?.detail || ''}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Số điện thoại:</Text>
+            <Text style={styles.value}>{user.phone || ''}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.value}>{user.email || ''}</Text>
+          </View>
+        </View>
+        <View style={styles.infoRight}>
+          <View style={styles.infoRow}>
+            <Text style={styles.quotationInfo}>Số: <Text style={styles.quotationInfoText}>{quote.quotation || ''}</Text></Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.quotationInfo}>Ngày: <Text style={styles.quotationInfoText}>{new Date(quote.createdAt as Date).toLocaleDateString('vi-VN') || ''}</Text></Text>
+          </View>
+        </View>
+      </View>
+
+      <Text style={styles.description}>
+        Công ty xin gửi đến Quý khách Hàng báo giá mới cho các sản phẩm và dịch vụ như sau:
+      </Text>
+
+      {/* Bảng sản phẩm */}
+      <Text style={styles.sectionTitle}>1. Chi tiết giá sản phẩm</Text>
+      
+      <View style={styles.table}>
+        {/* Header */}
+        <View style={styles.tableRow}>
+          <View style={styles.tableColHeader1}>
+            <Text style={styles.tableCellHeader}>STT</Text>
+          </View>
+          <View style={styles.tableColHeader2}>
+            <Text style={styles.tableCellHeader}>Mã sản phẩm</Text>
+          </View>
+          <View style={styles.tableColHeader3}>
+            <Text style={styles.tableCellHeader}>Mô tả hàng hóa/dịch vụ</Text>
+          </View>
+          <View style={styles.tableColHeader4}>
+            <Text style={styles.tableCellHeader}>Cung cấp dinh dưỡng</Text>
+          </View>
+          <View style={styles.tableColHeader5}>
+            <Text style={styles.tableCellHeader}>Cây trồng/Giai đoạn</Text>
+          </View>
+          <View style={styles.tableColHeader6}>
+            <Text style={styles.tableCellHeader}>Quy cách/thùng</Text>
+          </View>
+          <View style={styles.tableColHeader7}>
+            <Text style={styles.tableCellHeader}>ĐVT</Text>
+          </View>
+          <View style={styles.tableColHeader8}>
+            <Text style={styles.tableCellHeader}>Hình ảnh sản phẩm</Text>
+          </View>
+          <View style={styles.tableColHeader9}>
+            <Text style={styles.tableCellHeader}>Giá bán lẻ (VNĐ/ĐVT)</Text>
+          </View>
+          <View style={styles.tableColHeader10}>
+            <Text style={styles.tableCellHeader}>Giá đại lý (VNĐ/ĐVT)</Text>
+          </View>
+          <View style={styles.tableColHeader11}>
+            <Text style={styles.tableCellHeader}>Giá cửa hàng (VNĐ/ĐVT)</Text>
+          </View>
+          <View style={styles.tableColHeader12}>
+            <Text style={styles.tableCellHeader}>Giá lẽ tham khảo (VNĐ/ĐVT)</Text>
+          </View>
+        </View>
+
+        {/* Data rows */}
+        {quoteProducts.map((product, index) => (
+          <View style={styles.tableRow} key={product._id}>
+            <View style={styles.tableCol1}>
+              <Text style={styles.tableCell}>{index + 1}</Text>
+            </View>
+            <View style={styles.tableCol2}>
+              <Text style={styles.tableCell}>{product.code || ''}</Text>
+            </View>
+            <View style={styles.tableCol3}>
+              <Text style={styles.tableCellLeft}>{product.name_vn || ''}</Text>
+            </View>
+            <View style={styles.tableCol4}>
+              <Text style={styles.tableCellLeft}>{product.provide_nutrition || 'Chưa thêm'}</Text>
+            </View>
+            <View style={styles.tableCol5}>
+              <Text style={styles.tableCellLeft}>{`${product.crop}/${product.stage}` || 'Chưa thêm'}</Text>
+            </View>
+            <View style={styles.tableCol6}>
+              <Text style={styles.tableCell}>
+                {specifications?.find(el => el._id === product.specifications)?.name || 'Chưa thêm'}
+              </Text>
+            </View>
+            <View style={styles.tableCol7}>
+              <Text style={styles.tableCell}>
+                {specifications?.find(el => el._id === product.specifications)?.name || 'Chưa thêm'}
+              </Text>
+            </View>
+            <View style={styles.tableCol8}>
+              {product.thumb.url ? (
+                <ImagePDF style={styles.productImage} src={product.thumb.url} />
+              ) : (
+                <Text style={styles.tableCell}>Không có ảnh</Text>
+              )}
+            </View>
+            <View style={styles.tableCol9}>
+              <Text style={styles.tableCellRight}>
+                {product.prices.find(el => el.priceType === 'offeringPrice')?.price.toLocaleString() || 'Chưa thêm'}
+              </Text>
+            </View>
+            <View style={styles.tableCol10}>
+              <Text style={styles.tableCellRight}>
+                {product.prices.find(el => el.priceType === 'dealerPrice')?.price.toLocaleString() || 'Chưa thêm'}
+              </Text>
+            </View>
+            <View style={styles.tableCol11}>
+              <Text style={styles.tableCellRight}>
+                {product.prices.find(el => el.priceType === 'storePrice')?.price.toLocaleString() || 'Chưa thêm'}
+              </Text>
+            </View>
+            <View style={styles.tableCol12}>
+              <Text style={styles.tableCellRight}>
+                {product.prices.find(el => el.priceType === 'referencePrice')?.price.toLocaleString() || 'Chưa thêm'}
+              </Text>
+            </View>
+          </View>
+        ))}
+      </View>
+
+      {/* Ghi chú */}
+      <View>
+        <Text style={styles.sectionTitle}>2. Ghi chú</Text>
+        <Text style={styles.noteItem}>
+          <Text style={{paddingRight: 40}}>Địa điểm giao, nhận hàng:</Text> 
+          <Text style={styles.boldText}>          Thỏa thuận</Text>
+        </Text>
+        <Text style={styles.noteItem}>
+          <Text style={{paddingRight: 65}}>Thời gian giao hàng:</Text> <Text style={styles.boldText}>                    sau 7-10 ngày kể từ ngày nhận được thanh toán</Text>
+        </Text>
+        <Text style={styles.noteItem}>
+          <Text style={{paddingRight: 45}}>Phương thức thanh toán: </Text> <Text style={styles.boldText}>           chuyển khoản 100% trị giá đơn hàng</Text>
+        </Text>
+        <Text style={styles.noteItemMargin1}>CÔNG TY CỔ PHẦN RYNAN SMART AGRICULTURE</Text>
+        <Text style={styles.noteItemMargin1}>Ngân hàng TMCP Quân Đội - Chi nhánh Trà Vinh</Text>
+        <Text style={styles.noteItemMargin}>STK: 112 111 678 9999</Text>
+        <Text style={[styles.noteItem, styles.highlight]}>
+          Báo giá sẽ được cập nhật theo giá thị trường và sẽ thông báo đến Quý khách hàng khi có sự thay đổi.
+        </Text>
+        <Text style={styles.noteItem}>
+          Cảm ơn quý khách hàng đã quan tâm đến báo giá của Công ty.
+        </Text>
+        <Text style={styles.noteItem}>
+          Kính chúc Quý Khách thành công và nhiều sức khỏe. Trân trọng!!!
+        </Text>
+        <Text style={styles.signature}>BỘ PHẬN KINH DOANH</Text>
+      </View>
+
+      {/* Footer */}
+      <Text style={styles.footer} render={({ pageNumber, totalPages }) => (
+        `Trang ${pageNumber} / ${totalPages}`
+      )} fixed />
+    </Page>
+  </Document>
+);
+
+// Component sử dụng
+export const ExportToPDF = ({ qid }: { qid: string }) => {
   const [quote, setQuote] = useState<QuoteData>();
   const [quoteProducts, setQuoteProducts] = useState<Product[]>();
   const [specifications, setSpecification] = useState<Specification[]>();
   const [user, setUser] = useState<UserData>();
-  
-  // hiển thị thông tin phiếu báo giá
+
+  // Lấy thông tin báo giá
   useEffect(() => {
-    if(!qid) return;
+    if (!qid) return;
     const fetchQuote = async () => {
-      const response = await getQuoteById(qid);
-      if(response.success) setQuote(response.data);
-    }
+      try {
+        const response = await getQuoteById(qid);
+        if (response.success) setQuote(response.data);
+      } catch (error) {
+        console.error('Lỗi khi tải báo giá:', error);
+      }
+    };
     fetchQuote();
   }, [qid]);
-  // Hiển thị thông tin sản phẩm
+
+  // Lấy sản phẩm từ báo giá
   useEffect(() => {
-    if(!quote) return;
-    const fetchQuoteProduct = async() => {
-      const response = await getAllProduct();
-      if(response.success && response.data){
-        const quoteProductIds = quote.products.map((el) => el.pid);
-        const filteredProduct = response.data.filter((el) => quoteProductIds.includes(el._id));
-        if(filteredProduct) setQuoteProducts(filteredProduct);
+    if (!quote) return;
+    const fetchQuoteProduct = async () => {
+      try {
+        const response = await getAllProduct();
+        if (response.success && response.data) {
+          const quoteProductIds = quote.products.map(el => el.pid);
+          const filteredProducts = response.data.filter(el =>
+            quoteProductIds.includes(el._id)
+          );
+          setQuoteProducts(filteredProducts);
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải sản phẩm:', error);
       }
-    }
+    };
     fetchQuoteProduct();
   }, [quote]);
-  // Hiển thị thông tin khách hàng
+
+  // Lấy thông tin người dùng
   useEffect(() => {
-    if(!quote) return;
-    const fetchQuoteUser = async() => {
-      const response = await getAllUser();
-      if(response.success && response.data){
-        const findUser = response.data.find((el) => el._id === quote.client);
-        if(findUser) setUser(findUser); 
+    if (!quote) return;
+    const fetchQuoteUser = async () => {
+      try {
+        const response = await getAllUser();
+        if (response.success && response.data) {
+          const findUser = response.data.find(el => el._id === quote.client);
+          if (findUser) setUser(findUser);
+        }
+      } catch (error) {
+        console.error('Lỗi khi tải thông tin khách hàng:', error);
       }
-    }
+    };
     fetchQuoteUser();
-  },[quote]);
-  // Hiển thị thông tin quy cách
+  }, [quote]);
+
+  // Lấy quy cách
   useEffect(() => {
     const fetchSpecification = async () => {
-      const response = await getAllSpecification();
-      if(response.success) setSpecification(response.data)
-    }
-    fetchSpecification();
-  },[]);
-  // Xử lý tạo table sản phẩm
-  const createProductRows = async () => {
-    if (!quoteProducts || !quote) return [];
-    
-    const rows = [];
-    
-    // Header row
-    rows.push([
-      { 
-        text: 'STT', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0] 
-      },
-      { 
-        text: 'Mã sản phẩm', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'Mô tả hàng hóa / dịch vụ', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'Cung cấp dinh dưỡng', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'Cây trồng/Giai đoạn', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'Quy cách/thùng', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'ĐVT', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      { 
-        text: 'Hình ảnh sản phẩm', 
-        fontSize: 6, 
-        bold: true, 
-        fillColor: '#e0e0e0', 
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      {
-        stack: [
-          { text: 'Giá bán lẻ', bold: true },
-          { text: '(VNĐ/ĐVT)', fontSize: 6 }
-        ],
-        alignment: 'center',
-        fontSize: 6,
-        fillColor: '#e0e0e0',
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      {
-        stack: [
-          { text: 'Giá sỉ', bold: true },
-          { text: '(VNĐ/ĐVT)', fontSize: 6 }
-        ],
-        alignment: 'center',
-        fontSize: 6,
-        fillColor: '#e0e0e0',
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      {
-        stack: [
-          { text: 'Giá đại lý', bold: true },
-          { text: '(VNĐ/ĐVT)', fontSize: 6 }
-        ],
-        alignment: 'center',
-        fontSize: 6,
-        fillColor: '#e0e0e0',
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-      {
-        stack: [
-          { text: 'Giá NPP', bold: true },
-          { text: '(VNĐ/ĐVT)', fontSize: 6 }
-        ],
-        alignment: 'center',
-        fontSize: 6,
-        fillColor: '#e0e0e0',
-        style: 'tableHeader',
-        margin: [0, 16, 0, 0]
-      },
-    ]);
-
-    // Data rows
-    for (let i = 0; i < quoteProducts.length; i++) {
-      const product = quoteProducts[i];
-      
-      // Lấy ảnh sản phẩm nếu có
-      let productImage = '';
-      if (product.thumb.url) {
-        try {
-          productImage = await getBase64ImageFromURL(product.thumb.url);
-        } catch (error: unknown) {
-          console.error('Không thể load ảnh sản phẩm:', error);
-        }
+      try {
+        const response = await getAllSpecification();
+        if (response.success) setSpecification(response.data);
+      } catch (error) {
+        console.error('Lỗi khi tải quy cách:', error);
       }
-
-      rows.push([
-        { 
-          text: (i + 1).toString(), 
-          fontSize: 6, 
-          alignment: 'center',
-          margin: [0, 16, 0, 0] 
-        },
-        { 
-          text: product.code || '', 
-          fontSize: 6, 
-          alignment: 'center',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.name_vn || '', 
-          fontSize: 6, 
-          alignment: 'left',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.provide_nutrition || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'left',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: `${product.crop}/${product.stage}` || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'left',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'center',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: specifications?.find((el) => el._id === product.specifications)?.name || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'center',
-          margin: [0, 16, 0, 0]
-        },
-        productImage ? {
-          image: productImage,
-          width: 40,
-          height: 40,
-          alignment: 'center',
-          margin: [0, 2, 0, 0] // margin nhỏ hơn cho ảnh
-        } : { 
-          text: 'Không có ảnh', 
-          fontSize: 6, 
-          alignment: 'center',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.prices.find((el) => el.priceType === 'offeringPrice')?.price.toLocaleString() || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'right',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.prices.find((el) => el.priceType === 'dealerPrice')?.price.toLocaleString() || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'right',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.prices.find((el) => el.priceType === 'storePrice')?.price.toLocaleString() || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'right',
-          margin: [0, 16, 0, 0]
-        },
-        { 
-          text: product.prices.find((el) => el.priceType === 'referencePrice')?.price.toLocaleString() || 'Chưa thêm', 
-          fontSize: 6, 
-          alignment: 'right',
-          margin: [0, 16, 0, 0]
-        }
-      ]);
-    }
-
-    return rows;
-  };
-  const handleExportPDF = async () => {
-    if (!quoteProducts || !quote || !user) {
-      alert('Dữ liệu chưa được tải đầy đủ. Vui lòng thử lại.');
-      return;
-    }
-
-    const logo = await getBase64ImageFromURL('/logo/letterhead_2024-RYNAN AGRICULTURE- dung.png');
-    const tableRows = await createProductRows();
-    const docDefinition: TDocumentDefinitions = {
-      pageSize: 'A4',
-      pageMargins: [40, 70, 40, 20],
-
-      header: {
-        image: logo,
-        width: 350,
-        alignment: 'center',
-        margin: [0, 15, 0, 0],
-      },
-
-      footer: (currentPage, pageCount) => ({
-        columns: [
-          {
-            text: `Trang ${currentPage} / ${pageCount}`,
-            alignment: 'center',
-            fontSize: 6,
-          },
-        ],
-        margin: [0, 0, 0, 5],
-      }),
-
-      content: [
-        {
-          text: 'BẢNG BÁO GIÁ',
-          fontSize: 7,
-          bold: true,
-          alignment: 'center',
-          margin: [0, 0, 0, 10],
-        },
-        {
-          table: {
-            widths: ['*', 'auto'],
-            body: [
-              [
-                {
-                  stack: [
-                    {
-                      columns: [
-                        { text: 'Kính gửi:', fontSize: 6, width: 'auto' },
-                        { text: `${user?.name}`, fontSize: 6, bold: true, width: '*' , marginLeft: 40,  }
-                        
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      columns: [
-                        { text: 'Địa chỉ:', fontSize: 6, width: 'auto', },
-                        { text: `${user?.address?.detail}`, fontSize: 6, bold: true, width: '*', marginLeft: 44, }
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      columns: [
-                        { text: 'Số điện thoại:', fontSize: 6, width: 'auto' ,},
-                        { text: `${user?.phone}`, fontSize: 6, bold: true, width: '*', marginLeft: 27 ,}
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      columns: [
-                        { text: 'Email:', fontSize: 6, width: 'auto' ,},
-                        { text: `${user?.email}`, fontSize: 6, bold: true, width: '*',marginLeft: 47 ,}
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      text: 'Công ty xin gửi đến Quý khách Hàng báo giá mới cho các sản phẩm và dịch vụ như sau:',
-                      fontSize: 6,
-                      marginBottom: 3,
-                      
-                    }
-                  ],
-                  border: [false, false, false, false],
-                },
-                {
-                  stack: [
-                    {
-                      text: [
-                        { text: 'Số: ', fontSize: 6, },
-                        { text:`${quote.quotation}`, fontSize: 6, bold: true, marginLeft: 5, },
-                      ],
-                      marginBottom: 3,
-                      alignment: 'right'
-                    },
-                    {
-                      text: [
-                        { text: 'Ngày: ', fontSize: 6, },
-                        { text: `${moment(quote.createdAt).format('DD/MM/YYYY')}`, fontSize: 6, bold: true, marginLeft: 5, },
-                      ],
-                      alignment: 'right'
-                    },
-                  ],
-                  border: [false, false, false, false],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [10, 0, 10, 0],
-        },
-        {
-          text: '1. Chi tiết giá sản phẩm',
-          fontSize: 6,
-          bold: true,
-          marginBottom: 3,
-          
-        },
-        {
-          table: {
-            widths: [15, 32, 57, 30, 45, 28, 25, 60, 28, 28, 28, 28],
-            heights: Array(tableRows.length).fill(45),
-            body: tableRows,
-          },
-          layout: {
-            hLineWidth: function () {
-              return 0.5; // Độ dày border ngang
-            },
-            vLineWidth: function () {
-              return 0.5; // Độ dày border dọc
-            },
-            hLineColor: function () {
-              return '#cccccc'; // Màu border ngang
-            },
-            vLineColor: function () {
-              return '#cccccc'; // Màu border dọc
-            },
-            paddingLeft: function () {
-              return 4; // Padding trái
-            },
-            paddingRight: function () {
-              return 4; // Padding phải
-            },
-            paddingTop: function () {
-              return 4; // Padding trên
-            },
-            paddingBottom: function () {
-              return 4; // Padding dưới
-            }
-          },
-        },
-        {
-          text: '2. Ghi chú',
-          marginTop: 5,
-          marginBottom: 3,
-          bold: true,
-          fontSize: 6
-          ,
-        },
-        {
-          table: {
-            widths: ['*'],
-            body: [
-              [
-                {
-                  stack: [
-                    {
-                      columns: [
-                        { text: 'Địa điểm giao, nhận hàng: ', fontSize: 6, width: 'auto', },
-                        { text: 'Thỏa thuận', fontSize: 6, bold: true, width: '*', marginLeft: 33, },
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      columns: [
-                        { text: 'Thời gian giao hàng: ', fontSize: 6, width: 'auto', },
-                        { text:  'sau 7-10 ngày kể từ ngày nhận được thanh toán', fontSize: 6, bold: true, marginLeft: 49, width: '*', },
-                      ],
-                      marginBottom: 3
-                    },
-                    {
-                      columns: [
-                        { text: 'Phương thức thanh toán: ', fontSize: 6, width: 'auto', },
-                        { text: 'chuyển khoản 100% trị giá đơn hàng vào tài khoản của công ty chúng tôi trước khi nhận hàng', fontSize: 6, bold: true, width: '*', marginLeft: 36, },
-                      ],
-                      marginBottom: 3,
-                    },
-                    {
-                      text: 'CÔNG TY CỔ PHẦN RYNAN SMART AGRICULTURE',
-                      fontSize: 6,
-                      bold: true,
-                      marginBottom: 3,
-                      marginLeft: 40
-                      ,
-                    },
-                    {
-                      text: 'Ngân hàng TMCP Quân Đội - Chi nhánh Trà Vinh',
-                      fontSize: 6,
-                      bold: true,
-                      marginBottom: 3,
-                      marginLeft: 40
-                      ,
-                    },
-                    {
-                      text: 'STK: 112 111 678 9999',
-                      fontSize: 6,
-                      marginBottom: 3,
-                      marginLeft: 40,
-                      bold: true
-                      ,
-                    },
-                    {
-                      text: 'Báo giá sẽ được cập nhật theo giá thị trường và sẽ thông báo đến Quý khách hàng khi có sự thay đổi.',
-                      fontSize: 6,
-                      fillColor: '#FF0000' ,
-                      bold: true,
-                      marginBottom: 3
-                      ,
-                    },
-                    {
-                      text: 'Cảm ơn quý khách hàng đã quan đến báo giá của Công ty. Xin vui lòng liên hệ với chúng tôi qua số điện thoại 0287 1099 389 để có thêm thông tin.',
-                      fontSize: 6,
-                      marginBottom: 3,
-                      
-                    },
-                    {
-                      text: 'Kính chức Quý Hàng thành công và nhiều sức khỏe. Trân trọng!!!',
-                      fontSize: 6,marginBottom: 3,
-                    },
-                    {
-                      text: 'BỘ PHẬN KINH DOANH',
-                      fontSize: 6,
-                      bold: true,
-                      marginTop: 5,
-                      marginLeft: 360,
-                      
-                    }
-                  ],
-                  border: [false, false, false, false],
-                },
-              ],
-            ],
-          },
-          layout: 'noBorders',
-        },
-      ],
-
-      styles: {
-        tableHeader: {
-          bold: true,
-          fontSize: 6,
-          alignment: 'center',
-        },
-      },
-     
     };
+    fetchSpecification();
+  }, []);
 
-    pdfMake.createPdf(docDefinition).download('bao_gia.pdf');
-  };
+  // Kiểm tra dữ liệu đã sẵn sàng
+  const isDataReady = qid && quote && quoteProducts && user && specifications;
 
   return (
-    <PictureAsPdfOutlined
-      onClick={handleExportPDF}
-      style={{
-        cursor: 'pointer',
-        fontSize: 24,
-        color: '#e64c3c',
-      }}
-    />
+    <div>
+      {isDataReady ? (
+        <PDFDownloadLink
+          document={
+            <QuotePDFDocument
+              quote={quote as QuoteData}
+              quoteProducts={quoteProducts as Product[]}
+              user={user as UserData}
+              specifications={specifications as Specification[]}
+            />
+          }
+          fileName={`bao_gia_${quote.quotation}.pdf`}
+          className="pdf-download-link"
+        >
+          {({ loading, error }) => {
+            if (loading) return <PictureAsPdf style={{color: theme.palette.error.main}}/>;
+            if (error) return <Error style={{color: theme.palette.error.main}}/>;
+            return <PictureAsPdf style={{color: theme.palette.error.main}}/>;
+          }}
+        </PDFDownloadLink>
+      ) : (
+        <RestartAlt/>
+      )}
+    </div>
   );
 };

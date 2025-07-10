@@ -41,7 +41,7 @@ const menuItems: MenuItem[] = [
   { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', },
   { text: 'Báo giá', icon: <RequestQuote />, path: '/admin',
     subItems: [
-      { text: 'Tìm kiếm thông tin khách', icon: <Person/>, path: '/admin/quote-management' },
+      { text: 'Khách hàng tiềm năng', icon: <Person/>, path: '/admin/quote-management/potential_customer' },
       { text: 'Báo giá', icon: <RequestQuote/>, path: '/admin/quote-management' },
     ]
   },

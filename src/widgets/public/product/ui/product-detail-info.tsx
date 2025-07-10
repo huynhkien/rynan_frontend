@@ -1,5 +1,6 @@
 'use client';
-import { getCategory } from '@/features/category/store/asyncActions';
+import { getAllCategory } from '@/features/category/api/categoryApi';
+import { Category } from '@/features/category/type/categoryType';
 import { GetProductBySlug } from '@/features/product/api/productApi';
 import { Product } from '@/features/product/type/productType';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
@@ -7,7 +8,7 @@ import { Specification } from '@/features/specification/type/specificationType';
 import { addToCart } from '@/features/user/store/userSlice';
 import { Button } from '@/shared/components';
 import { Quantity } from '@/shared/components/ui/public/Quantity';
-import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { useAppDispatch} from '@/shared/hooks/useAppHook';
 import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';
@@ -23,18 +24,21 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
     const [selectedImage, setSelectedImage] = useState<string>('');
     const [qty, setQty] = useState<number>(1);
     const [specification, setSpecification] = useState<Specification[] | []>([]);
-    const {categories} = useAppSelector((state) => state.category);
-    
+    const [categories, setCategories] = useState<Category[] | []>([]);
     const fetchSpecification = async() => {
         const response = await getAllSpecification();
         if(response.success) setSpecification(response.data || []);
     }
+    // Hiển thị thông tin danh mục
+    const fetchCategories = async() => {
+      const response =await getAllCategory();
+      if(response.success) setCategories(response.data || []);
+    }
     useEffect(() => {
         fetchSpecification();
+        fetchCategories();
     },[]);
-    useEffect(() => {
-        dispatch(getCategory());
-    }, [dispatch]);
+   
     // Xử lý khi phóng to ảnh
     const [showZoom, setShowZoom] = useState<boolean>(false);
     const [zoomPosition, setZoomPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
@@ -418,7 +422,7 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
                                     fontWeight: theme.typography.fontWeightMedium,
                                     color: theme.palette.text.secondary
                                 }}>
-                                    {categories.find(el => el._id ===productSlug.category)?.name}
+                                    {categories.find(el => el._id === productSlug.category)?.name}
                                 </Typography>
                             </Box>
                         </Box>

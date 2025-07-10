@@ -1,6 +1,6 @@
 'use client'
 import { Card, CardContent, Typography, Box, IconButton, Chip, useTheme } from '@mui/material';
-import { useEffect, useState } from 'react';
+import {  useEffect, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
@@ -8,24 +8,31 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Product} from '@/features/product/type/productType';
 import Link from 'next/link';
-import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
-import { getCategory } from '@/features/category/store/asyncActions';
+import { useAppDispatch} from '@/shared/hooks/useAppHook';
 import { addToCart } from '@/features/user/store/userSlice';
 import { toast } from 'react-toastify';
+import { Category, } from '@/features/category/type/categoryType';
+import { getAllCategory } from '@/features/category/api/categoryApi';
 
 
 const ProductCard = ({ data }: { data: Product }) => {
   const router = useRouter();
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
+  const [categories, setCategories] = useState<Category[] | []>([]);
   const dispatch = useAppDispatch();
-  const {categories} = useAppSelector((state) => state.category);
-  useEffect(() => {
-        dispatch(getCategory());
-    }, [dispatch]);
+
   const handleProduct = () => {
     router.push(`/products/${data.slug}`)
   }
+  // Hiển thị thông tin danh mục
+  const fetchCategories = async() => {
+    const response =await getAllCategory();
+    if(response.success) setCategories(response.data || []);
+  }
+  useEffect(() => {
+    fetchCategories();
+  },[]);
   // Xử lý thêm sản phẩm vào giỏ hàng
   const handleAddCart = async () => {
     dispatch(addToCart({

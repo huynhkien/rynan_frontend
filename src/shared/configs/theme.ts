@@ -32,8 +32,8 @@ const theme = createTheme({
         secondary: '#ffffff'
     },
     background: {
-      default: 'rgba(209, 208, 208, 0.5)',
-      paper: '#ffffff'                  
+      default: '#ffffff',
+      paper: 'rgba(209, 208, 208, 0.5)'                  
     }
 
   },

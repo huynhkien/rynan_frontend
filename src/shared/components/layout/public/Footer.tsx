@@ -112,12 +112,12 @@ export const Footer: React.FC = () => {
                         <IconButton
                             key={index}
                             sx={{
-                            backgroundColor: theme.palette.warning.main,
-                            color: theme.palette.text.secondary,
+                            backgroundColor: theme.palette.text.secondary,
+                            color: theme.palette.primary.main,
                             width: 40,
                             height: 40,
                             '&:hover': {
-                                backgroundColor: theme.palette.warning.light,
+                                backgroundColor: theme.palette.primary.light,
                                 transform: 'translateY(-2px)',
                             },
                             transition: 'all 0.3s ease',
@@ -141,22 +141,22 @@ export const Footer: React.FC = () => {
                         </Typography>
                         <Box display="flex" flexDirection="column" gap={2}>
                             <Box display="flex" alignItems="flex-start" gap={1}>
-                                <LocationOn sx={{ color: theme.palette.warning.main, mt: 0.5 }} />
+                                <LocationOn sx={{ color: theme.palette.text.secondary, mt: 0.5 }} />
                                 <Typography variant="body1">
                                 Khu CN Long Đức, xã Long Đức<br />
                                 TP. Trà Vinh, Tỉnh Trà Vinh
                                 </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>
-                                <Phone sx={{ color: theme.palette.warning.main }} />
+                                <Phone sx={{ color: theme.palette.text.secondary }} />
                                 <Typography variant="body1">Điện Thoại: 012345678</Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>
-                                <Email sx={{ color: theme.palette.warning.main }} />
+                                <Email sx={{ color: theme.palette.text.secondary }} />
                                 <Typography variant="body1">Mail: inforynan@gmail.com</Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>
-                                <Schedule sx={{ color: theme.palette.warning.main }} />
+                                <Schedule sx={{ color: theme.palette.text.secondary }} />
                                 <Typography variant="body1">T2 - T6: 8.00am - 17.00pm</Typography>
                             </Box>
                         </Box>

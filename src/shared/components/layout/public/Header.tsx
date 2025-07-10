@@ -15,22 +15,33 @@ import {
   LinkedIn,
   ShoppingCart,
   Person,
-  Menu 
+  Menu, 
+  Home,
+  Logout
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { CartDrawerView } from '@/widgets/public/cart/view/cart-drawer-view';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { logout } from '@/features/user/store/userSlice';
 
 export const Header = () => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const dispatch = useAppDispatch();
+  const {current} = useAppSelector((state) => state.user);
 
   const handleCartClick = (e: React.MouseEvent) => {
   e.preventDefault(); 
   setOpen(true);
   };
+  const handleLogout = async() => {
+    if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
+      dispatch(logout());
+    }
+  }
 
   return (
     <Box sx={{position: 'relative'}}>
@@ -135,40 +146,91 @@ export const Header = () => {
               <IconButton
                 sx={{
                   display: {xs: 'none', md: 'flex'},
-                  color: theme.palette.primary.main,
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.text.secondary,
+                  width: '40px',
+                  height: '40px',
                   '&:hover': {
-                    backgroundColor: 'rgba(45, 80, 22, 0.1)'
+                    backgroundColor: theme.palette.primary.light
                   }
                 }}
                 onClick={handleCartClick}
               >
-                <ShoppingCart />
+                <ShoppingCart sx={{fontSize: 'body2.fontSize'}} />
               </IconButton>
-              
+              {!current &&
               <IconButton
                 sx={{
                   display: {xs: 'none', md: 'flex'},
-                  color: theme.palette.primary.light,
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.text.secondary,
+                  width: '40px',
+                    height: '40px',
                   '&:hover': {
-                    backgroundColor: theme.palette.text.secondary
+                    backgroundColor: theme.palette.primary.light
                   }
                 }}
               >
-                <Link href='/login'
-                  style={{
-                    textDecoration: 'none',
-                    color: theme.palette.primary.main
+                  <Link href='/login'
+                    style={{
+                      textDecoration: 'none',
+                      color: theme.palette.text.secondary,
+                    }}
+                  >
+                    <Person sx={{fontSize: 'body2.fontSize'}}/>
+                  </Link>  
+              </IconButton>
+              }
+              {current &&
+              <>
+                <IconButton
+                  sx={{
+                    display: {xs: 'none', md: 'flex'},
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.text.secondary,
+                    width: '40px',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.light
+                    }
                   }}
                 >
-                  <Person />
-                </Link>
-              </IconButton>
-              
+                  <Link href='/user'
+                    style={{
+                      textDecoration: 'none',
+                      color: theme.palette.text.secondary,
+                      padding:0,
+                      margin: 0
+                    }}
+                  >
+                    <Home sx={{fontSize: 'body2.fontSize'}}/>
+                  </Link>
+                </IconButton>
+                <IconButton
+                  onClick={handleLogout}
+                  sx={{
+                    display: {xs: 'none', md: 'flex'},
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.text.secondary,
+                    width: '40px',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.light
+                    }
+                  }}
+                >
+                    <Logout sx={{fontSize: 'body2.fontSize'}}/>
+                </IconButton>
+                
+              </>
+              }
               <IconButton
                 sx={{
                   display: {xs: 'flex', md: 'none'},
                   color: '#2d5016',
                   backgroundColor: '#f5f5f5',
+                  width: '40px',
+                    height: '40px',
                   '&:hover': {
                     backgroundColor: '#e0e0e0'
                   }

@@ -9,7 +9,7 @@ export const SpecificationManagementView = () => {
         <>
             <Box
                 sx={{
-                    backgroundColor: theme.palette.background.default,
+                    backgroundColor: theme.palette.background.paper,
                     width: '100%'
                 }}
             >

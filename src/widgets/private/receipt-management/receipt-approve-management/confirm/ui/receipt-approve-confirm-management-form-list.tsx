@@ -149,7 +149,7 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, sp
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -228,7 +228,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -498,7 +498,7 @@ const ReceiptImportManagementFormListProduct = ({receipts, users, specifications
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -577,7 +577,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -847,7 +847,7 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, sp
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -926,7 +926,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -1192,7 +1192,7 @@ const ReceiptExportManagementFormListProduct = ({receipts, users,specifications,
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -1271,7 +1271,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -1548,7 +1548,7 @@ export const ReceiptApproveConfirmManagementFormList = () => {
 
     return (
         <Box sx={{ mb: 2,  }}>
-            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.default, display: 'flex' , justifyContent: 'space-between' }}>
+            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper, display: 'flex' , justifyContent: 'space-between' }}>
                 <Tabs
                     value={tabIndex}
                     onChange={handleTabChange}

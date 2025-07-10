@@ -223,7 +223,7 @@ export const OrderManagementFormAddEdit = () => {
             )}>
                 <Box >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
-                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                     Thông tin đơn hàng
@@ -340,7 +340,7 @@ export const OrderManagementFormAddEdit = () => {
                                     />
                             </Box>
                         </Paper>
-                        <Paper sx={{ width: '50%', display: 'flex', borderRadius: 0, flexDirection: 'column', gap: 1, backgroundColor: theme.palette.background.default }}>
+                        <Paper sx={{ width: '50%', display: 'flex', borderRadius: 0, flexDirection: 'column', gap: 1, backgroundColor: theme.palette.background.paper }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                     Thông tin liên hệ
@@ -369,7 +369,7 @@ export const OrderManagementFormAddEdit = () => {
                         </Paper>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
-                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                             <OrderManagementFormAddEditProduct
                                 handleSelectionChangeProduct={handleSelectionChangeProduct}
                                 product={product as Product}
@@ -378,7 +378,7 @@ export const OrderManagementFormAddEdit = () => {
                                 order={orderData}
                             />
                         </Paper>
-                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                        <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                     Danh sách sản phẩm
@@ -391,7 +391,7 @@ export const OrderManagementFormAddEdit = () => {
                         <Paper sx={{ 
                             width: '50%', 
                             borderRadius: 0, 
-                            backgroundColor: theme.palette.background.default 
+                            backgroundColor: theme.palette.background.paper
                         }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
                                 <Typography variant='body2' sx={{ 
@@ -487,7 +487,7 @@ export const OrderManagementFormAddEdit = () => {
                             </Box>
                         </Paper>
                         {id && (
-                            <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                            <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                                 <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                     <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                         Danh sách sản phẩm tồn tại trong giỏ hàng

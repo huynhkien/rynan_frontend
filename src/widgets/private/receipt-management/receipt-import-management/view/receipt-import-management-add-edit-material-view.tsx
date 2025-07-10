@@ -9,7 +9,7 @@ export const ReceiptImportManagementAddEditMaterialView = () => {
         <>
             <Box
                 sx={{
-                    backgroundColor: theme.palette.background.default,
+                    backgroundColor: theme.palette.background.paper,
                     width: '100%'
                 }}
             >

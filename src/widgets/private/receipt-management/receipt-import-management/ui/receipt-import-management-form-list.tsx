@@ -169,7 +169,7 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, fe
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -253,7 +253,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -559,7 +559,7 @@ export const ReceiptImportManagementFormListProduct = ({receipts, users, fetchAl
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -643,7 +643,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -916,7 +916,7 @@ export const ReceiptImportManagementFormList = () => {
 
     return (
         <Box sx={{ mb: 2,  }}>
-            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.default, display: 'flex' , justifyContent: 'space-between' }}>
+            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper, display: 'flex' , justifyContent: 'space-between' }}>
                 <Tabs
                     value={tabIndex}
                     onChange={handleTabChange}

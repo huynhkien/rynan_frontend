@@ -174,7 +174,7 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -243,7 +243,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'
@@ -254,7 +254,7 @@ return (
             <TableHead>
               <TableRow
                 sx={{
-                  backgroundColor: theme.palette.background.default,
+                  backgroundColor: theme.palette.background.paper,
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
@@ -370,7 +370,7 @@ return (
       </Paper>
      {
         isUpdatePriceProduct && (
-             <Box sx={{p:1, backgroundColor: theme.palette.background.default}}>
+             <Box sx={{p:1, backgroundColor: theme.palette.background.paper}}>
                 <Box sx={{
                     backgroundColor: theme.palette.primary.light,
                     py: 2,
@@ -388,7 +388,7 @@ return (
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 10,
-                        backgroundColor: theme.palette.background.default
+                        backgroundColor: theme.palette.background.paper
                     }}
             >
                   <Box

@@ -93,7 +93,7 @@ export const ReceiptExportManagementFormListProductItem = ({productReceipt, mate
    
 return (
     <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'

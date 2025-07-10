@@ -220,7 +220,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
             >
             <Box >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
-                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                 Thông tin xuất kho
@@ -331,7 +331,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
                             />
                         </Box>
                     </Paper>
-                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                 Thông tin khách hàng
@@ -358,7 +358,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
             </Box>
             <Box >
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', gap: 2, mt:2 }}>
-                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                 Lựa chọn nguyên liệu cần xuất
@@ -366,7 +366,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
                         </Box>
                         <ReceiptExportManagementFormAddEditMaterialItem materialReceipt={materialReceipt} handleSelectMaterial={handleSelectMaterial} materials={materials} material={material} specifications={specifications} receipt={receipt}/>
                     </Paper>
-                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+                    <Paper sx={{ width: '50%', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
                         <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                             <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>
                                 Thông tin nguyên liệu 
@@ -379,7 +379,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
                         <Paper sx={{ 
                             width: '50%', 
                             borderRadius: 0, 
-                            backgroundColor: theme.palette.background.default 
+                            backgroundColor: theme.palette.background.paper 
                         }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}` }}>
                                 <Typography variant='body2' sx={{ 
@@ -475,7 +475,7 @@ export const ReceiptExportManagementFormAddEditMaterial = () => {
                         <Paper sx={{ 
                             width: '50%', 
                             borderRadius: 0, 
-                            backgroundColor: theme.palette.background.default 
+                            backgroundColor: theme.palette.background.paper 
                         }}>
                             <Box sx={{ py: 2, borderBottom: `1px solid ${theme.palette.divider}`  }}>
                                 <Typography variant='body2' sx={{ color: theme.palette.primary.main, mx: 2, fontWeight: 'bold' }}>

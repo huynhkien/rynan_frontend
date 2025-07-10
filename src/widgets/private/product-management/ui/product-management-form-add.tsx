@@ -470,7 +470,7 @@ export const ProductManagementFormAdd = () => {
     };
 
     return (
-        <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+        <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
             <Box sx={{ py: 2 }}>
                 <Typography variant='h6' sx={{ color: theme.palette.primary.main }}>
                     Thêm thông tin khách

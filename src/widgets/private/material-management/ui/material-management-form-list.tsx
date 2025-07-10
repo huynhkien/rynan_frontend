@@ -168,7 +168,7 @@ export const MaterialManagementFormList = () => {
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
-      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ mb: 2, p: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <Box
             sx={{
                 display: 'flex',
@@ -250,7 +250,7 @@ return (
         </Box>
       </Paper>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.default }}>
+      <Paper sx={{ width: '100%', overflow: 'hidden', borderRadius: 0, backgroundColor: theme.palette.background.paper }}>
         <TableContainer sx={{ 
           '&::-webkit-scrollbar': {
             display: 'none'

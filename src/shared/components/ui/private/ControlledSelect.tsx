@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import { ControlledSelectProps, SelectPrivateProps } from '@/types/components/select';
+import theme from '@/shared/configs/theme';
 
 const Select = ({ 
   value, 
@@ -98,15 +99,22 @@ const Select = ({
           const selectedOption = options.find(opt => opt._id === selected);
           return (selectedOption?.name);
         }}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: theme.palette.text.secondary,
+            }
+          }
+        }}
       >
         {filteredOptions.length > 0 ? (
           filteredOptions.map((el) => (
-            <MenuItem key={el._id} value={el._id}>
+            <MenuItem sx={{backgroundColor: theme.palette.text.secondary}}  key={el._id} value={el._id}>
               {el.name}
             </MenuItem>
           ))
         ) : (
-          <MenuItem disabled>
+          <MenuItem sx={{backgroundColor: theme.palette.text.secondary}} disabled>
             <Typography variant="body2" color="textSecondary">
               Không tìm thấy kết quả
             </Typography>

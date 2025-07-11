@@ -1,6 +1,7 @@
 import React from 'react';
 import { Select as SelectItem, MenuItem, SelectChangeEvent, Box } from '@mui/material';
 import { SelectProps } from '@/types/components/select';
+import theme from '@/shared/configs/theme';
 
 export const Select: React.FC<SelectProps> = ({ value, changeValue, options }) => {
   const handleChange = (event: SelectChangeEvent<string | number>) => {
@@ -15,6 +16,13 @@ export const Select: React.FC<SelectProps> = ({ value, changeValue, options }) =
         value={value}
         onChange={handleChange}
         displayEmpty
+        MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      backgroundColor: theme.palette.text.secondary,
+                    }
+                  }
+                }}
       >
         {options.map((el) => (
           <MenuItem key={el.id} value={el.value}>

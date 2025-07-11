@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard,  Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete } from '@mui/icons-material';
+import { Dashboard,  Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete, AdminPanelSettings } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -38,7 +38,12 @@ const menuItems: MenuItem[] = [
       { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
     ]
   },
-  { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', },
+  { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', 
+    subItems: [
+      {text: 'Thông tin người dùng', icon: <Person />, path: '/admin/user-management'},
+      { text: 'Phân quyền', icon: <AdminPanelSettings/>, path: '/admin/decentralize-management' },
+    ]
+  },
   { text: 'Báo giá', icon: <RequestQuote />, path: '/admin',
     subItems: [
       { text: 'Khách hàng tiềm năng', icon: <Person/>, path: '/admin/quote-management/potential_customer' },

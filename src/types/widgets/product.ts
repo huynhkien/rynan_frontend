@@ -11,11 +11,11 @@ export interface ProductPriceRange {
 }
 
 export interface ProductPriceFilterProps {
-  initialMin?: number;
-  initialMax?: number;
+  priceRange: number[];
   minRange?: number;
   maxRange?: number;
-  onFilter?: (priceRange: ProductPriceRange) => void;
+  handleFilter?: () => void;
+  handleSliderChange?: (event: Event, newValue: number | number[]) => void;
   currency?: string;
 }
 // Sắp xếp sản phẩm

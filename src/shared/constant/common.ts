@@ -2,22 +2,22 @@
 export const ProductSortOption = [
     {
         id: 1,
-        value: "name",
+        value: "name_vn",
         text: "Theo bảng chữ cái, A-Z"
     },
     {
         id: 2,
-        value: "-name",
+        value: "-name_vn",
         text: "Theo bảng chữ cái, Z-A"
     },
     {
         id: 3,
-        value: "-price",
+        value: "-price_reference",
         text: "Giá từ cao đến thấp"
     },
     {
         id: 4,
-        value: "price",
+        value: "price_reference",
         text: "Giá từ thấp đến cao"
     },
     {
@@ -434,3 +434,6 @@ export const shelfLocation = [
   { _id: 'Y', name: 'Y' },
   { _id: 'Z', name: 'Z' }
 ];
+
+// Số trang sản phẩm
+export const PRODUCTS_PER_PAGE = 12;

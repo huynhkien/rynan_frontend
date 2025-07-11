@@ -35,7 +35,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     }
 
     const DrawerList = (
-        <Box sx={{ width: 500, height: '100%' }} role='presentation' position='relative'>
+        <Box sx={{ width: 500, height: '100%', backgroundColor: theme.palette.text.secondary }} role='presentation' position='relative'>
             {/* Header với nút đóng */}
             <Box sx={{ 
                 display: 'flex', 
@@ -216,7 +216,8 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                     boxSizing: 'border-box',
                     width: 500,
                     height: '100%'
-                }
+                },
+                
             }}
         >
             {DrawerList}

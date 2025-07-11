@@ -14,8 +14,6 @@ export const HomeProduct = () => {
         const response = await getAllProduct({ sort, limit: 12 });
         if (response.success) {
             let products = response.data || [];
-
-            // Nếu là random, shuffle mảng
             if (sort === 'random') {
                 products = products.sort(() => 0.5 - Math.random());
             }

@@ -1,6 +1,7 @@
 export const UserEndpoints = {
     REGISTER: '/user/register',
     LOGIN: '/user/login',
+    ADD_ROLE: '/user/add-role',
     FINAL_REGISTER: '/user/final-register',
     GET_ALL: '/user/',
     GET_BY_ID: (id: string | number) => `/user/${id}`,

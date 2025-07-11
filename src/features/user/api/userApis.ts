@@ -9,6 +9,11 @@ export const registerUser = async (data: RegisterData): Promise<RegisterResponse
     withCredentials: true,
     
 });
+// Thêm quyền cho nhân viên
+export const addRole = async (data: FormData): Promise<RegisterResponse> => 
+  axiosInstance.post(UserEndpoints.ADD_ROLE, data, {
+    withCredentials: true,
+});
 // Đăng nhập
 export const loginUser = async (data: LoginData): Promise<LoginResponse> => 
   axiosInstance.post(UserEndpoints.LOGIN, data, {

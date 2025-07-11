@@ -27,6 +27,13 @@ export const ProductSort: React.FC<ProductSortProps> = ({ value, changeValue, op
           }
           return options.find((opt) => opt.value === selected)?.text || "";
         }}
+        MenuProps={{
+          PaperProps: {
+            sx: {
+              backgroundColor: theme.palette.text.secondary,
+            }
+          }
+        }}
       >
         {/* Thêm option để reset sắp xếp */}
         <MenuItem sx={{backgroundColor: theme.palette.text.secondary}} value="">

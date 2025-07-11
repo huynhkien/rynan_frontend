@@ -1,37 +1,34 @@
 'use client'
 import { Banner } from "@/shared/components/layout/public/Banner"
 import { Box, Container, Typography } from "@mui/material"
-import { ProductFilterPrice } from "../ui/product-filter-price"
-import ProductCard from "../ui/product-card"
-import { ProductFilterCategory } from "../ui/product-filter-category"
-import { ProductFilterRating } from "../ui/product-filter-rating"
-import { ProductSort } from "../ui/product-sort"
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { PRODUCTS_PER_PAGE, ProductSortOption } from "@/shared/constant/common"
 import { getAllProduct } from "@/features/product/api/productApi"
 import { Product } from "@/features/product/type/productType"
-import { ProductPagination } from "../ui/product-pagination"
 import { Category } from "@/features/category/type/categoryType"
 import { getAllCategory } from "@/features/category/api/categoryApi"
-import { ProductFilterTag } from "../ui/product-filter-tag"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
+import { ProductFilterCategory } from "../ui/product-filter-category"
+import { ProductFilterPrice } from "../ui/product-filter-price"
+import { ProductFilterRating } from "../ui/product-filter-rating"
+import { ProductFilterTag } from "../ui/product-filter-tag"
+import { ProductSort } from "../ui/product-sort"
+import ProductCard from "../ui/product-card"
+import { ProductPagination } from "../ui/product-pagination"
 
-interface params {
-    sort?: string
-}
 
-
-export const ProductsView = () => {
+export const ProductSearchView = () => {
     // Lấy page từ URL
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
     const currentPage = parseInt(searchParams.get('page') || '1', 10);
-    console.log(currentPage);
+    const searchValue = searchParams.get('q')?.toString(); 
+    
     
     // States
     const initialMin = 0;
-    const initialMax = 10000000;
+    const initialMax = 5000000;
     const [sortValue, setSortValue] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -50,12 +47,12 @@ export const ProductsView = () => {
     }
     
     // Hiển thị sản phẩm (lấy tất cả để filter tại frontend)
-    const fetchProducts = async (sort?: string) => {
-        let params : params = {};
-        if (sort && sort.trim() !== '') {
-            params = { sort } ;
-        }
-        const response = await getAllProduct(params.sort ? params : undefined);
+    const fetchProducts = async (sort?: string, value?: string) => {
+        const response = await getAllProduct({
+            sort: sort && sort.trim() !== '' ? sort : '', 
+            q: value && value.trim() !== '' ? value : ''
+        });
+        
         if (response.success) {
             setProducts(response.data || []);
             setLoading(true);
@@ -67,30 +64,9 @@ export const ProductsView = () => {
         fetchProducts(); 
     }, []);
     useEffect(() => {
-        fetchProducts(sortValue);
-    }, [sortValue])
-    // Lựa chọn danh mục
-    const handleSelectValueCategory = useCallback((id: string) => {
-        setSelectedCategory(prev => prev === id ? null : id);
-    }, []);
-    
-    // Lựa chọn sao
-    const handleSelectValueStar = useCallback((star: number) => {
-        setSelectedStar(prev => prev === star ? null : star);
-    }, []);
-    
-    // Lựa chọn tag
-    const handleSelectValueTag = useCallback((id: string) => {
-        setSelectedTag(prev => prev === id ? null : id);
-    }, []);
-    
-    // Xử lý thay đổi giá
-    const handleSliderChange = useCallback((event: Event, newValue: number | number[]) => {
-        if (Array.isArray(newValue)) {
-            setPriceRange(newValue);
-        }
-    }, []);
-    
+        fetchProducts(sortValue, searchValue as string);
+    }, [sortValue, searchValue])
+   
     // Tính toán phân trang tại frontend
     const paginatedProducts = useMemo(() => {
         let filtered = products;
@@ -139,13 +115,33 @@ export const ProductsView = () => {
         newSearchParams.set('page', '1');
         router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
     }, [searchParams, router, pathname]);
-    // Reset về trang 1 khi filter thay đổi
-    useEffect(() => {
-        if (currentPage > 1) {
-            resetToFirstPage();
-        }
-    }, [currentPage, resetToFirstPage]);
     // Sắp xếp
+     // Lựa chọn danh mục
+    const handleSelectValueCategory = useCallback((id: string) => {
+        setSelectedCategory(prev => prev === id ? null : id);
+        resetToFirstPage();
+    }, [resetToFirstPage]);
+    
+    // Lựa chọn sao
+    const handleSelectValueStar = useCallback((star: number) => {
+        setSelectedStar(prev => prev === star ? null : star);
+        resetToFirstPage();
+    }, [resetToFirstPage]);
+    
+    // Lựa chọn tag
+    const handleSelectValueTag = useCallback((id: string) => {
+        setSelectedTag(prev => prev === id ? null : id);
+        resetToFirstPage();
+    }, [resetToFirstPage]);
+    
+    // Xử lý thay đổi giá
+    const handleSliderChange = useCallback((event: Event, newValue: number | number[]) => {
+        if (Array.isArray(newValue)) {
+            setPriceRange(newValue);
+        }
+        resetToFirstPage();
+    }, [resetToFirstPage]);
+    
     const handleSortChange = useCallback((value: string | number) => {
         setSortValue(value.toString());
         resetToFirstPage(); 
@@ -154,10 +150,10 @@ export const ProductsView = () => {
     return (
         <>
             <Banner
-                category='Sản phẩm'
+                category='Tìm kiếm sản phẩm'
                 breadcrumb={[{
-                    name: 'Sản phẩm',
-                    url: '/products'
+                    name: 'Tìm kiếm sản phẩm',
+                    url: `search/${searchValue}`
                 }]}
             />
             <Container maxWidth='xl'

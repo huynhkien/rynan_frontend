@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import {
   Box,
   Card,
@@ -7,47 +7,22 @@ import {
   Typography,
   Slider,
   Stack,
-  Button,
   useTheme,
 } from '@mui/material';
-import { ProductPriceFilterProps, ProductPriceRange } from '@/types/widgets/product';
+import { ProductPriceFilterProps } from '@/types/widgets/product';
 
 
 export const ProductFilterPrice: React.FC<ProductPriceFilterProps> = ({
-  initialMin = 0,
-  initialMax = 637,
-  minRange = 0,
-  maxRange = 100000000,
-  onFilter,
-  currency = 'VNĐ',
-}) => {
+    priceRange,
+    minRange = 0,
+    maxRange = 100000000,
+    handleSliderChange,
+    currency = 'VNĐ',
+  }) => {
   const theme = useTheme();
-  const [priceRange, setPriceRange] = useState<number[]>([initialMin, initialMax]);
-
-
-  const handleSliderChange = useCallback((event: Event, newValue: number | number[]) => {
-    if (Array.isArray(newValue)) {
-      setPriceRange(newValue);
-    }
-  }, []);
-
-  const handleFilter = useCallback(() => {
-    const newRange: ProductPriceRange = {
-      min: priceRange[0],
-      max: priceRange[1],
-    };
-    
-    if (onFilter) {
-      onFilter(newRange);
-    }
-    
-    console.log(`Filtering by price: ${currency}${newRange.min} - ${currency}${newRange.max}`);
-  }, [priceRange, onFilter, currency]);
-
   const formatPrice = (value: number): string => {
     return `${value.toLocaleString()} ${currency}`;
   };
-
   return (
     <Card sx={{
       border: `1px solid ${theme.palette.primary.dark}`,
@@ -128,10 +103,6 @@ export const ProductFilterPrice: React.FC<ProductPriceFilterProps> = ({
                 {formatPrice(priceRange[1])}
               </Typography>
             </Box>
-
-            <Button onClick={handleFilter} sx={{backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary}}>
-              Lọc
-            </Button>
           </Stack>
         </Stack>
       </CardContent>

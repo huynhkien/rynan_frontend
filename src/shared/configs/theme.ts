@@ -12,7 +12,7 @@ const theme = createTheme({
     secondary: {
       main: '#52320a',        
       light: 'rgb(207,216,220)',      
-      dark: 'rgb(69,90,100)',         
+      dark: 'rgba(189, 185, 185, 0.5)',         
       contrastText: '#ffffff',  
     },
     error: {
@@ -33,7 +33,7 @@ const theme = createTheme({
     },
     background: {
       default: '#ffffff',
-      paper: 'rgba(209, 208, 208, 0.5)'                  
+      paper: 'rgba(189, 185, 185, 0.5)'                  
     }
 
   },

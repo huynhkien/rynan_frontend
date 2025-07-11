@@ -16,8 +16,8 @@ export const UserManagementAddView = () => {
                 <Breadcrumb
                     type='Admin'
                     breadcrumb={[{
-                        name: 'Quản lý sản phẩm',
-                        url: '/admin/product-management',
+                        name: 'Quản lý khách hàng',
+                        url: '/admin/user-management',
                     },
                     {
                         name: 'Thêm thông tin khách',

@@ -7,6 +7,13 @@ import {
   Box,
   Container,
   Badge,
+  Dialog,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  InputAdornment,
+  Slide,
 } from '@mui/material';
 import {
   Facebook,
@@ -17,33 +24,73 @@ import {
   Person,
   Menu, 
   Home,
-  Logout
+  Logout,
+  Search
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, forwardRef, Ref } from 'react';
 import { CartDrawerView } from '@/widgets/public/cart/view/cart-drawer-view';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { logout } from '@/features/user/store/userSlice';
+import { TransitionProps } from '@mui/material/transitions';
+import { useDebounce } from '@/shared/hooks/useDeounce';
+import { useRouter } from 'next/navigation';
+import { slugify } from '@/shared/validation/slug';
+
+// Tạo Transition component cho slide từ trên xuống
+const Transition = forwardRef<
+  Ref<unknown>,
+  TransitionProps & {
+    children: React.ReactElement;
+  }
+>(function Transition(props, ref) {
+  return <Slide direction="down" ref={ref} {...props} />;
+});
 
 export const Header = () => {
-  const theme = useTheme();
-  const [open, setOpen] = useState(false);
-  const dispatch = useAppDispatch();
-  const {current} = useAppSelector((state) => state.user);
-
-  const handleCartClick = (e: React.MouseEvent) => {
-  e.preventDefault(); 
-  setOpen(true);
-  };
-  const handleLogout = async() => {
-    if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
-      dispatch(logout());
+    const theme = useTheme();
+    const [openCart, setOpenCart] = useState<boolean>(false);
+    const dispatch = useAppDispatch();
+    const {current} = useAppSelector((state) => state.user);
+    const [openSearch, setOpenSearch] = useState<boolean>(false);
+    const [searchValue, setSearchValue] = useState<string>('');
+    const router = useRouter();
+    // Giảm số lần gọi khi nhập value search 
+    const searchDebounce = useDebounce(searchValue, 500);
+    console.log(searchDebounce);
+    const handleCloseSearch = () => {
+      setOpenSearch(prev => !prev);
+      setSearchValue('');
+    };
+    // Xử lý search 
+    const handleOpenSearch = () => {
+      setOpenSearch(true);
+    };
+    // Xử lý giỏ hàng
+    const handleCartClick = (e: React.MouseEvent) => {
+    e.preventDefault(); 
+    setOpenCart(true);
+    };
+    // Xử lý logout
+    const handleLogout = async() => {
+      if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
+        dispatch(logout());
+      }
     }
+    // Xử lý 
+    const handleSearch = () => {
+      const keyword = searchDebounce.trim();
+        if (keyword) {
+          const slug = slugify(keyword);
+          router.push(`/search/${slug}?q=${encodeURIComponent(keyword)}`);
+          setSearchValue('');
+          setOpenSearch(false);
+        }
   }
 
-  return (
+return (
     <Box sx={{position: 'relative'}}>
       <AppBar 
         position="relative" 
@@ -158,6 +205,21 @@ export const Header = () => {
               >
                 <ShoppingCart sx={{fontSize: 'body2.fontSize'}} />
               </IconButton>
+              <IconButton
+                  sx={{
+                    display: {xs: 'none', md: 'flex'},
+                    backgroundColor: theme.palette.primary.main,
+                    color: theme.palette.text.secondary,
+                    width: '40px',
+                    height: '40px',
+                    '&:hover': {
+                      backgroundColor: theme.palette.primary.light
+                    }
+                  }}
+                  onClick={handleOpenSearch}
+                >
+                    <Search sx={{fontSize: 'body2.fontSize'}}/>
+                </IconButton>
               {!current &&
               <IconButton
                 sx={{
@@ -180,6 +242,7 @@ export const Header = () => {
                     <Person sx={{fontSize: 'body2.fontSize'}}/>
                   </Link>  
               </IconButton>
+              
               }
               {current &&
               <>
@@ -227,8 +290,8 @@ export const Header = () => {
               <IconButton
                 sx={{
                   display: {xs: 'flex', md: 'none'},
-                  color: '#2d5016',
-                  backgroundColor: '#f5f5f5',
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.text.secondary,
                   width: '40px',
                     height: '40px',
                   '&:hover': {
@@ -244,7 +307,6 @@ export const Header = () => {
           </Toolbar>
         </Container>
       </AppBar>
-      
       <Box
         sx={{
           position: 'absolute',
@@ -266,10 +328,72 @@ export const Header = () => {
           }}
         />
       </Box>
+      {/* Hiển thị cart drawer */}
       <CartDrawerView
-        open={open}
-        setOpen={setOpen}
+        open={openCart}
+        setOpen={setOpenCart}
       />
+      {/* Hiển thị thanh tìm kiếm */}
+      <Dialog
+        open={openSearch}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleCloseSearch}
+        aria-describedby="search-dialog-description"
+        PaperProps={{
+          sx: {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            margin: 0,
+            maxWidth: '100%',
+            width: '100%',
+            borderRadius: 0,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+            backgroundColor: theme.palette.primary.main
+          }
+        }}
+        sx={{
+          '& .MuiBackdrop-root': {
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+          }
+        }}
+      >
+        <DialogContent sx={{ py: 3, px: 4 }}>
+          <TextField
+            autoFocus
+            fullWidth
+            variant="outlined"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            placeholder="Tìm kiếm sản phẩm..."
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <Search />
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 2,
+                py: 1,
+              },
+              backgroundColor: theme.palette.text.secondary,
+              borderRadius: '5px'
+            }}
+          />
+        </DialogContent>
+        <DialogActions sx={{ px: 4, pb: 3 }}>
+          <Button sx={{backgroundColor: theme.palette.text.secondary, color:theme.palette.text.primary }} onClick={handleCloseSearch} variant="outlined">
+            Hủy
+          </Button>
+          <Button  sx={{backgroundColor: theme.palette.text.secondary, color:theme.palette.text.primary }} onClick={handleSearch} variant="contained">
+            Tìm kiếm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };

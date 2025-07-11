@@ -437,3 +437,19 @@ export const shelfLocation = [
 
 // Số trang sản phẩm
 export const PRODUCTS_PER_PAGE = 12;
+
+// Phân quyền nhân viên
+export const Role = [
+    {
+        _id: '2002',
+        name: 'Nhân viên',
+    },
+    {
+        _id: '2004',
+        name: 'Quản lý'
+    },
+    {
+        _id: '2006',
+        name: 'Quản trị hệ thống'
+    }
+] 

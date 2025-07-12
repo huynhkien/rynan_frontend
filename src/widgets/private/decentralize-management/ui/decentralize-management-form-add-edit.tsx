@@ -1,7 +1,7 @@
 'use client'
 
 import { BaseOption, fetchDistricts, fetchProvinces, fetchWards } from "@/features/user/api/addressApis";
-import { addRole, getAllUser, getUserById, updateUserByAdmin } from "@/features/user/api/userApis";
+import { addRole, checkMail, getAllUser, getUserById, updateUserByAdmin } from "@/features/user/api/userApis";
 import UserFormInput from "@/features/user/components/UserFormInput";
 import { UserInputImage } from "@/features/user/components/UserInputImage";
 import { UserData, UserDataProps } from "@/features/user/type/userTypes";
@@ -18,9 +18,6 @@ export const DecentralizeManagementFormAddEdit = () => {
     const theme = useTheme();
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
-    // State cho nhân viên
-    // Lấy thông tin nhân viên
-    
     // State cho preview image
     const [preview, setPreview] = useState<string | null>(null);
     //  State cho nhân viên
@@ -249,6 +246,11 @@ export const DecentralizeManagementFormAddEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
+            const existingMail = await checkMail(data.email);
+            if(!existingMail.success){
+                toast.error(existingMail.message);
+                return;
+            }
 
             const response = await addRole(formData);
             if(response.success){
@@ -283,6 +285,7 @@ export const DecentralizeManagementFormAddEdit = () => {
                         gender: userData.gender || '',
                         type: userData.type || '',
                         note: userData.note || '',
+                        identification_card: userData.identification_card || '',
                         staff: userData.staff || '',
                     });
                     setPreview(userData.avatar?.url || '');
@@ -355,15 +358,12 @@ export const DecentralizeManagementFormAddEdit = () => {
             formData.append('identification_card', data.identification_card);
             formData.append('staff', data.staff);
             if (data.note) formData.append('note', data.note);
-            if (data.website) formData.append('website', data.website);
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
-
             const response = await updateUserByAdmin(id as string , formData);
             if(response.success){
                 toast.success(response.message);
-                reset();
             }
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';

@@ -9,6 +9,12 @@ export const registerUser = async (data: RegisterData): Promise<RegisterResponse
     withCredentials: true,
     
 });
+// check mail
+export const checkMail = async (email: string): Promise<RegisterResponse> => 
+  axiosInstance.post(UserEndpoints.CHECK_MAIL, { email }, {
+    withCredentials: true,
+    
+});
 // Thêm quyền cho nhân viên
 export const addRole = async (data: FormData): Promise<RegisterResponse> => 
   axiosInstance.post(UserEndpoints.ADD_ROLE, data, {

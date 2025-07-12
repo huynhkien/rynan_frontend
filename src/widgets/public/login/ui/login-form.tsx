@@ -10,7 +10,7 @@ import Link from 'next/link';
 import Swal from 'sweetalert2';
 import { BaseInput } from '@/shared/components/ui/public/BaseInput';
 import { validateFormLoginAndRegister } from '@/shared/validation/form';
-import { loginUser,  registerUser } from '@/features/user/api/userApis';
+import { checkMail, loginUser,  registerUser } from '@/features/user/api/userApis';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { useRouter } from 'next/navigation';
 import { login } from '@/features/user/store/userSlice';
@@ -42,6 +42,13 @@ export const LoginForm = () => {
         if(invalids.length > 0) return;
         try{
             if(isRegister){
+                const existingMail = await checkMail(payload.email);
+                if(!existingMail.success){
+                    Swal.fire('Thất bại', existingMail.message, 'error').then(() => {
+                        resetPayload();
+                    });
+                    return;
+                }
                 const response = await registerUser(payload);
                 if(response.success) {
                     Swal.fire('Chúc mừng', response.message, 'success').then(() => {

@@ -33,7 +33,7 @@ export const Breadcrumb = ({breadcrumb, type}: BreadcrumbProps) => {
                 }}
             >
                 <Link 
-                    href={type === 'Admin' ? '/admin' : '/'}
+                    href={type === 'Admin' ? '/admin' : type === 'User' ? '/user' : '/'}
                     style={{ textDecoration: 'none' }}
                 >
                     <Box

@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
-import { Dashboard,  Help, ExitToApp, ChevronLeft, ChevronRight, Person, Info, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Help, ExitToApp, ChevronLeft, ChevronRight, Person, Info, ExpandLess, ExpandMore, ShoppingBag } from '@mui/icons-material';
 import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
 
@@ -27,8 +27,8 @@ interface SidebarProps {
 }
 
 const menuItems: MenuItem[] = [
-  { text: 'Dashboard', icon: <Dashboard/>, path: '/user' },
   { text: 'Thông tin', icon: <Info />, path: '/user' },
+  { text: 'Đơn hàng', icon: <ShoppingBag />, path: '/user/order-management' },
 
 ];
 

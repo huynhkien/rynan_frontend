@@ -69,28 +69,6 @@ export const ProductsView = () => {
     useEffect(() => {
         fetchProducts(sortValue);
     }, [sortValue])
-    // Lựa chọn danh mục
-    const handleSelectValueCategory = useCallback((id: string) => {
-        setSelectedCategory(prev => prev === id ? null : id);
-    }, []);
-    
-    // Lựa chọn sao
-    const handleSelectValueStar = useCallback((star: number) => {
-        setSelectedStar(prev => prev === star ? null : star);
-    }, []);
-    
-    // Lựa chọn tag
-    const handleSelectValueTag = useCallback((id: string) => {
-        setSelectedTag(prev => prev === id ? null : id);
-    }, []);
-    
-    // Xử lý thay đổi giá
-    const handleSliderChange = useCallback((event: Event, newValue: number | number[]) => {
-        if (Array.isArray(newValue)) {
-            setPriceRange(newValue);
-        }
-    }, []);
-    
     // Tính toán phân trang tại frontend
     const paginatedProducts = useMemo(() => {
         let filtered = products;
@@ -139,16 +117,35 @@ export const ProductsView = () => {
         newSearchParams.set('page', '1');
         router.push(`${pathname}?${newSearchParams.toString()}`, { scroll: false });
     }, [searchParams, router, pathname]);
-    // Reset về trang 1 khi filter thay đổi
-    useEffect(() => {
-        if (currentPage > 1) {
-            resetToFirstPage();
-        }
-    }, [currentPage, resetToFirstPage]);
     // Sắp xếp
     const handleSortChange = useCallback((value: string | number) => {
         setSortValue(value.toString());
         resetToFirstPage(); 
+    }, [resetToFirstPage]);
+    // Lựa chọn danh mục
+    const handleSelectValueCategory = useCallback((id: string) => {
+        resetToFirstPage();
+        setSelectedCategory(prev => prev === id ? null : id);
+    }, [resetToFirstPage]);
+    
+    // Lựa chọn sao
+    const handleSelectValueStar = useCallback((star: number) => {
+        resetToFirstPage()
+        setSelectedStar(prev => prev === star ? null : star);
+    }, [resetToFirstPage]);
+    
+    // Lựa chọn tag
+    const handleSelectValueTag = useCallback((id: string) => {
+        resetToFirstPage()
+        setSelectedTag(prev => prev === id ? null : id);
+    }, [resetToFirstPage]);
+    
+    // Xử lý thay đổi giá
+    const handleSliderChange = useCallback((event: Event, newValue: number | number[]) => {
+        if (Array.isArray(newValue)) {
+            resetToFirstPage()
+            setPriceRange(newValue);
+        }
     }, [resetToFirstPage]);
     
     return (

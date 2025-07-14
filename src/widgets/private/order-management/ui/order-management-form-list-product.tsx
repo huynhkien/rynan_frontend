@@ -38,11 +38,11 @@ type SortOrder = 'asc' | 'desc';
 
 export const OrderManagementFormListProduct = ({
     orderProduct, 
-    id, 
     edit, 
     productsData, 
     oid, 
-    renderOrder
+    renderOrder, 
+    action
 }: OrderProductProps) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -51,6 +51,9 @@ export const OrderManagementFormListProduct = ({
     const [isEditProduct, setIsEditProduct] = useState<string | null>(null);
     const theme = useTheme();
     const dispatch = useAppDispatch();
+    
+    // Logic để kiểm tra có hiển thị cột thao tác không
+    const shouldShowActions = !action;
     
     // xóa sản phẩm theo trạng thái
     const handleDeleteProduct = (id: string | number) => {
@@ -77,6 +80,7 @@ export const OrderManagementFormListProduct = ({
     const handleCloseDialog = () => {
         setIsEditProduct(null);
     };
+    
     const handleDeleteProductOrder = async (pid: string) => {
         try {
             if(confirm('Bạn có chắc xóa sản phẩm này không?')){
@@ -111,7 +115,7 @@ export const OrderManagementFormListProduct = ({
                     }}
                   >
                     {headCells
-                    .filter((headCell) => !id || headCell.id !== 'actions')
+                    .filter((headCell) => shouldShowActions || headCell.id !== 'actions')
                     .map((headCell, index) => (
                       <TableCell 
                         key={index}
@@ -145,7 +149,7 @@ export const OrderManagementFormListProduct = ({
                 <TableBody>
                   {!orderProduct || orderProduct?.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} align='center' sx={{ py: 4 }}>
+                      <TableCell colSpan={shouldShowActions ? 6 : 5} align='center' sx={{ py: 4 }}>
                         Không có sản phẩm
                       </TableCell>
                     </TableRow>
@@ -197,7 +201,7 @@ export const OrderManagementFormListProduct = ({
                               {item.quantity  || 'Chưa Thêm'}
                             </Typography>
                           </TableCell>
-                          {!id && (
+                          {shouldShowActions && (
                             <TableCell>
                             {/* Hành động */}
                             {edit &&(
@@ -210,6 +214,7 @@ export const OrderManagementFormListProduct = ({
                                       <Edit/>
                                 </IconButton>
                             )}
+                            {!action &&
                                 <IconButton 
                                     color='error'
                                     aria-label={`Xóa ${item.name}`}
@@ -218,6 +223,7 @@ export const OrderManagementFormListProduct = ({
                                 >
                                     <Delete />
                                 </IconButton>
+                            }
                           </TableCell>
                           )}
                         </TableRow>

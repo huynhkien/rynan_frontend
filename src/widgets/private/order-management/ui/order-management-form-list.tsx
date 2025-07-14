@@ -517,7 +517,7 @@ return (
       >
         <Box sx={{ position: 'relative' }}>
           <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-          {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} id={quoteId as string}/>}
+          {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} id={quoteId as string} action='show'/>}
           {isShowUser && <OrderManagementFormListUser user={user as UserData}/>}
         </Box>
       </Dialog>

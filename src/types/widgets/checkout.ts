@@ -3,13 +3,11 @@ export interface CheckoutInfoProps {
     name: string;
     phone: string;
     address: {
-        street: string; 
+        province: string; 
         ward: string;
         district: string;
-        city: string;
-        country: string;
-        zipCode: string;
+        addressAdd: string;
     },
-    message?: string;
+    note?: string;
     
 }

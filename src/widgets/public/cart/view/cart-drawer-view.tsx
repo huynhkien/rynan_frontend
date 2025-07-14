@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { removeItemCart } from '@/features/user/store/userSlice';
 import { toast } from 'react-toastify';
+import Swal, { SweetAlertResult } from 'sweetalert2';
 
 export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const theme = useTheme();
@@ -21,7 +22,15 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
         setOpen(false);
     };
     const handleCheckOut = () => {
-      router.push('/checkout')
+      return Swal.fire({
+                text: 'Vui lòng đăng nhập',
+                icon: 'info',
+                cancelButtonText: 'Không phải bây giờ',
+                showCancelButton: true,
+                confirmButtonText: 'Chuyển đến trang đăng nhập'
+             }).then((rs: SweetAlertResult) => {
+                if(rs.isConfirmed) router.push('/login')
+             })
     }
     const handleCart = () => {
       router.push('/cart')

@@ -65,7 +65,7 @@ export const CartForm = () => {
           confirmButtonText: 'Chuyển đến trang đăng nhập'
        }).then((rs: SweetAlertResult) => {
           if(rs.isConfirmed) router.push('/login')
-       })
+       });
     }
  }
 

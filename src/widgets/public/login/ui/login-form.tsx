@@ -3,28 +3,64 @@ import { InvalidFieldProps } from '@/types/widgets/contact';
 import { LoginFormProps } from '@/types/widgets/login';
 import {  Lock, Email, Person, Phone, Password } from '@mui/icons-material';
 import { Box, Container, Typography, useTheme, Divider} from '@mui/material'
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import {  Button } from '@/shared/components';
 import Link from 'next/link';
 import Swal from 'sweetalert2';
 import { BaseInput } from '@/shared/components/ui/public/BaseInput';
 import { validateFormLoginAndRegister } from '@/shared/validation/form';
-import { checkMail, loginUser,  registerUser } from '@/features/user/api/userApis';
+import { checkMail, getAllUser, loginUser,  registerUser } from '@/features/user/api/userApis';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { useRouter } from 'next/navigation';
 import { login } from '@/features/user/store/userSlice';
+import { UserData } from '@/features/user/type/userTypes';
 
 export const LoginForm = () => {
     const theme = useTheme();
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const [users, setUsers] = useState<UserData[] | []>([]);
+    // Hiển thị thông tin người dùng
+    useEffect(() => {
+        const fetchUsers = async() => {
+            const response = await getAllUser();
+            if(response.success) setUsers(response.data);
+        }
+        fetchUsers();
+    },[]);
+    // Tạo mã code tự động
+    const generateUniqueCode = useCallback(() => {
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = currentYear.toString().slice(-2); // Lấy 2 số cuối của năm
+        
+        // Tìm số thứ tự cao nhất từ các đơn hàng hiện có
+        const currentYearUsers = users.filter(user => 
+        user.code && user.code.startsWith(`RYNAN${yearSuffix}-U`)
+        );
+        
+        let maxNumber = 0;
+        currentYearUsers.forEach(user => {
+        const match = (user.code as string).match(/RYNAN\d{2}-0*(\d+)$/);
+        if (match) {
+            const number = parseInt(match[1]);
+            if (number > maxNumber) {
+            maxNumber = number;
+            }
+        }
+        });
+        // Tạo mã mới với số thứ tự tiếp theo
+        const nextNumber = maxNumber + 1;
+        const paddedNumber = nextNumber.toString().padStart(3, '0'); 
+        return `RYNAN${yearSuffix}-U${paddedNumber}`;
+    }, [users]);
     const [payload, setPayload] = useState<LoginFormProps>({
         email: '',
         name: '',
         phone: '',
         password: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        code: generateUniqueCode(),
     });
     const resetPayload = () => {
         setPayload({
@@ -32,7 +68,8 @@ export const LoginForm = () => {
             name: '',
             phone: '',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            code: '',
         })
     }
     const [isRegister, setIsRegister] = useState(false);

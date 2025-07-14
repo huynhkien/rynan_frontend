@@ -188,3 +188,9 @@ export interface ProductRatingProps {
     pid: string;
     uid: string;
 }
+// Phản hồi
+export interface ProductReplyProps {
+    replier: string;
+    feedback: string;
+    postedBy: string;
+}

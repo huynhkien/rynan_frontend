@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { ProductParams, ProductRatingProps, ProductResponse, ProductResponseById } from "../type/productType";
+import { ProductParams, ProductRatingProps, ProductReplyProps, ProductResponse, ProductResponseById } from "../type/productType";
 import { ProductEndpoints } from "./productEndpoints";
 
 
@@ -79,3 +79,12 @@ export const addRating = async (data: ProductRatingProps): Promise<ProductRespon
 // Xóa đánh giá
 export const deleteRating = async(id: string, rid: string): Promise<ProductResponse> => 
     axiosInstance.delete(ProductEndpoints.DELETE_RATING(id, rid));
+// Thêm phản hồi
+export const addReply = async(id: string, rid: string, data: ProductReplyProps): Promise<ProductResponse> => 
+  axiosInstance.put(ProductEndpoints.ADD_REPLY(id, rid), data, {
+    withCredentials: true
+});
+export const addReplyChild = async(id: string, cid: string, data: ProductReplyProps): Promise<ProductResponse> => 
+  axiosInstance.put(ProductEndpoints.ADD_REPLY_CHILD(id, cid), data, {
+    withCredentials: true
+});

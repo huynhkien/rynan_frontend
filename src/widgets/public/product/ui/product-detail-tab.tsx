@@ -20,7 +20,7 @@ export const ProductDetailTab = ({slug}: {slug: string}) => {
             case 0:
                 return <ProductDetailTabDescription slug={slug}/>;
             case 1: 
-                return <ProductDetailTabRating/>;
+                return <ProductDetailTabRating slug={slug}/>;
             default:
                 return <ProductDetailTabDescription slug={slug}/>;
         }

@@ -6,6 +6,13 @@ import theme from '@/shared/configs/theme';
 import { Button } from '@/shared/components';
 import { VoteStar } from '@/shared/constant/common';
 import { ProductDetailRatingVoteProps } from '@/types/widgets/product';
+import { Product, ProductRatingProps } from '@/features/product/type/productType';
+import { addRating, GetProductBySlug } from '@/features/product/api/productApi';
+import { useAppSelector } from '@/shared/hooks/useAppHook';
+import { toast } from 'react-toastify';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { useRouter } from 'next/navigation';
+import { ProductDetailTabRatingOverview } from './product-detail-tab-rating-over-view';
 
 
 // Hiển thị lượt đánh giá
@@ -78,57 +85,215 @@ const ProductDetailTabRatingVote = ({ number, ratingCount, ratingTotal } : Produ
     );
 };
 // Hiển thị ô đánh giá
-const ProductDetailTabRatingComment = () => {
+const ProductDetailTabRatingComment = ({product, setIsShowTabComment} : {product: Product, setIsShowTabComment: (isShowTabComment: boolean) => void}) => {
     const [isChooseStar, setIsChooseStar] = useState<number | null>(null);
+    const [comment, setComment] = useState('');
+    const {current} = useAppSelector(state => state.user);
+    const router = useRouter();
+    // Đánh giá sản phẩm
+    const handleAddRating = async() => {
+        try{
+            if(!product){
+                toast.error('Không có thông tin về sản phẩm');
+                return;
+            }
+            if(!current){
+              return Swal.fire({
+                 text: 'Vui lòng đăng nhập',
+                 icon: 'info',
+                 cancelButtonText: 'Không phải bây giờ',
+                 showCancelButton: true,
+                 confirmButtonText: 'Chuyển đến trang đăng nhập'
+              }).then((rs: SweetAlertResult) => {
+                 if(rs.isConfirmed) router.push('/login')
+              });
+            }
+            const ratingData = {
+                star: isChooseStar,
+                comment: comment,
+                pid: product._id,
+                uid: current._id
+            }
+            const response = await addRating(ratingData as ProductRatingProps);
+            if(response.success) toast.success(response.message); setIsShowTabComment(false);
+        }catch(error: unknown){
+            const errorMessage = (error as Error).message || 'Xảy ra lỗi không xác định';
+            toast.error(errorMessage);
+        }
+    }
     return (
         <Box
             sx={{
-                px:5,
-                py:3
+                px: { xs: 2, md: 5 },
+                py: 4,
+                maxWidth: '800px',
+                margin: '0 auto',
+                background: '#fafafa',
+                borderRadius: 2,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
             }}
         >
-            <Typography variant='h6' sx={{textAlign: 'center', py: 1}}>Đánh giá</Typography>
-            <TextField
-                fullWidth
-                multiline
-                rows={8}
-                placeholder="Viết bình luận của bạn ở đây..."
-            />
-            <Typography variant='body1' sx={{py:1}}>Bạn cảm thấy sản phẩm như thế nào?</Typography>
-            <Box sx={{display: 'flex', justifyContent: 'space-between', textAlign: 'center', pb:1}}>
+            {/* Header */}
+            <Typography 
+                variant='h5' 
+                sx={{
+                    textAlign: 'center', 
+                    mb: 1,
+                    fontWeight: 600,
+                    color: theme.palette.primary.main
+                }}
+            >
+                Đánh giá sản phẩm
+            </Typography>
+            <Typography 
+                variant='body2' 
+                sx={{
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
+                }}
+            >
+                Bạn cảm thấy sản phẩm như thế nào?
+            </Typography>
+
+            {/* Star Rating */}
+            <Box 
+                sx={{
+                    display: 'flex', 
+                    flexWrap: 'wrap',
+                    gap: 1,
+                    mb: 3,
+                    justifyContent: 'center'
+                }}
+            >
                 {VoteStar.map((el, index) => (
-                    <Box key={index}
-                        onClick = {() => setIsChooseStar(el?.id)}
+                    <Box 
+                        key={index}
+                        onClick={() => setIsChooseStar(el?.id)}
                         sx={{
-                            textAlign: 'center',
-                            background: theme.palette.primary.light,
-                            width: '100%',
-                            mx:1,
-                            p:1,
-                            borderRadius: '10px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            background: isChooseStar !== null && isChooseStar >= el.id 
+                                ? theme.palette.primary.main 
+                                : 'white',
+                            color: isChooseStar !== null && isChooseStar >= el.id 
+                                ? 'white' 
+                                : theme.palette.text.primary,
+                            minWidth: { xs: '60px', sm: '80px' },
+                            flex: { xs: '0 0 calc(20% - 8px)', sm: '1' },
+                            p: 1.5,
+                            borderRadius: 2,
                             cursor: 'pointer',
+                            border: `2px solid ${theme.palette.primary.light}`,
+                            transition: 'all 0.3s ease',
                             '&:hover': {
-                                transform: 'scale(1.02)',
-                                transition: '0.2s',
+                                transform: 'translateY(-2px)',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                borderColor: theme.palette.primary.main,
                             }
                         }}
                     >
-                        <StarBorder sx={{
-                            color: isChooseStar !== null && isChooseStar >= el.id ? theme.palette.warning.main: 'black',
-                        }}/>
-                        <Typography>{el?.text}</Typography>
+                        <StarBorder 
+                            sx={{
+                                fontSize: { xs: '20px', sm: '24px' },
+                                color: isChooseStar !== null && isChooseStar >= el.id 
+                                    ? theme.palette.warning.main 
+                                    : theme.palette.text.primary,
+                                mb: 0.5
+                            }}
+                        />
+                        <Typography 
+                            variant='caption' 
+                            sx={{
+                                fontSize: { xs: '10px', sm: '12px' },
+                                textAlign: 'center',
+                                lineHeight: 1.2,
+                                fontWeight: 500
+                            }}
+                        >
+                            {el?.text}
+                        </Typography>
                     </Box>
                 ))}
             </Box>
-            <Button name='Đánh giá'/>
+            <Typography 
+                variant='body1' 
+                sx={{
+                    mb: 2,
+                    fontWeight: 500,
+                    color: theme.palette.text.primary
+                }}
+            >
+                Chia sẻ trải nghiệm của bạn:
+            </Typography>
+
+            <TextField
+                fullWidth
+                multiline
+                rows={6}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Hãy chia sẻ chi tiết về trải nghiệm của bạn với sản phẩm này..."
+                sx={{
+                    mb: 3,
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        backgroundColor: 'white',
+                        '&:hover fieldset': {
+                            borderColor: theme.palette.primary.main,
+                        },
+                        '&.Mui-focused fieldset': {
+                            borderColor: theme.palette.primary.main,
+                        }
+                    }
+                }}
+            />
+            <Typography 
+                variant='caption' 
+                sx={{
+                    display: 'block',
+                    textAlign: 'right',
+                    color: theme.palette.text.primary,
+                    mb: 2
+                }}
+            >
+                {comment.length}/500 ký tự
+            </Typography>
+            <Box sx={{ textAlign: 'center' }}>
+                <Button name='Gửi đánh giá' handleOnClick={handleAddRating}/>
+            </Box>
+            {/* Helper text */}
+            <Typography 
+                variant='caption' 
+                sx={{
+                    display: 'block',
+                    textAlign: 'center',
+                    color: theme.palette.text.primary,
+                    mt: 2,
+                    fontStyle: 'italic'
+                }}
+            >
+                Đánh giá của bạn sẽ giúp những khách hàng khác có thêm thông tin hữu ích
+            </Typography>
         </Box>
-    )
-}
-export const ProductDetailTabRating = () => {
+    );
+};
+export const ProductDetailTabRating = ({slug}: {slug: string}) => {
     const [isShowTabComment, setIsShowTabComment] = useState(false);
+    const [productSlug, setProductSlug] = useState<Product | null>(null);
     const handleShowTabComment = () => {
         setIsShowTabComment(prev => !prev);
     }
+    // Hiển thị thông tin chi tiết về sản phẩm
+    useEffect(() => {
+        if(!slug) return;
+        const fetchProduct = async() => {
+            const response = await GetProductBySlug(slug);
+            if(response.success) setProductSlug(response.data);
+        }
+        fetchProduct();
+    },[slug])
     return (
         <Box>
             <Box
@@ -180,6 +345,9 @@ export const ProductDetailTabRating = () => {
             <Box sx={{py:3, width: '100%'}}>
                 <Button name='Đánh giá' handleOnClick={handleShowTabComment}/>
             </Box>
+            <Box>
+                <ProductDetailTabRatingOverview product={productSlug as Product}/>
+            </Box>
             {isShowTabComment && (
                 <Fragment>
                     <Dialog
@@ -192,12 +360,13 @@ export const ProductDetailTabRating = () => {
                             width: '40%',
                             height: '50%',
                             maxWidth: '1000px',
-                            position: 'relative'
+                            position: 'relative',
+                            backgroundColor: theme.palette.text.secondary
                         },
                         }}
                     >
                         <Typography onClick={handleShowTabComment} component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-                        <ProductDetailTabRatingComment/>
+                        <ProductDetailTabRatingComment product={productSlug as Product} setIsShowTabComment={setIsShowTabComment}/>
                     </Dialog>
                 </Fragment>
             )}

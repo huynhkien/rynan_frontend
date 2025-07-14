@@ -1,6 +1,8 @@
 'use client';
 import { getAllCategory } from '@/features/category/api/categoryApi';
 import { Category } from '@/features/category/type/categoryType';
+import { getAllInventory } from '@/features/inventory/api/inventoryApi';
+import { InventoryData } from '@/features/inventory/type/inventoryType';
 import { GetProductBySlug } from '@/features/product/api/productApi';
 import { Product } from '@/features/product/type/productType';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
@@ -25,6 +27,7 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
     const [qty, setQty] = useState<number>(1);
     const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [categories, setCategories] = useState<Category[] | []>([]);
+    const [inventories, setInventories] = useState<InventoryData[] | []>([]);
     const fetchSpecification = async() => {
         const response = await getAllSpecification();
         if(response.success) setSpecification(response.data || []);
@@ -34,9 +37,15 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
       const response =await getAllCategory();
       if(response.success) setCategories(response.data || []);
     }
+    // Hiển thị thông tin tồn kho
+    const fetchInventories = async () => {
+      const response = await getAllInventory();
+      if(response.success) setInventories(response.data || []);
+    }
     useEffect(() => {
         fetchSpecification();
         fetchCategories();
+        fetchInventories();
     },[]);
    
     // Xử lý khi phóng to ảnh
@@ -83,6 +92,20 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
 
 
     const handleAddToCart = () => {
+        const existingProductInventory = inventories.find(el => el.productId === productSlug?._id)
+        console.log(existingProductInventory);
+        if(existingProductInventory && Number(existingProductInventory.currentStock) < 50){
+            toast.error('Số lượng sản phẩm hiện quá thấp. Mong quý khách thông cảm vì sự bất tiện này.');
+            return;
+        }
+        if(qty ===  0){
+            toast.error('Vui lòng chọn số lượng phù hợp');
+            return;
+        }
+        if(existingProductInventory && Number(existingProductInventory.currentStock) < qty){
+            toast.error(`Số lượng sản phẩm bạn đặt lớn hơn số lượng sản phẩm trong kho - Kho: ${existingProductInventory.currentStock} sản phẩm. Vui lòng chọn lại số lượng phù hợp`);
+            return;
+        }
         dispatch(addToCart({
             pid: productSlug?._id || '',
             price: productSlug?.price_reference || 0,
@@ -93,6 +116,24 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
         toast.success(`Thêm ${qty} sản phẩm vào giỏ hàng`)
     };
     const handleBuyNow = () => {
+        const existingProductInventory = inventories.find(el => el.productId === productSlug?._id)
+        console.log(existingProductInventory);
+        if(existingProductInventory && Number(existingProductInventory.currentStock) < 50){
+            toast.error('Số lượng sản phẩm hiện quá thấp. Mong quý khách thông cảm vì sự bất tiện này.');
+            return;
+        }
+        if(qty >  200){
+            toast.error('Để đặt số lượng lớn quý khách vui lòng liên hệ về Công ty để trao đổi');
+            return;
+        }
+        if(qty ===  0){
+            toast.error('Vui lòng chọn số lượng phù hợp');
+            return;
+        }
+        if(existingProductInventory && Number(existingProductInventory.currentStock) < qty){
+            toast.error(`Số lượng sản phẩm bạn đặt lớn hơn số lượng sản phẩm trong kho - Kho: ${existingProductInventory.currentStock} sản phẩm. Vui lòng chọn lại số lượng phù hợp`);
+            return;
+        }
         dispatch(addToCart({
             pid: productSlug?._id || '',
             price: productSlug?.price_reference || 0,
@@ -483,7 +524,7 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
                                     fontWeight: theme.typography.fontWeightMedium,
                                     color: theme.palette.text.secondary
                                 }}>
-                                    205 sản phẩm
+                                    {productSlug.sold} sản phẩm
                                 </Typography>
                             </Box>
                         </Box>
@@ -514,7 +555,7 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
                                     fontWeight: theme.typography.fontWeightMedium,
                                     color: theme.palette.text.secondary
                                 }}>
-                                    100 sản phẩm
+                                    {inventories.find(el => el.productId === productSlug._id)?.currentStock} sản phẩm
                                 </Typography>
                             </Box>
                         </Box>

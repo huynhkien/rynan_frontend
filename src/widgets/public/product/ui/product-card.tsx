@@ -13,6 +13,8 @@ import { addToCart } from '@/features/user/store/userSlice';
 import { toast } from 'react-toastify';
 import { Category, } from '@/features/category/type/categoryType';
 import { getAllCategory } from '@/features/category/api/categoryApi';
+import { InventoryData } from '@/features/inventory/type/inventoryType';
+import { getAllInventory } from '@/features/inventory/api/inventoryApi';
 
 
 const ProductCard = ({ data }: { data: Product }) => {
@@ -20,6 +22,7 @@ const ProductCard = ({ data }: { data: Product }) => {
   const theme = useTheme();
   const [hovering, setHovering] = useState(false);
   const [categories, setCategories] = useState<Category[] | []>([]);
+  const [inventories, setInventories] = useState<InventoryData[] | []>([]);
   const dispatch = useAppDispatch();
 
   const handleProduct = () => {
@@ -30,11 +33,22 @@ const ProductCard = ({ data }: { data: Product }) => {
     const response =await getAllCategory();
     if(response.success) setCategories(response.data || []);
   }
+  // Hiển thị thông tin tồn kho
+  const fetchInventories = async () => {
+    const response = await getAllInventory();
+    if(response.success) setInventories(response.data || []);
+  }
   useEffect(() => {
     fetchCategories();
+    fetchInventories();
   },[]);
   // Xử lý thêm sản phẩm vào giỏ hàng
   const handleAddCart = async () => {
+    const existingProductInventory = inventories.find(el => el.productId === data._id)
+    if(existingProductInventory && Number(existingProductInventory.currentStock) < 50){
+      toast.error('Số lượng sản phẩm hiện quá thấp. Mong quý khách thông cảm vì sự bất tiện này.');
+      return;
+    }
     dispatch(addToCart({
       pid: data._id,
       price: data.price_reference,

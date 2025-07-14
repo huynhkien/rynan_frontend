@@ -1598,7 +1598,7 @@ export const ReceiptApprovePendingManagementFormList = () => {
 
     return (
         <Box sx={{ mb: 2,  }}>
-            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.background.paper, display: 'flex' , justifyContent: 'space-between' }}>
+            <Paper sx={{ mt: 2, borderRadius: 0, backgroundColor: theme.palette.secondary.dark, display: 'flex' , justifyContent: 'space-between' }}>
                 <Tabs
                     value={tabIndex}
                     onChange={handleTabChange}

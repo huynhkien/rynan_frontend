@@ -105,24 +105,26 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
     }, 0);
     // Tạo mã đơn
     const handleGenerateCode = useCallback(() => {
-        if (receipts?.length === 0) {
-            setValue('code', 'RYNAN25-RIM01');
-            setLastCodeNumber(1);
-            return;
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = currentYear.toString().slice(-2); 
+        let nextNumber = lastCodeNumber + 1;
+        let newCode = '';
+
+        // Tạo mã mới và kiểm tra trùng lặp
+        while (true) {
+            const paddedNumber = nextNumber.toString().padStart(3, '0');
+            newCode = `RYNANIM${yearSuffix}-${paddedNumber}`;
+
+            // Nếu không bị trùng thì dừng lại
+            const isDuplicate = receipts?.some((el) => el.code === newCode);
+            if (!isDuplicate) break;
+
+            nextNumber += 1; 
         }
-        
-        let newNumber = lastCodeNumber + 1;
-        let newCode = `RYNAN25-RIM0${newNumber}`;
-        
-        while (receipts?.some((el) => el.code === newCode)) {
-            newNumber += 1;
-            newCode = `RYNAN25-RIM0${newNumber}`;
-        }
-        
-        setLastCodeNumber(newNumber);
+
+        setLastCodeNumber(nextNumber);
         setValue('code', newCode);
     }, [receipts, lastCodeNumber, setValue]);
-    // Xử lý tạo đơn hàng
     const handleAddReceiptImport = async(data: ReceiptData) => {
         try{
             const newDataReceipt = {

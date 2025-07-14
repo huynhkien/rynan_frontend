@@ -65,18 +65,20 @@ export const UserManagementFormAddEdit = () => {
 }, [user]); 
     // Tạo mã khách hàng
     const handleGenerateCode = useCallback(() => {
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = currentYear.toString().slice(-2); // Lấy 2 số cuối của năm
         if (user.length === 0) {
-            setValue('code', 'RYNAN1');
+            setValue('code', `RYNAN${yearSuffix}-U1`);
             setLastCodeNumber(1);
             return;
         }
         
         let newNumber = lastCodeNumber + 1;
-        let newCode = `RYNAN${newNumber}`;
+        let newCode = `RYNAN${yearSuffix}-U${newNumber}`;
         
         while (user.some((el) => el.code === newCode)) {
             newNumber += 1;
-            newCode = `RYNAN${newNumber}`;
+            newCode =`RYNAN${yearSuffix}-U${newNumber}`;
         }
         
         setLastCodeNumber(newNumber);

@@ -3,10 +3,10 @@ export interface CheckoutInfoProps {
     name: string;
     phone: string;
     address: {
-        province: string; 
-        ward: string;
-        district: string;
-        addressAdd: string;
+        province?: string; 
+        ward?: string;
+        district?: string;
+        addressAdd?: string;
     },
     note?: string;
     

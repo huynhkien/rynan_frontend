@@ -4,4 +4,5 @@ export interface LoginFormProps {
     phone: string;
     password: string;
     confirmPassword: string;
+    code: string;
 }

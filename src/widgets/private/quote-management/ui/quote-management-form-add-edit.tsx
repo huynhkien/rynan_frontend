@@ -9,7 +9,7 @@ import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelec
 import { useAppDispatch, useAppSelector } from "@/shared/hooks/useAppHook";
 import { Box, Paper, Typography, useTheme, Button} from "@mui/material"
 import { useParams } from "next/navigation";
-import { useEffect, useState} from "react";
+import { useCallback, useEffect, useState} from "react";
 import { useForm} from "react-hook-form";
 import { QuoteManagementFormProductList } from "./quote-management-form-proudct-list";
 import { createQuote, getAllQuote, getQuoteById, updateQuote } from "@/features/quote/api/quoteApi";
@@ -128,15 +128,28 @@ export const QuoteManagementFormAddEdit = () => {
         fetchProductToQuote();
     }, [products, quoteProduct]);
     // Hàm tạo mã số báo giá tự động
-    const generateQuotationCode = (lastNumber: number): string => {
-        let nextNumber = lastNumber + 1;
-        let code = `RSA25${nextNumber.toString().padStart(2, '0')}`;
-        while (quotes?.find((el) => el.quotation === code)) {
-            nextNumber++;
-            code = `RSA25${nextNumber.toString().padStart(2, '0')}`;
-        }
-        return code;
-    };
+    const generateUniqueCode = useCallback(() => {
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = currentYear.toString().slice(-2); // Lấy 2 số cuối của năm
+        // Tìm số thứ tự cao nhất từ các đơn hàng hiện có
+        const currentYearQuotes = quotes?.filter(quote => 
+          quote.quotation && quote.quotation.startsWith(`RYNANQ${yearSuffix}-`)
+        );
+        let maxNumber = 0;
+        currentYearQuotes?.forEach(quote => {
+          const match = (quote?.quotation as string).match(/RYNANQ\d{2}-0*(\d+)$/);
+          if (match) {
+            const number = parseInt(match[1]);
+            if (number > maxNumber) {
+              maxNumber = number;
+            }
+          }
+        });
+        // Tạo mã mới với số thứ tự tiếp theo
+        const nextNumber = maxNumber + 1;
+        const paddedNumber = nextNumber.toString().padStart(3, '0'); // Pad với 4 chữ số
+        return `RYNANQ${yearSuffix}-${paddedNumber}`;
+      }, [quotes]);
     // Kiểm tra mã báo giá đã tồn tại trong hệ thống chưa
     // Tạo phiếu báo giá 
     const handleCreateQuote = async() => {
@@ -160,7 +173,7 @@ export const QuoteManagementFormAddEdit = () => {
             const newQuoteData = {
                 client: selectedUser as string,
                 products: quoteProduct as QuoteProductData[],
-                quotation: generateQuotationCode(0)
+                quotation: generateUniqueCode(),
             }
             const response = await createQuote(newQuoteData);
             if(response.success) {

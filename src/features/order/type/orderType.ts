@@ -17,6 +17,7 @@ export interface OrderData extends Record<string, unknown> {
     paymentDueDate?: string | Date;
     createdAt?: string | Date;
     code: string;
+    orderType?: string;
 }
 export interface OrderRecipientData {
     name: string;
@@ -32,7 +33,7 @@ interface OrderProductData {
     name: string;
     quantity: number;
     price: number;
-    priceType: string;
+    priceType?: string;
     thumb: string;
 
 }

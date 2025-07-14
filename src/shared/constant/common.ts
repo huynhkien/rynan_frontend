@@ -331,6 +331,17 @@ export const SpecificationType = [
         name: 'Chi tiết đóng gói'
     },
 ]
+// Loại đơn hàng
+export const OrderType = [
+    {
+        _id: 'STAFF_CREATED',
+        name: 'Nhân viên tạo mới'
+    },
+    {
+        _id: 'CUSTOMER_ONLINE',
+        name: 'Khách tạo mới'
+    },
+]
 // Trạng thái đơn hàng
 export const OrderStatus = [
     {

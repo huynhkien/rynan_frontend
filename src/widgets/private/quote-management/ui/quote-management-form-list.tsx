@@ -45,10 +45,10 @@ const headProductCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
   { id: 'thumb', label: 'Ảnh', sortable: true },
-  { id: 'offering_price', label: 'Giá chào bán', sortable: true },
-  { id: 'dealer_price', label: 'Giá đại lý', sortable: true },
-  { id: 'store_price', label: 'Giá cửa hàng', sortable: true },
-  { id: 'reference_price', label: 'Giá lẻ tham khảo', sortable: true },
+  { id: 'offering_price', label: 'Giá chào bán', sortable: false },
+  { id: 'dealer_price', label: 'Giá đại lý', sortable: false },
+  { id: 'store_price', label: 'Giá cửa hàng', sortable: false },
+  { id: 'reference_price', label: 'Giá lẻ tham khảo', sortable: false },
 
 ];
 type SortOrder = 'asc' | 'desc';
@@ -617,7 +617,8 @@ return (
                     height: '50%',
                     maxWidth: '1000px',
                     position: 'relative',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.text.secondary
                 },
         }}
       >

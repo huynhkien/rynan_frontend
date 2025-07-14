@@ -22,10 +22,10 @@ import {
   Checkbox,
   Dialog,
 } from '@mui/material';
-import { Add,   Cancel,   Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,   Cancel,   Delete, Edit, ExitToApp, LibraryAddCheck } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
-import {  OrderStatus, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
+import {  OrderStatus, OrderType, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
 import { OrderData } from '@/features/order/type/orderType';
 import { deleteOrder, getAllOrder, getOrderById } from '@/features/order/api/orderApi';
 import moment from 'moment';
@@ -43,6 +43,7 @@ const headCells = [
   { id: 'paymentStatus', label: 'Trạng thái thanh toán', sortable: true },
   { id: 'paymentMethod', label: 'Hình thức thanh toán', sortable: true },
   { id: 'expectedDeliveryDate', label: 'Hạn thanh toán', sortable: true },
+  { id: 'orderType', label: 'Loại đơn hàng', sortable: true },
   { id: 'actions', label: 'Thao tác', sortable: false },
 
 ];
@@ -433,26 +434,47 @@ return (
                           {moment(item.paymentDueDate).format('DD/MM/YYYY')}
                         </Typography>
                       </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                        <Typography variant='body1'>
+                          {OrderType.find(el => el._id === item.orderType)?.name}
+                        </Typography>
+                      </TableCell>
                       <TableCell>
                         {/* Hành động */}
-                            <IconButton 
-                                color='success'
-                                aria-label={`Sửa ${item.name_vn}`}
-                                size='small'
-                                onClick={() => setQuoteId(item._id as string)}
-                            >
-                                <Link href={`/admin/order-management/edit/${item._id}`} style={{color: theme.palette.success.main}}>
-                                  <Edit/>
-                                </Link>
-                            </IconButton>
-                            <IconButton 
-                                onClick={() => handleDelete(item._id as string)} 
-                                color='error'
-                                aria-label={`Xóa ${item.name_vn}`}
-                                size='small'
-                            >
-                                <Delete />
-                            </IconButton>
+                            {item.orderType === 'STAFF_CREATED' &&
+                            <>
+                              <IconButton 
+                                  color='success'
+                                  aria-label={`Sửa ${item.name_vn}`}
+                                  size='small'
+                                  onClick={() => setQuoteId(item._id as string)}
+                              >
+                                  <Link href={`/admin/order-management/edit/${item._id}`} style={{color: theme.palette.success.main}}>
+                                    <Edit/>
+                                  </Link>
+                              </IconButton>
+                              <IconButton 
+                                  onClick={() => handleDelete(item._id as string)} 
+                                  color='error'
+                                  aria-label={`Xóa ${item.name_vn}`}
+                                  size='small'
+                              >
+                                  <Delete />
+                              </IconButton>
+                            </>
+                            }
+                            {
+                              item.orderType === 'CUSTOMER_ONLINE' &&
+                              <IconButton 
+                                  color='success'
+                                  aria-label={`Sửa ${item.name_vn}`}
+                                  size='small'
+                                  onClick={() => setQuoteId(item._id as string)}
+                              >
+                                    <LibraryAddCheck/>
+                              </IconButton>
+                            }
+                            
                       </TableCell>
                     </TableRow>
                   ))

@@ -7,7 +7,7 @@ import { Product } from '@/features/product/type/productType';
 import { getAllUser, getUserById } from '@/features/user/api/userApis';
 import { OrderProductItem, UserData } from '@/features/user/type/userTypes';
 import { ControlledSelect } from '@/shared/components/ui/private/ControlledSelect';
-import {OrderStatus, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
+import {OrderStatus, OrderType, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
 import { Box, Typography, useTheme, Button, Paper, Divider } from '@mui/material'
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -87,21 +87,24 @@ export const OrderManagementFormAddEdit = () => {
 
     // Tạo mã đơn
     const handleGenerateCode = useCallback(() => {
-        if (orders?.length === 0) {
-            setValue('code', 'RYNAN25-01');
-            setLastCodeNumber(1);
-            return;
+        const currentYear = new Date().getFullYear();
+        const yearSuffix = currentYear.toString().slice(-2); 
+        let nextNumber = lastCodeNumber + 1;
+        let newCode = '';
+
+        // Tạo mã mới và kiểm tra trùng lặp
+        while (true) {
+            const paddedNumber = nextNumber.toString().padStart(3, '0');
+            newCode = `RYNAN${yearSuffix}-${paddedNumber}`;
+
+            // Nếu không bị trùng thì dừng lại
+            const isDuplicate = orders?.some((el) => el.code === newCode);
+            if (!isDuplicate) break;
+
+            nextNumber += 1; 
         }
-        
-        let newNumber = lastCodeNumber + 1;
-        let newCode = `RYNAN25-0${newNumber}`;
-        
-        while (orders?.some((el) => el.code === newCode)) {
-            newNumber += 1;
-            newCode = `RYNAN25-0${newNumber}`;
-        }
-        
-        setLastCodeNumber(newNumber);
+
+        setLastCodeNumber(nextNumber);
         setValue('code', newCode);
     }, [orders, lastCodeNumber, setValue]);
 
@@ -132,15 +135,16 @@ export const OrderManagementFormAddEdit = () => {
                 paymentDueDate: OrderData.paymentDueDate,
                 note: OrderData.note,
                 staff: OrderData.staff,
-                expectedDeliveryDate: OrderData.expectedDeliveryDate
+                expectedDeliveryDate: OrderData.expectedDeliveryDate,
+                orderType: 'STAFF_CREATED',
             }
             const response = await createOrder(newOrderData as OrderData);
             if(response.success){
-                // dispatch(removeAllOrderProduct());
-                // toast.success(response.message);
-                // setSelectedUser(null);
-                // setSelectedProduct(null);
-                // reset();
+                dispatch(removeAllOrderProduct());
+                toast.success(response.message);
+                setSelectedUser(null);
+                setSelectedProduct(null);
+                reset();
             }
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
@@ -200,7 +204,8 @@ export const OrderManagementFormAddEdit = () => {
                 paymentDueDate: data.paymentDueDate,
                 note: data.note,
                 staff: data.staff,
-                expectedDeliveryDate: data.expectedDeliveryDate
+                expectedDeliveryDate: data.expectedDeliveryDate,
+                orderType: 'STAFF_CREATED',
             }
             console.log(newOrderData);
             const response = await updateOrder(newOrderData as OrderData, id as string);
@@ -302,6 +307,16 @@ export const OrderManagementFormAddEdit = () => {
                                     defaultValue={OrderStatus.find(el => el._id === 'Processing')?.name}
                                 />
                                 }
+                                <OrderFormInput
+                                    label='Loại đơn hàng'
+                                    important
+                                    disabled
+                                    register={register as UseFormRegister<OrderData>}
+                                    errors={errors as FieldErrors<OrderData>}
+                                    id='orderType'
+                                    validate={{ required: 'Loại đơn hàng không được để trống' }}
+                                    defaultValue={OrderType.find(el => el._id === 'STAFF_CREATED')?.name}
+                                />
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
                                     <ControlledSelect
                                         label='Nhân viên xử lý'

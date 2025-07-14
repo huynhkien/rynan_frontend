@@ -1,4 +1,4 @@
-import { UserInfoManagementEditView } from "@/widgets/private/user-info-management/view/user-info-mangement-edit-view";
+import { UserInfoManagementEditView } from "@/widgets/private/user-info-management/view/user-info-management-edit-view";
 
 const User = () => {
     return (

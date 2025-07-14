@@ -94,7 +94,7 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
     return (
         <Box
             sx={{
-                width: '100%'
+                width: '100%',
             }}
         >
             <Box sx={{

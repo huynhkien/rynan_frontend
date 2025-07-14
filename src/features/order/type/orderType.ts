@@ -66,5 +66,6 @@ export interface OrderProductProps {
     productsData?: Product[];
     oid?: string;
     renderOrder?: () => void;
+    action?: string
 }
 export type OrderFormInputProps = FormInputProps<OrderData>;

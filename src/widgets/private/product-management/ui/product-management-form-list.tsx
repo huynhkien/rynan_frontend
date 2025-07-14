@@ -528,7 +528,8 @@ return (
                     height: '60%',
                     maxWidth: '1000px',
                     position: 'relative',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.text.secondary
                 },
             }}
         >

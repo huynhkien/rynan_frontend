@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { ProductParams, ProductResponse, ProductResponseById } from "../type/productType";
+import { ProductParams, ProductRatingProps, ProductResponse, ProductResponseById } from "../type/productType";
 import { ProductEndpoints } from "./productEndpoints";
 
 
@@ -7,7 +7,6 @@ import { ProductEndpoints } from "./productEndpoints";
 export const createProduct = async (data: FormData): Promise<ProductResponseById> => 
   axiosInstance.post(ProductEndpoints.CREATE, data, {
     withCredentials: true,
-    
 });
 // Cập nhật bai viet
 export const updateProduct = async (data: FormData, id: string): Promise<ProductResponse> => 
@@ -41,6 +40,7 @@ export const updatePriceProduct = async ({updatePrice, id, rid}: {updatePrice: {
   axiosInstance.put(ProductEndpoints.UPDATE_PRICE_PRODUCT(id, rid), { updatePrice }, {
     withCredentials: true,
 });
+// Cập nhật giá tiền
 export const addUpdatePriceProduct = async ({updatePrice, id}: {updatePrice: {
         priceType: string;
         price: number;
@@ -71,4 +71,11 @@ export const GetProductBySlug = async(slug: string): Promise<ProductResponseById
 // Xóa bai viet
 export const deleteProduct = async(id: string): Promise<ProductResponse> => 
     axiosInstance.delete(ProductEndpoints.DELETE(id));
-
+// Thêm đánh giá
+export const addRating = async (data: ProductRatingProps): Promise<ProductResponseById> => 
+  axiosInstance.put(ProductEndpoints.ADD_RATING, data, {
+    withCredentials: true,
+});
+// Xóa đánh giá
+export const deleteRating = async(id: string, rid: string): Promise<ProductResponse> => 
+    axiosInstance.delete(ProductEndpoints.DELETE_RATING(id, rid));

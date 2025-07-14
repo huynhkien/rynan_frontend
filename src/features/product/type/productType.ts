@@ -48,12 +48,16 @@ export interface Product {
     stage: string;
     ratings: ProductRatingsData[];
 }
+interface ProductRatingsLikeData{
+    uid: string;
+}
 interface ProductRatingsData {
+    _id?: string;
     star: number;
     postedBy: string;
-    postedByName: string;
     comment: string;
-    like: string,
+    createdAt: string | Date;
+    like: ProductRatingsLikeData[],
     replies: ProductRatingsRepliesData[];
 }
 interface ProductRatingsRepliesData {
@@ -151,7 +155,7 @@ export type ProductPriceInputProps = FormInputProps<ProductPrice>;
 export type ProductImageInputProps = InputImageProps<ProductData>;
 
 
-// 
+// Mô tả 
 export interface MarkdownEditorProps {
     id?: string;
     value: string;
@@ -160,7 +164,7 @@ export interface MarkdownEditorProps {
  
 }
 
-// 
+// Form add
 export interface ProductManagementFormAddInfoProps{
     category: Category[];
     specification: Specification[];
@@ -176,5 +180,11 @@ export interface ProductManagementFormEditInfoProps{
     preview: string | null;
     setPreview: (preview: string | null) => void;
     handleAddProduct: (data: ProductData) => void;
-
+}
+// Đánh giá sản phẩm
+export interface ProductRatingProps {
+    star: number;
+    comment: string;
+    pid: string;
+    uid: string;
 }

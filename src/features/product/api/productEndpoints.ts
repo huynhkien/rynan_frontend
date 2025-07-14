@@ -1,6 +1,8 @@
 export const ProductEndpoints = {
     CREATE: '/product',
     GET_ALL: '/product',
+    ADD_RATING: '/product/add-rating',
+    DELETE_RATING: (pid: string | number, rid: string | number) =>  `/product/delete-rating/${pid}/${rid}`,
     GET_BY_ID: (id: string | number) => `/product/${id}`,
     UPDATE: (id: string | number) => `/product/${id}`,
     DELETE_PRICE_PRODUCT: (id: string | number, rid: string) => `/product/delete-price/${id}/${rid}`,

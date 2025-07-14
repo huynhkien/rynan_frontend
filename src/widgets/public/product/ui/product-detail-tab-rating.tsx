@@ -1,5 +1,5 @@
 'use client'
-import { useRef, useEffect, useState, Fragment } from 'react';
+import { useRef, useEffect, useState, Fragment, useCallback } from 'react';
 import { Box, Dialog, TextField, Typography, useTheme } from '@mui/material';
 import { Cancel, Star, StarBorder } from '@mui/icons-material';
 import theme from '@/shared/configs/theme';
@@ -85,7 +85,7 @@ const ProductDetailTabRatingVote = ({ number, ratingCount, ratingTotal } : Produ
     );
 };
 // Hiển thị ô đánh giá
-const ProductDetailTabRatingComment = ({product, setIsShowTabComment} : {product: Product, setIsShowTabComment: (isShowTabComment: boolean) => void}) => {
+const ProductDetailTabRatingComment = ({product, setIsShowTabComment, fetchProduct} : {product: Product, setIsShowTabComment: (isShowTabComment: boolean) => void, fetchProduct: () => void}) => {
     const [isChooseStar, setIsChooseStar] = useState<number | null>(null);
     const [comment, setComment] = useState('');
     const {current} = useAppSelector(state => state.user);
@@ -115,7 +115,7 @@ const ProductDetailTabRatingComment = ({product, setIsShowTabComment} : {product
                 uid: current._id
             }
             const response = await addRating(ratingData as ProductRatingProps);
-            if(response.success) toast.success(response.message); setIsShowTabComment(false);
+            if(response.success) toast.success(response.message); setIsShowTabComment(false); fetchProduct();
         }catch(error: unknown){
             const errorMessage = (error as Error).message || 'Xảy ra lỗi không xác định';
             toast.error(errorMessage);
@@ -286,14 +286,14 @@ export const ProductDetailTabRating = ({slug}: {slug: string}) => {
         setIsShowTabComment(prev => !prev);
     }
     // Hiển thị thông tin chi tiết về sản phẩm
-    useEffect(() => {
+    const fetchProduct = useCallback(async() => {
         if(!slug) return;
-        const fetchProduct = async() => {
-            const response = await GetProductBySlug(slug);
-            if(response.success) setProductSlug(response.data);
-        }
-        fetchProduct();
+        const response = await GetProductBySlug(slug);
+        if(response.success) setProductSlug(response.data);
     },[slug])
+    useEffect(() => {
+        fetchProduct();
+    },[fetchProduct])
     return (
         <Box>
             <Box
@@ -366,7 +366,7 @@ export const ProductDetailTabRating = ({slug}: {slug: string}) => {
                         }}
                     >
                         <Typography onClick={handleShowTabComment} component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-                        <ProductDetailTabRatingComment product={productSlug as Product} setIsShowTabComment={setIsShowTabComment}/>
+                        <ProductDetailTabRatingComment product={productSlug as Product} setIsShowTabComment={setIsShowTabComment} fetchProduct={fetchProduct}/>
                     </Dialog>
                 </Fragment>
             )}

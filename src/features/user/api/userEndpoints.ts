@@ -5,6 +5,7 @@ export const UserEndpoints = {
     ADD_ROLE: '/user/add-role',
     FINAL_REGISTER: '/user/final-register',
     GET_ALL: '/user/',
+    UPDATE_INFO: (id: string | number) =>  `/user/update-user/${id}`,
     GET_BY_ID: (id: string | number) => `/user/${id}`,
     GET_CURRENT: '/user/find-user',
     UPDATE: (id: string | number) => `/user/${id}`,

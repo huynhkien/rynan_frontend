@@ -45,6 +45,11 @@ export const updateUserByAdmin = async (id: string, data: FormData): Promise<Reg
   axiosInstance.put(UserEndpoints.UPDATE(id), data, {
     withCredentials: true,
 });
+// Cập nhật thông tin bởi người dùng
+export const updateInfoByUser = async (id: string, data: FormData): Promise<RegisterResponse> => 
+  axiosInstance.put(UserEndpoints.UPDATE_INFO(id), data, {
+    withCredentials: true,
+});
 // Xóa thông tin người dùng
 export const deleteUser = async (id: string): Promise<UserResponse> => 
   axiosInstance.delete(UserEndpoints.DELETE(id));

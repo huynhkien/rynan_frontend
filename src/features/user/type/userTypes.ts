@@ -101,6 +101,7 @@ export interface UsersResponse {
 export interface RegisterResponse {
   success: boolean;
   message: string;
+  data?: UserData;
 }
 export interface LoginResponse {
   success: boolean;

@@ -45,6 +45,10 @@ export const userSlice = createSlice({
     clearMessage: (state) => {
       state.mes = '';
     },
+    // Reset lại thông tin khi cập nhật trạng thái
+    updateUserSuccess: (state, action) => {
+        state.current = action.payload;
+    },
     // Xử lý quản lý trạng thái thêm sản phẩm vào giỏ hàng
     addToCart: (state, action: PayloadAction<CartItem>) => {
       const {pid, quantity, thumb, name, price} = action.payload;
@@ -225,20 +229,30 @@ export const userSlice = createSlice({
         state.current = action.payload as UserData; 
         state.isLogin = true;
       })
-      .addCase(actions.getCurrent.rejected, (state) => {
+      .addCase(actions.getCurrent.rejected, (state, action) => {
         state.isLoading = false;
-        state.current = null;
-        state.isLogin = false;
-        state.token = null;
-        state.mes = 'Phiên đăng nhập đã hết hạn, hãy đăng nhập lại';
+        
+        const error = action.payload as { message: string; status: number };
+        
+        // Chỉ logout khi status là 401 (Unauthorized)
+        if (error?.status === 401) {
+          state.current = null;
+          state.isLogin = false;
+          state.token = null;
+          state.mes = 'Phiên đăng nhập đã hết hạn, hãy đăng nhập lại';
+        } else {
+          // Các lỗi khác không logout
+          state.mes = error?.message || 'Không thể tải thông tin người dùng';
+        }
       });
-  }
+    }
 });
 
 export const { 
   login, 
   logout, 
   clearMessage, 
+  updateUserSuccess,
   addToCart, 
   updateQuantityCart,
   removeItemCart, 

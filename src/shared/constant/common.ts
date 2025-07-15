@@ -464,3 +464,5 @@ export const Role = [
         name: 'Quản trị hệ thống'
     }
 ] 
+// Hiển thị số bình luận
+export const INITIAL_DISPLAY_COUNT = 3;

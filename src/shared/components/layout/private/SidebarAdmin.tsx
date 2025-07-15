@@ -82,8 +82,8 @@ const menuItems: MenuItem[] = [
       { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/inventory-management' },
     ]
    },
-  { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin' },
-  { text: 'Bình luận', icon: <Comment />, path: '/admin' },
+  { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin/contact-management' },
+  { text: 'Bình luận', icon: <Comment />, path: '/admin/rating-management' },
 ];
 
 const bottomItems: MenuItem[] = [

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -15,7 +15,6 @@ import {
   ListItemText,
 } from '@mui/material';
 import {
-  NotificationsOutlined,
   MailOutline,
   Person,
   Settings,
@@ -24,37 +23,41 @@ import {
   Language,
 } from '@mui/icons-material';
 import { HEADER_HEIGHT } from '@/shared/constant/common';
+import { ContactData } from '@/features/contact/type/contactType';
+import { getAllContact } from '@/features/contact/api/contactApi';
+import Link from 'next/link';
+import { useAppSelector } from '@/shared/hooks/useAppHook';
 
 
 
 export const Header = () => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-
- 
+  const [contacts, setContacts] = useState<ContactData[] | []>([]);
+  const {current} = useAppSelector(state => state.user);
   // Xử lý sự kiện
-  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
+  const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleProfileMenuClose = (): void => {
+  const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
-  const renderProfileMenu = (): React.ReactElement => (
+const renderProfileMenu = () => (
     <Menu
       anchorEl={anchorEl}
       open={Boolean(anchorEl)}
       onClose={handleProfileMenuClose}
       PaperProps={{
-        sx: { width: 250, mt: 1.5 }
+        sx: { width: 250, mt: 1.5, backgroundColor: theme.palette.text.secondary },
       }}
     >
       <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
         <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
           Admin User
         </Typography>
-        <Typography variant='body2' color='text.secondary'>
-          admin@company.com
+        <Typography variant='body2' color='text.primary'>
+          {current?.email}
         </Typography>
       </Box>
       <MenuItem onClick={handleProfileMenuClose}>
@@ -92,7 +95,14 @@ export const Header = () => {
       </MenuItem>
     </Menu>
   );
-
+  // Xử lý số lượng tin liên hệ
+  const fetchContacts = async() => {
+    const response = await getAllContact();
+    if(response.success) setContacts(response.data || []);
+  }
+  useEffect(() => {
+    fetchContacts();
+  },[]);
   return (
     <AppBar sx={{
         position: 'fixed',
@@ -105,16 +115,15 @@ export const Header = () => {
     }}>
       <Toolbar sx={{ minHeight: HEADER_HEIGHT, display: 'flex', justifyContent: 'flex-end' }}>
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+          {(current?.role === '2002' || '2004' || '2006') &&
           <IconButton color='inherit'>
-            <Badge badgeContent={4} color='error'>
+            <Link href='/admin/contact-management' style={{color: theme.palette.text.secondary}}>
+            <Badge badgeContent={contacts.filter(el => el.status === 'pending').length || 0} color='error'>
               <MailOutline />
             </Badge>
+            </Link>
           </IconButton>
-          <IconButton color='inherit'>
-            <Badge badgeContent={4} color='error'>
-              <NotificationsOutlined />
-            </Badge>
-          </IconButton>
+          }
           
           <IconButton
             edge='end'

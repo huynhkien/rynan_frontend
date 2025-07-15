@@ -3,7 +3,7 @@ import { ButtonContactProps } from "@/types/components/button"
 import { Button, useTheme } from "@mui/material"
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-export const ButtonContact = ({text}: ButtonContactProps) => {
+export const ButtonContact = ({text, handleOnClick}: ButtonContactProps) => {
     const theme = useTheme();
     return (
       <Button
@@ -46,6 +46,8 @@ export const ButtonContact = ({text}: ButtonContactProps) => {
             right: 0,
           },
         }}
+        type='submit'
+        onClick={handleOnClick}
         >
             {text}
             <ArrowForwardIosIcon

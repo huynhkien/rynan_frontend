@@ -15,6 +15,7 @@ import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { useRouter } from 'next/navigation';
 import { login } from '@/features/user/store/userSlice';
 import { UserData } from '@/features/user/type/userTypes';
+import { showModal } from '@/shared/store/appSlice';
 
 export const LoginForm = () => {
     const theme = useTheme();
@@ -98,8 +99,11 @@ export const LoginForm = () => {
                     });
                 }
             }else{
+
                 const response = await loginUser({email: payload.email, password: payload.password});
+                dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
                 if(response.success) {
+                    dispatch(showModal({ isShowModal: false, modalType: 'loading' }));
                     dispatch(login({ isLogin: true, token: response.accessToken || '', userData: response.data }));
                     if(response.data.role === '2006'){
                         router.push('/admin');

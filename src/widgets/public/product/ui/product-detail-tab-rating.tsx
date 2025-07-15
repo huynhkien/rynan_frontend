@@ -319,9 +319,9 @@ export const ProductDetailTabRating = ({slug}: {slug: string}) => {
                         Khách hàng đánh giá
                     </Typography>
                     <Typography variant='h5' fontWeight='bold'>
-                        4/5
+                        {productSlug?.totalRatings}
                     </Typography>
-                    <Typography variant='body1'>12 lượt đánh giá</Typography>
+                    <Typography variant='body1'>{productSlug?.ratings && productSlug?.ratings.length} lượt đánh giá</Typography>
                 </Box>
                 <Box
                     sx={{
@@ -332,12 +332,12 @@ export const ProductDetailTabRating = ({slug}: {slug: string}) => {
                         px: 5
                     }}
                 >
-                    {Array(5).fill(0).map((el, index) => (
+                    {Array.from({ length: 5 }, (_, index) => (
                         <ProductDetailTabRatingVote
-                            key={index}
+                            key={index + 1}
                             number={index + 1}
-                            ratingTotal={5}
-                            ratingCount={4}
+                            ratingCount={productSlug?.ratings && productSlug?.ratings.filter(el => el.star === index + 1).length || 0}
+                            ratingTotal={productSlug?.ratings && productSlug?.ratings.length || 0}
                         />
                     ))}
                 </Box>
@@ -346,7 +346,7 @@ export const ProductDetailTabRating = ({slug}: {slug: string}) => {
                 <Button name='Đánh giá' handleOnClick={handleShowTabComment}/>
             </Box>
             <Box>
-                <ProductDetailTabRatingOverview product={productSlug as Product}/>
+                <ProductDetailTabRatingOverview product={productSlug as Product} fetchProduct={fetchProduct}/>
             </Box>
             {isShowTabComment && (
                 <Fragment>

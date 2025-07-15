@@ -1,6 +1,7 @@
 'use client'
 import { GetProductBySlug } from "@/features/product/api/productApi";
 import { Product } from "@/features/product/type/productType";
+import theme from "@/shared/configs/theme";
 import { Box } from "@mui/material"
 import DOMPurify from 'dompurify';
 import { useEffect, useState } from "react";
@@ -17,7 +18,7 @@ export const ProductDetailTabDescription = ({slug}: {slug: string}) => {
             fetchProductBySlug();
         },[slug]);
     return (
-        <Box>
+        <Box sx={{backgroundColor: theme.palette.secondary.dark, borderRadius: '10px', px: 2, py:1}}>
             {productSlug?.description ? (
                 <Box
                     dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(productSlug.description) }}

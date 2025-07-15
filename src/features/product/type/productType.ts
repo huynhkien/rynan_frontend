@@ -46,25 +46,27 @@ export interface Product {
     provide_nutrition: string;
     crop: string;
     stage: string;
-    ratings: ProductRatingsData[];
+    ratings?: ProductRatingsData[];
 }
 interface ProductRatingsLikeData{
-    uid: string;
+    uid?: string;
 }
-interface ProductRatingsData {
+export interface ProductRatingsData {
     _id?: string;
-    star: number;
-    postedBy: string;
-    comment: string;
-    createdAt: string | Date;
-    like: ProductRatingsLikeData[],
-    replies: ProductRatingsRepliesData[];
+    name?: string;
+    pid?: string;
+    star?: number;
+    postedBy?: string;
+    comment?: string;
+    createdAt?: string | Date;
+    like?: ProductRatingsLikeData[],
+    replies?: ProductRatingsRepliesData[];
 }
-interface ProductRatingsRepliesData {
-    replier: string,
-    replierName: string;
+export interface ProductRatingsRepliesData {
+    _id?: string;
+    replier: string;
     feedBack: string;
-    createdAt: string | Date;
+    createdAt?: string | Date;
     postedBy: string;
 }
 export interface ProductData extends Record<string, unknown> {
@@ -187,10 +189,4 @@ export interface ProductRatingProps {
     comment: string;
     pid: string;
     uid: string;
-}
-// Phản hồi
-export interface ProductReplyProps {
-    replier: string;
-    feedback: string;
-    postedBy: string;
 }

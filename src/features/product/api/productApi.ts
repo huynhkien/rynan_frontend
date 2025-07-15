@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { ProductParams, ProductRatingProps, ProductReplyProps, ProductResponse, ProductResponseById } from "../type/productType";
+import { ProductParams, ProductRatingProps, ProductRatingsRepliesData, ProductResponse, ProductResponseById } from "../type/productType";
 import { ProductEndpoints } from "./productEndpoints";
 
 
@@ -80,11 +80,14 @@ export const addRating = async (data: ProductRatingProps): Promise<ProductRespon
 export const deleteRating = async(id: string, rid: string): Promise<ProductResponse> => 
     axiosInstance.delete(ProductEndpoints.DELETE_RATING(id, rid));
 // Thêm phản hồi
-export const addReply = async(id: string, rid: string, data: ProductReplyProps): Promise<ProductResponse> => 
-  axiosInstance.put(ProductEndpoints.ADD_REPLY(id, rid), data, {
+export const addReply = async(id: string, rid: string, data: ProductRatingsRepliesData): Promise<ProductResponse> => 
+  axiosInstance.post(ProductEndpoints.ADD_REPLY(id, rid), data, {
     withCredentials: true
 });
-export const addReplyChild = async(id: string, cid: string, data: ProductReplyProps): Promise<ProductResponse> => 
-  axiosInstance.put(ProductEndpoints.ADD_REPLY_CHILD(id, cid), data, {
+export const addReplyChild = async(id: string, cid: string, data: ProductRatingsRepliesData): Promise<ProductResponse> => 
+  axiosInstance.post(ProductEndpoints.ADD_REPLY_CHILD(id, cid), data, {
     withCredentials: true
 });
+// Xóa phản hồi
+export const deleteReply = async(id: string, rid: string, repId: string): Promise<ProductResponse> => 
+    axiosInstance.delete(ProductEndpoints.DELETE_REPLY(id, rid, repId));

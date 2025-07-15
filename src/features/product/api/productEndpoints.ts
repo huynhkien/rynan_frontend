@@ -13,5 +13,6 @@ export const ProductEndpoints = {
     UPDATE_DESCRIPTION: (id: string | number) => `/product/update-description/${id}`,
     ADD_PRICE: (id: string | number) => `/product/add-price/${id}`,
     DELETE: (id: string | number) => `/product/${id}`,
-    GET_BY_SLUG: (slug: string ) => `/product/detail/${slug}`
+    GET_BY_SLUG: (slug: string ) => `/product/detail/${slug}`,
+    DELETE_REPLY: (id: string | number, rid: string | number, repId: string| number ) => `/product/delete-reply/${id}/${rid}/${repId}`
 }

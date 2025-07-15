@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ReduxProvider, ThemeProvider, ToastProvider, } from "@/app/_providers";
+import { ModalProvider, ReduxProvider, ThemeProvider, ToastProvider, } from "@/app/_providers";
 import utmAvo from "@/shared/configs/font";
 
 // import swiper css
@@ -22,7 +22,9 @@ export default function RootLayout({
           <ReduxProvider>
             <ThemeProvider>
               <ToastProvider />
-              {children}
+              <ModalProvider>
+                {children}
+              </ModalProvider>
             </ThemeProvider>
           </ReduxProvider>
           

@@ -43,37 +43,37 @@ export const AdminManagementStatisticalProduct = ({
     { 
       name: '0 - 1 sao', 
       value: filteredProducts.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).reduce((acc, product) => acc + product.ratings.length, 0) || 0,
+      countRating: filteredProducts.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#EF5350' 
     },
     { 
       name: '1 - 2 sao', 
       value: filteredProducts.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).reduce((acc, product) => acc + product.ratings.length, 0) || 0,
+      countRating: filteredProducts.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#FF9800' 
     },
     { 
       name: '2 - 3 sao', 
       value: filteredProducts.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).reduce((acc, product) => acc + product.ratings.length, 0) || 0,
+      countRating: filteredProducts.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#FFC107' 
     },
     { 
       name: '3 - 4 sao', 
       value: filteredProducts.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).reduce((acc, product) => acc + product.ratings.length, 0) || 0,
+      countRating: filteredProducts.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#8BC34A' 
     },
     { 
       name: '4 - 5 sao', 
       value: filteredProducts.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).reduce((acc, product) => acc + product.ratings.length, 0) || 0,
+      countRating: filteredProducts.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#4CAF50' 
     },
   ];
 
   const totalProductCount = filteredProducts.length || 0;
-  const countRating = filteredProducts.reduce((acc, product) => acc + product.ratings.length, 0) || 0;
+  const countRating = filteredProducts.reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0;
   const CustomTooltip = ({ active, payload, label }: CustomProductTooltipProps) => {
     if (active && payload && payload.length) {
       return (

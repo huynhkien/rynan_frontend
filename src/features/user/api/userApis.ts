@@ -25,6 +25,9 @@ export const loginUser = async (data: LoginData): Promise<LoginResponse> =>
   axiosInstance.post(UserEndpoints.LOGIN, data, {
     withCredentials: true,
 });
+// Đăng xuất
+export const logoutUser = async (): Promise<LoginResponse> => 
+  axiosInstance.get(UserEndpoints.LOGOUT, { withCredentials: true });
 // Lấy thông tin người dùng theo id
 export const getUserById = async (id: string): Promise<UserResponse> => 
   axiosInstance.get(UserEndpoints.GET_BY_ID(id));

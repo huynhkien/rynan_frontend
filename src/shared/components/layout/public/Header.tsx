@@ -38,6 +38,8 @@ import { TransitionProps } from '@mui/material/transitions';
 import { useDebounce } from '@/shared/hooks/useDeounce';
 import { useRouter } from 'next/navigation';
 import { slugify } from '@/shared/validation/slug';
+import { logoutUser } from '@/features/user/api/userApis';
+import { toast } from 'react-toastify';
 
 // Tạo Transition component cho slide từ trên xuống
 const Transition = forwardRef<
@@ -76,7 +78,13 @@ export const Header = () => {
     // Xử lý logout
     const handleLogout = async() => {
       if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
-        dispatch(logout());
+        const response = await logoutUser();
+        if(response.success){
+          toast.success(response.message);
+          dispatch(logout());
+        }else{
+          toast.error(response.message);
+        }
       }
     }
     // Xử lý 

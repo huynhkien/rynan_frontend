@@ -1,6 +1,6 @@
 'use client'
 import { Header } from '@/shared/components/layout/private/Header'
-import { SidebarUser } from '@/shared/components/layout/private/SidebarUser'
+import { SidebarUser } from '@/shared/components/layout/private/SidebarUser';
 import React, { useState } from 'react'
 
 const UserLayout = ({ children }: { children: React.ReactNode }) => {

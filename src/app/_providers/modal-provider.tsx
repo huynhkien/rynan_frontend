@@ -1,5 +1,5 @@
 'use client'
-import { Modal, Box, CircularProgress } from "@mui/material";
+import { Modal, Box, CircularProgress, Typography } from "@mui/material";
 import { useAppSelector } from "@/shared/hooks/useAppHook";
 
 export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
@@ -11,11 +11,16 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
         return (
           <Box
             display="flex"
+            flexDirection="column"
             justifyContent="center"
             alignItems="center"
-            height="100vh"
+            gap={2}
+            p={3}
           >
-            <CircularProgress />
+            <CircularProgress size={40} />
+            <Typography variant="body1" color="text.secondary">
+              Đang xử lý...
+            </Typography>
           </Box>
         );
       default:
@@ -27,7 +32,7 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
     <>
       <Modal
         open={isShowModal}
-        onClose={() => {}}
+        onClose={() => {}} 
         aria-labelledby="modal-loading"
         aria-describedby="modal-loading-description"
         disableEscapeKeyDown
@@ -36,20 +41,11 @@ export const ModalProvider = ({ children }: { children: React.ReactNode }) => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          backdropFilter: "blur(2px)",
+          backdropFilter: "blur(4px)",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
         }}
       >
-        <Box
-          sx={{
-            outline: "none",
-            backgroundColor: "white",
-            borderRadius: 2,
-            padding: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
+        <Box>
           {renderModalContent()}
         </Box>
       </Modal>

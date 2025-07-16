@@ -34,6 +34,8 @@ export interface UserData {
   type?: string;
   lastLoginAt: string;
   avatar: UserDataAvatar;
+  wishlist: string[];
+
 }
 export interface UserDataAddress{
   detail: string,

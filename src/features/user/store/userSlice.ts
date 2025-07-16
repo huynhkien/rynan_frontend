@@ -49,6 +49,22 @@ export const userSlice = createSlice({
     updateUserSuccess: (state, action) => {
         state.current = action.payload;
     },
+    // Danh sách yêu thích
+    updateFavorite: (state, action) => {
+      const productId = action.payload;
+      if (state.current) {
+        const wishlist = state.current.wishlist || [];
+        const index = wishlist.findIndex(id => id === productId);
+        
+        if (index === -1) {
+          // Thêm vào wishlist
+          state.current.wishlist = [...wishlist, productId];
+        } else {
+          // Xóa khỏi wishlist
+          state.current.wishlist = wishlist.filter(id => id !== productId);
+        }
+      }
+    },
     // Xử lý quản lý trạng thái thêm sản phẩm vào giỏ hàng
     addToCart: (state, action: PayloadAction<CartItem>) => {
       const {pid, quantity, thumb, name, price} = action.payload;
@@ -270,7 +286,8 @@ export const {
   addProductToReceipt,
   removeAllProductReceipt,
   removeItemProductReceipt,
-  updateProductByPid
+  updateProductByPid,
+  updateFavorite
 } 
   = userSlice.actions;
 export default userSlice.reducer;

@@ -25,6 +25,16 @@ export const loginUser = async (data: LoginData): Promise<LoginResponse> =>
   axiosInstance.post(UserEndpoints.LOGIN, data, {
     withCredentials: true,
 });
+// Quên mật khẩu
+export const forgotPassword = async (email: string): Promise<LoginResponse> => 
+  axiosInstance.post(UserEndpoints.FORGOT_PASSWORD, {email}, {
+    withCredentials: true,
+});
+// Cập nhật mật khẩu
+export const resetPassword = async (password: string, token: string): Promise<LoginResponse> => 
+  axiosInstance.put(UserEndpoints.RESET_PASSWORD, {password, token}, {
+    withCredentials: true,
+});
 // Đăng xuất
 export const logoutUser = async (): Promise<LoginResponse> => 
   axiosInstance.get(UserEndpoints.LOGOUT, { withCredentials: true });
@@ -56,3 +66,8 @@ export const updateInfoByUser = async (id: string, data: FormData): Promise<Regi
 // Xóa thông tin người dùng
 export const deleteUser = async (id: string): Promise<UserResponse> => 
   axiosInstance.delete(UserEndpoints.DELETE(id));
+// thêm sản phẩm vào danh sách yêu thích
+export const addFavorite = async (uid: string, pid: string): Promise<RegisterResponse> => 
+  axiosInstance.post(UserEndpoints.ADD_FAVORITE, {uid, pid}, {
+    withCredentials: true,
+});

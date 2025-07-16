@@ -25,8 +25,11 @@ import {
 import { HEADER_HEIGHT } from '@/shared/constant/common';
 import { ContactData } from '@/features/contact/type/contactType';
 import { getAllContact } from '@/features/contact/api/contactApi';
-import Link from 'next/link';
-import { useAppSelector } from '@/shared/hooks/useAppHook';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { LinkTransition } from '../../ui/public/LinkTransition';
+import { logoutUser } from '@/features/user/api/userApis';
+import { toast } from 'react-toastify';
+import { logout } from '@/features/user/store/userSlice';
 
 
 
@@ -35,10 +38,23 @@ export const Header = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contacts, setContacts] = useState<ContactData[] | []>([]);
   const {current} = useAppSelector(state => state.user);
+  const dispatch = useAppDispatch();
   // Xử lý sự kiện
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+  // Xử lý logout
+      const handleLogout = async() => {
+        if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
+          const response = await logoutUser();
+          if(response.success){
+            toast.success(response.message);
+            dispatch(logout());
+          }else{
+            toast.error(response.message);
+          }
+        }
+      }
 
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
@@ -87,7 +103,7 @@ const renderProfileMenu = () => (
         <ListItemText>Ngôn ngữ</ListItemText>
       </MenuItem>
       <Divider />
-      <MenuItem onClick={handleProfileMenuClose}>
+      <MenuItem onClick={handleLogout}>
         <ListItemIcon>
           <ExitToApp fontSize='small' />
         </ListItemIcon>
@@ -117,11 +133,11 @@ const renderProfileMenu = () => (
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
           {(current?.role === '2002' || '2004' || '2006') &&
           <IconButton color='inherit'>
-            <Link href='/admin/contact-management' style={{color: theme.palette.text.secondary}}>
+            <LinkTransition href='/admin/contact-management' style={{color: theme.palette.text.secondary}}>
             <Badge badgeContent={contacts.filter(el => el.status === 'pending').length || 0} color='error'>
               <MailOutline />
             </Badge>
-            </Link>
+            </LinkTransition>
           </IconButton>
           }
           

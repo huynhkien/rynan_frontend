@@ -2,15 +2,21 @@
 import React, { useState } from 'react';
 import { Drawer, List, ListItem, ListItemIcon, ListItemText, Avatar, Typography, Box, Badge, Divider, useTheme, IconButton, Tooltip, Collapse} from '@mui/material';
 import { Dashboard,  Help, ExitToApp, ChevronLeft, ChevronRight, Person, Category, Store, RequestQuote, CheckOutlined, Warehouse, Comment, ContactEmergency, ExpandLess, ExpandMore,  Inventory, ManageAccounts, Inventory2,  Label, House, AddHomeWork, AddHome, AssignmentTurnedIn, PendingActions, AutoDelete, AdminPanelSettings } from '@mui/icons-material';
-import Link from 'next/link';
 import { COLLAPSED_WIDTH, SIDEBAR_WIDTH } from '@/shared/constant/common';
+import { LinkTransition } from '../../ui/public/LinkTransition';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { logoutUser } from '@/features/user/api/userApis';
+import { toast } from 'react-toastify';
+import { logout } from '@/features/user/store/userSlice';
+import { showModal } from '@/shared/store/appSlice';
+import { useRouter } from 'next/navigation';
 
 // Types
 interface SubMenuItem {
   text: string;
   icon: React.ReactElement;
   path: string;
-  subItems?: SubMenuItem[]; // Cho phép lồng thêm subitem
+  subItems?: SubMenuItem[]; 
 }
 
 interface MenuItem {
@@ -19,6 +25,7 @@ interface MenuItem {
   path: string;
   badge?: number;
   subItems?: SubMenuItem[];
+  onClick?: () => void;
 }
 
 interface SidebarProps {
@@ -26,74 +33,97 @@ interface SidebarProps {
   setIsCollapsed: (isCollapsed: boolean) => void
 }
 
-const menuItems: MenuItem[] = [
-  { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
-  { text: 'Danh mục', icon: <Category />, path: '/admin/category-management' },
-  { 
-    text: 'Sản phẩm', 
-    icon: <Store />, 
-    path: '/',
-    subItems: [
-      { text: 'Quy cách đóng gói', icon: <Inventory />, path: '/admin/product-management/specification' },
-      { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
-    ]
-  },
-  { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', 
-    subItems: [
-      {text: 'Thông tin người dùng', icon: <Person />, path: '/admin/user-management'},
-      { text: 'Phân quyền', icon: <AdminPanelSettings/>, path: '/admin/decentralize-management' },
-    ]
-  },
-  { text: 'Báo giá', icon: <RequestQuote />, path: '/admin',
-    subItems: [
-      { text: 'Khách hàng tiềm năng', icon: <Person/>, path: '/admin/quote-management/potential_customer' },
-      { text: 'Báo giá', icon: <RequestQuote/>, path: '/admin/quote-management' },
-    ]
-  },
-  { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin/order-management' },
-  { text: 'Kho hàng', icon: <Warehouse />, path: '/admin',
-    subItems: [
-      { text: 'Nguyên liệu', icon: <Label/>, path: '/admin/material-management' },
-      { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/supplier-management' },
-      { text: 'Nhập kho', icon: <AddHome/>, path: '/admin/receipt-management/import' },
-      { text: 'Xuất kho', icon: <AddHomeWork/>, path: '/admin/receipt-management/export' },
-      { 
-        text: 'Kiểm duyệt', 
-        icon: <AssignmentTurnedIn/>, 
-        path: '/admin/receipt-management/approve',
-        subItems: [
-          { 
-            text: 'Chưa duyệt', 
-            icon: <PendingActions/>, 
-            path: '/admin/receipt-management/approve/pending',
-          },
-          { 
-            text: 'Đã duyệt', 
-            icon: <CheckOutlined/>, 
-            path: '/admin/receipt-management/approve/confirm',
-          },
-          { 
-            text: 'Đã hủy', 
-            icon: <AutoDelete/>, 
-            path: '/admin/receipt-management/approve/cancel',
-          },
-        ]
-      },
-      { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/inventory-management' },
-    ]
-   },
-  { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin/contact-management' },
-  { text: 'Bình luận', icon: <Comment />, path: '/admin/rating-management' },
-];
-
-const bottomItems: MenuItem[] = [
-  { text: 'Trợ giúp', icon: <Help />, path: '/help' },
-  { text: 'Đăng xuất', icon: <ExitToApp />, path: '/logout' },
-];
-
 export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
   const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const [openSubMenus, setOpenSubMenus] = useState<{[key: string]: boolean}>({});
+  
+  // Xử lý logout
+  const handleLogout = async() => {
+    if(confirm('Bạn chắc có muốn đăng xuất khỏi hệ thống?')){
+      try {
+        dispatch(showModal({isShowModal: true, modalType: 'loading'}));
+        const response = await logoutUser();
+        if(response.success){
+          toast.success(response.message);
+          dispatch(logout());
+          router.push('/');
+          dispatch(showModal({isShowModal: false, modalType: null}))
+        } else {
+          toast.error(response.message);
+        }
+      } catch (error) {
+        toast.error('Có lỗi xảy ra khi đăng xuất');
+        console.error('Logout error:', error);
+      }
+    }
+  }
+
+  const menuItems: MenuItem[] = [
+    { text: 'Dashboard', icon: <Dashboard />, path: '/admin' },
+    { text: 'Danh mục', icon: <Category />, path: '/admin/category-management' },
+    { 
+      text: 'Sản phẩm', 
+      icon: <Store />, 
+      path: '/',
+      subItems: [
+        { text: 'Quy cách đóng gói', icon: <Inventory />, path: '/admin/product-management/specification' },
+        { text: 'Quản lý sản phẩm', icon: <ManageAccounts />, path: '/admin/product-management' },
+      ]
+    },
+    { text: 'Người dùng', icon: <Person />, path: '/admin/user-management', 
+      subItems: [
+        {text: 'Thông tin người dùng', icon: <Person />, path: '/admin/user-management'},
+        { text: 'Phân quyền', icon: <AdminPanelSettings/>, path: '/admin/decentralize-management' },
+      ]
+    },
+    { text: 'Báo giá', icon: <RequestQuote />, path: '/admin',
+      subItems: [
+        { text: 'Khách hàng tiềm năng', icon: <Person/>, path: '/admin/quote-management/potential_customer' },
+        { text: 'Báo giá', icon: <RequestQuote/>, path: '/admin/quote-management' },
+      ]
+    },
+    { text: 'Đơn hàng', icon: <CheckOutlined />, path: '/admin/order-management' },
+    { text: 'Kho hàng', icon: <Warehouse />, path: '/admin',
+      subItems: [
+        { text: 'Nguyên liệu', icon: <Label/>, path: '/admin/material-management' },
+        { text: 'Nhà cung cấp', icon: <House/>, path: '/admin/supplier-management' },
+        { text: 'Nhập kho', icon: <AddHome/>, path: '/admin/receipt-management/import' },
+        { text: 'Xuất kho', icon: <AddHomeWork/>, path: '/admin/receipt-management/export' },
+        { 
+          text: 'Kiểm duyệt', 
+          icon: <AssignmentTurnedIn/>, 
+          path: '/admin/receipt-management/approve',
+          subItems: [
+            { 
+              text: 'Chưa duyệt', 
+              icon: <PendingActions/>, 
+              path: '/admin/receipt-management/approve/pending',
+            },
+            { 
+              text: 'Đã duyệt', 
+              icon: <CheckOutlined/>, 
+              path: '/admin/receipt-management/approve/confirm',
+            },
+            { 
+              text: 'Đã hủy', 
+              icon: <AutoDelete/>, 
+              path: '/admin/receipt-management/approve/cancel',
+            },
+          ]
+        },
+        { text: 'Tồn kho', icon: <Inventory2/>, path: '/admin/inventory-management' },
+      ]
+     },
+    { text: 'Liên hệ', icon: <ContactEmergency />, path: '/admin/contact-management' },
+    { text: 'Bình luận', icon: <Comment />, path: '/admin/rating-management' },
+  ];
+
+  const bottomItems: MenuItem[] = [
+    { text: 'Trợ giúp', icon: <Help />, path: '/help' },
+    { text: 'Đăng xuất', icon: <ExitToApp />, path: '#', onClick: handleLogout },
+  ];
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -185,7 +215,6 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
     </Box>
   );
 
-  // Recursive function để render subitem có thể lồng nhiều cấp
   const renderSubMenuItem = (
     subItem: SubMenuItem, 
     itemKey: string, 
@@ -245,7 +274,7 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
             {isSubMenuOpen ? <ExpandLess /> : <ExpandMore />}
           </Box>
         ) : (
-          <Link 
+          <LinkTransition 
             href={subItem.path} 
             style={{ 
               display: 'flex', 
@@ -272,7 +301,7 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
                 }}
               />
             )}
-          </Link>
+          </LinkTransition>
         )}
       </ListItem>
     );
@@ -308,6 +337,13 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
     const isSubMenuOpen = openSubMenus[item.text];
 
     const handleClick = (e: React.MouseEvent) => {
+      // Xử lý onClick nếu có
+      if (item.onClick) {
+        e.preventDefault();
+        item.onClick();
+        return;
+      }
+
       if (hasSubItems && !isCollapsed) {
         e.preventDefault();
         toggleSubMenu(item.text);
@@ -324,18 +360,18 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
           mx: 1,
           justifyContent: isCollapsed ? 'center' : 'flex-start',
           px: isCollapsed ? 1 : 2,
-          cursor: hasSubItems && !isCollapsed ? 'pointer' : 'default',
+          cursor: (hasSubItems && !isCollapsed) || item.onClick ? 'pointer' : 'default',
           '&:hover': {
             bgcolor: 'rgba(255,255,255,0.1)',
           },
         }}
       >
-        {hasSubItems && !isCollapsed ? (
+        {(hasSubItems && !isCollapsed) || item.onClick ? (
           <Box sx={{ 
             display: 'flex', 
             alignItems: 'center', 
             width: '100%',
-            justifyContent: 'space-between'
+            justifyContent: hasSubItems && !isCollapsed ? 'space-between' : 'flex-start'
           }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <ListItemIcon sx={{ 
@@ -351,17 +387,21 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
                   item.icon
                 )}
               </ListItemIcon>
-              <ListItemText 
-                primary={item.text} 
-                primaryTypographyProps={{
-                  fontWeight: 500
-                }}
-              />
+              {!isCollapsed && (
+                <ListItemText 
+                  primary={item.text} 
+                  primaryTypographyProps={{
+                    fontWeight: 500
+                  }}
+                />
+              )}
             </Box>
-            {isSubMenuOpen ? <ExpandLess /> : <ExpandMore />}
+            {hasSubItems && !isCollapsed && (
+              isSubMenuOpen ? <ExpandLess /> : <ExpandMore />
+            )}
           </Box>
         ) : (
-          <Link 
+          <LinkTransition 
             href={item.path} 
             style={{ 
               display: 'flex', 
@@ -393,7 +433,7 @@ export const SidebarAdmin = ({isCollapsed, setIsCollapsed}: SidebarProps) => {
                 }}
               />
             )}
-          </Link>
+          </LinkTransition>
         )}
       </ListItem>
     );

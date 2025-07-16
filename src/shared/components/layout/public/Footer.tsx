@@ -23,8 +23,6 @@ import Image from 'next/image';
 
 export const Footer: React.FC = () => {
     const theme = useTheme();
-
-
     const quickLinks = [
         'Trang chủ',
         'Liên hệ',

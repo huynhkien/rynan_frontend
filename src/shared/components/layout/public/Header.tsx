@@ -29,7 +29,6 @@ import {
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useState, forwardRef, Ref } from 'react';
 import { CartDrawerView } from '@/widgets/public/cart/view/cart-drawer-view';
 import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
@@ -40,6 +39,7 @@ import { useRouter } from 'next/navigation';
 import { slugify } from '@/shared/validation/slug';
 import { logoutUser } from '@/features/user/api/userApis';
 import { toast } from 'react-toastify';
+import { LinkTransition } from '../../ui/public/LinkTransition';
 
 // Tạo Transition component cho slide từ trên xuống
 const Transition = forwardRef<
@@ -190,10 +190,10 @@ return (
 
             {/* Thanh menu */}
             <Box sx={{ flexGrow: 1, display: {xs: 'none', md: 'flex'}, alignItems: 'center', justifyContent: 'center', gap: 3, color: theme.palette.primary.main }}>
-              <Link href='/' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Trang Chủ</Link>
-              <Link href='/products' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Sản Phẩm</Link>
-              <Link href='/about' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Giới Thiệu</Link>
-              <Link href='/contact' style={{textDecoration: 'none', color: theme.palette.primary.main}}>Liên Hệ</Link>
+              <LinkTransition href='/' style={{textDecoration: 'none', color: theme.palette.primary.main}} name='Trang chủ'/>
+              <LinkTransition href='/products' style={{textDecoration: 'none', color: theme.palette.primary.main}} name='Sản phẩm'/>
+              <LinkTransition href='/about' style={{textDecoration: 'none', color: theme.palette.primary.main}} name='Giới thiệu'/>
+              <LinkTransition href='/contact' style={{textDecoration: 'none', color: theme.palette.primary.main}} name='Liên hệ'/>
             </Box>
 
             {/* Thanh icon */}
@@ -241,14 +241,9 @@ return (
                   }
                 }}
               >
-                  <Link href='/login'
-                    style={{
-                      textDecoration: 'none',
-                      color: theme.palette.text.secondary,
-                    }}
-                  >
+                  <LinkTransition href='/login' style={{textDecoration: 'none', color: theme.palette.text.secondary,}}>
                     <Person sx={{fontSize: 'body2.fontSize'}}/>
-                  </Link>  
+                  </LinkTransition>
               </IconButton>
               
               }
@@ -266,7 +261,7 @@ return (
                     }
                   }}
                 >
-                  <Link href='/user'
+                  <LinkTransition href='/user'
                     style={{
                       textDecoration: 'none',
                       color: theme.palette.text.secondary,
@@ -275,7 +270,7 @@ return (
                     }}
                   >
                     <Home sx={{fontSize: 'body2.fontSize'}}/>
-                  </Link>
+                  </LinkTransition>
                 </IconButton>
                 <IconButton
                   onClick={handleLogout}

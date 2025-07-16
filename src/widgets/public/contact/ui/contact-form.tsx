@@ -3,12 +3,15 @@ import { createContact } from "@/features/contact/api/contactApi";
 import ContactFormInput from "@/features/contact/components/ContactFormInput";
 import { ContactData } from "@/features/contact/type/contactType";
 import { ButtonContact } from "@/shared/components";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 
 export const ContactForm = () => {
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const { register, formState: { errors }, handleSubmit, reset} = useForm<ContactData>();
     const handleAddContact = async(data: ContactData) => {
         const contactData = {
@@ -18,11 +21,14 @@ export const ContactForm = () => {
             phone: data.phone,
             message: data.message
         }
+        dispatch(showModal({isShowModal:true, modalType: 'loading'}))
         const response = await createContact(contactData);
         if(response.success){
+            dispatch(showModal({isShowModal: false, modalType: null}))
             toast.success(response.message);
             reset();
         }else{
+            dispatch(showModal({isShowModal: false, modalType: null}))
             toast.error(response.message);
         }
     }

@@ -1,20 +1,22 @@
 'use client'
 import { Card, CardContent, Typography, Box, IconButton, Chip, useTheme } from '@mui/material';
-import {  useEffect, useState } from 'react';
+import {  useCallback, useEffect, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Product} from '@/features/product/type/productType';
-import Link from 'next/link';
-import { useAppDispatch} from '@/shared/hooks/useAppHook';
-import { addToCart } from '@/features/user/store/userSlice';
+import { useAppDispatch, useAppSelector} from '@/shared/hooks/useAppHook';
+import { addToCart, updateFavorite } from '@/features/user/store/userSlice';
 import { toast } from 'react-toastify';
 import { Category, } from '@/features/category/type/categoryType';
 import { getAllCategory } from '@/features/category/api/categoryApi';
 import { InventoryData } from '@/features/inventory/type/inventoryType';
 import { getAllInventory } from '@/features/inventory/api/inventoryApi';
+import { LinkTransition } from '@/shared/components/ui/public/LinkTransition';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { addFavorite } from '@/features/user/api/userApis';
 
 
 const ProductCard = ({ data }: { data: Product }) => {
@@ -23,25 +25,29 @@ const ProductCard = ({ data }: { data: Product }) => {
   const [hovering, setHovering] = useState(false);
   const [categories, setCategories] = useState<Category[] | []>([]);
   const [inventories, setInventories] = useState<InventoryData[] | []>([]);
+  const {current} = useAppSelector(state => state.user);
   const dispatch = useAppDispatch();
+  console.log(current);
 
   const handleProduct = () => {
     router.push(`/products/${data.slug}`)
   }
   // Hiển thị thông tin danh mục
-  const fetchCategories = async() => {
-    const response =await getAllCategory();
+   const fetchCategories = useCallback(async() => {
+    const response = await getAllCategory();
     if(response.success) setCategories(response.data || []);
-  }
-  // Hiển thị thông tin tồn kho
-  const fetchInventories = async () => {
+  }, []);
+  const fetchInventories = useCallback(async () => {
     const response = await getAllInventory();
     if(response.success) setInventories(response.data || []);
-  }
+  }, []);
+  const refreshData = useCallback(async () => {
+    await Promise.all([fetchCategories(), fetchInventories()]);
+  }, [fetchCategories, fetchInventories]);
+
   useEffect(() => {
-    fetchCategories();
-    fetchInventories();
-  },[]);
+    refreshData();
+  }, [refreshData]);
   // Xử lý thêm sản phẩm vào giỏ hàng
   const handleAddCart = async () => {
     const existingProductInventory = inventories.find(el => el.productId === data._id)
@@ -57,6 +63,28 @@ const ProductCard = ({ data }: { data: Product }) => {
       name: data.name_vn
     }))
     toast.success('Thêm thành công sản phẩm vào giỏ hàng');
+  }
+  // Xử lý thêm sản phẩm vào danh sách yêu thích
+  const handleAddFavorite = async() => {
+    if(!current){
+      Swal.fire({
+        text: 'Vui lòng đăng nhập',
+        icon: 'info',
+        cancelButtonText: 'Không phải bây giờ',
+        showCancelButton: true,
+        confirmButtonText: 'Chuyển đến trang đăng nhập'
+      }).then((rs: SweetAlertResult) => {
+        if(rs.isConfirmed) router.push('/login')
+      });
+    } else{
+      const response = await addFavorite(current._id, data._id);
+      if(response.success){
+        toast.success(response.message);
+        dispatch(updateFavorite(data._id));
+      }else{
+        toast.error(response.message)
+      }
+    }
   }
   return (
     <Card
@@ -125,10 +153,11 @@ const ProductCard = ({ data }: { data: Product }) => {
               },
               transition: 'all 0.2s ease'
             }}
+            onClick={handleAddFavorite}
           >
-            <FavoriteIcon sx={{ color: theme.palette.primary.light, fontSize: theme.typography.fontSize }} />
+            <FavoriteIcon sx={{ color: current?.wishlist?.find(el => el === data._id) ? theme.palette.error.main: theme.palette.primary.light, fontSize: theme.typography.fontSize }} />
           </IconButton>
-          <Link href={`/products/${data.slug}`}>
+          <LinkTransition href={`/products/${data.slug}`}>
             <IconButton 
               sx={{ 
                 boxShadow: 5,
@@ -143,7 +172,7 @@ const ProductCard = ({ data }: { data: Product }) => {
             
                   <VisibilityIcon sx={{ color: theme.palette.primary.light,  fontSize: theme.typography.fontSize }} />
             </IconButton>
-          </Link>
+          </LinkTransition>
 
           <IconButton 
             onClick={handleAddCart}

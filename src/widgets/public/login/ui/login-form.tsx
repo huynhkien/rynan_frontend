@@ -6,7 +6,6 @@ import { Box, Container, Typography, useTheme, Divider} from '@mui/material'
 import { useCallback, useEffect, useState } from 'react';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
 import {  Button } from '@/shared/components';
-import Link from 'next/link';
 import Swal from 'sweetalert2';
 import { BaseInput } from '@/shared/components/ui/public/BaseInput';
 import { validateFormLoginAndRegister } from '@/shared/validation/form';
@@ -16,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { login } from '@/features/user/store/userSlice';
 import { UserData } from '@/features/user/type/userTypes';
 import { showModal } from '@/shared/store/appSlice';
+import { LinkTransition } from '@/shared/components/ui/public/LinkTransition';
 
 export const LoginForm = () => {
     const theme = useTheme();
@@ -34,12 +34,10 @@ export const LoginForm = () => {
     const generateUniqueCode = useCallback(() => {
         const currentYear = new Date().getFullYear();
         const yearSuffix = currentYear.toString().slice(-2); // Lấy 2 số cuối của năm
-        
         // Tìm số thứ tự cao nhất từ các đơn hàng hiện có
         const currentYearUsers = users.filter(user => 
         user.code && user.code.startsWith(`RYNAN${yearSuffix}-U`)
         );
-        
         let maxNumber = 0;
         currentYearUsers.forEach(user => {
         const match = (user.code as string).match(/RYNAN\d{2}-0*(\d+)$/);
@@ -55,13 +53,19 @@ export const LoginForm = () => {
         const paddedNumber = nextNumber.toString().padStart(3, '0'); 
         return `RYNAN${yearSuffix}-U${paddedNumber}`;
     }, [users]);
+    useEffect(() => {
+        if (users.length > 0) {
+            const newCode = generateUniqueCode();
+            setPayload(prev => ({ ...prev, code: newCode }));
+        }
+    }, [users, generateUniqueCode]);
     const [payload, setPayload] = useState<LoginFormProps>({
         email: '',
         name: '',
         phone: '',
         password: '',
         confirmPassword: '',
-        code: generateUniqueCode(),
+        code: '',
     });
     const resetPayload = () => {
         setPayload({
@@ -87,28 +91,30 @@ export const LoginForm = () => {
                     });
                     return;
                 }
+                dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
                 const response = await registerUser(payload);
                 if(response.success) {
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     Swal.fire('Chúc mừng', response.message, 'success').then(() => {
                         setIsRegister(false);
                         resetPayload();
                     });
                 }else{
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     Swal.fire('Thất bại', response.message, 'error').then(() => {
                         resetPayload();
                     });
                 }
             }else{
-
-                const response = await loginUser({email: payload.email, password: payload.password});
                 dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+                const response = await loginUser({email: payload.email, password: payload.password});
                 if(response.success) {
-                    dispatch(showModal({ isShowModal: false, modalType: 'loading' }));
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     dispatch(login({ isLogin: true, token: response.accessToken || '', userData: response.data }));
-                    if(response.data.role === '2006'){
+                    if(['2002', '2004', '2006'].includes(response.data.role as string)){
                         router.push('/admin');
                     }else{
-                        router.push('/login')
+                        router.push('/')
                     }
                     resetPayload();
                 }
@@ -116,7 +122,8 @@ export const LoginForm = () => {
         }catch(error: unknown){
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             Swal.fire('Thất bại', errorMessage, 'error');
-            // resetPayload();
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            resetPayload();
         }
         setTimeout(() => setInValidFields([]), 3000);
     }, [isRegister, payload, router, dispatch]);
@@ -258,14 +265,14 @@ export const LoginForm = () => {
                     >
                         {isRegister ? 'Đăng nhập' : 'Đăng ký ngay'}
                     </Typography>
-                    <Link href='/'
+                    <LinkTransition href='/forgot-password'
                         style={{
                             textDecoration: 'none',
                             color: theme.palette.text.primary
                         }}
                     >
                         Quên mật khẩu?
-                    </Link>
+                    </LinkTransition>
                 </Box>
             </Box>
         </Container>

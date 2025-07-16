@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/configs/axios";
 import { OrderEndpoints } from "./orderEndpoints";
-import { OrderData, OrderResponse, OrdersResponse } from "../type/orderType";
+import { OrderData, OrderResponse, OrdersResponse, OrderStatusData } from "../type/orderType";
 import { OrderProductItem } from "@/features/user/type/userTypes";
 
 // Thêm đơn hàng
@@ -12,6 +12,15 @@ export const createOrder = async (data: OrderData): Promise<OrderResponse> =>
 // Cập nhật đơn hàng
 export const updateOrder = async (data: OrderData, id: string): Promise<OrderResponse> => 
   axiosInstance.put(OrderEndpoints.UPDATE(id), data, {
+    withCredentials: true,
+});
+// Cập nhật đơn hàng
+export const updateStatusOrderByAdmin = async (data: OrderStatusData, id: string): Promise<OrderResponse> => 
+  axiosInstance.put(OrderEndpoints.UPDATE_STATUS_ORDER_BY_ADMIN(id), data, {
+    withCredentials: true,
+});
+export const updateStatusOrderByUser = async (status: string, id: string): Promise<OrderResponse> => 
+  axiosInstance.put(OrderEndpoints.UPDATE_STATUS_ORDER_BY_USER(id),{status}, {
     withCredentials: true,
 });
 // Cập nhật sản phẩm trong đơn hàng

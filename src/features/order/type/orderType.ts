@@ -2,6 +2,8 @@ import { Product } from "@/features/product/type/productType";
 import { OrderProductItem } from "@/features/user/type/userTypes";
 import { FormInputProps } from "@/types/components/input";
 
+
+
 export interface OrderData extends Record<string, unknown> {
     _id?: string;
     status: string;
@@ -27,6 +29,11 @@ export interface OrderRecipientData {
 export interface OrderLocationData {
     lat: number;
     lng: number;
+}
+export interface OrderStatusData extends Record<string, unknown> {
+    staff: string;
+    status: string;
+    location:OrderLocationData,
 }
 interface OrderProductData {
     pid?: string;
@@ -69,3 +76,4 @@ export interface OrderProductProps {
     action?: string
 }
 export type OrderFormInputProps = FormInputProps<OrderData>;
+export type OrderStatusFormInputProps = FormInputProps<OrderStatusData>;

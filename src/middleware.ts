@@ -11,10 +11,17 @@ export async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(
       token,
       new TextEncoder().encode(process.env.JWT_SECRET!)
-    )
+    );
+    const pathName = request.nextUrl.pathname;
 
-    if (!['2002', '2004', '2006'].includes(payload.role as string)) {
+    if(pathName.startsWith('/admin')) {
+      if (!['2002', '2004', '2006'].includes(payload.role as string)) {
+        return NextResponse.redirect(new URL('/', request.url))
+      }
+    }else if(pathName.startsWith('/user')){
+      if (!['2000', '2002', '2004', '2006'].includes(payload.role as string)) {
       return NextResponse.redirect(new URL('/', request.url))
+    }
     }
 
     return NextResponse.next()
@@ -25,5 +32,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/admin/:path*'
+  matcher:[
+     '/admin/:path*',
+      '/user/:path*'
+  ]
 }

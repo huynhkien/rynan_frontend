@@ -14,12 +14,15 @@ import {  getReceiptById } from "@/features/receipt/api/receiptApi";
 import { ReceiptImportManagementFormListProductItem } from "../../../receipt-import-management/ui/receipt-import-management-form-list-product-item";
 import { toast } from "react-toastify";
 import { createInventory, removeInventory } from "@/features/inventory/api/inventoryApi";
+import { showModal } from "@/shared/store/appSlice";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
 
 export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specifications, fetchAllReceipt}: ReceiptApprovePendingManagementFormAddEditProps) => {
     const theme = useTheme();
     const { register,  formState: { errors }, control, handleSubmit, reset } = useForm<InventoryData>();
     const [receipt, setReceipt] = useState<ReceiptData>();
     const [selectStatus, setSelectStatus] = useState<string | null>(null);
+    const dispatch = useAppDispatch();
     // Hiển thị thông tin phiếu
     useEffect(() => {
         if(!rid) return;
@@ -88,9 +91,10 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     toast.error("Không có nguyên liệu hoặc sản phẩm để duyệt.");
                     return;
                 }
-                
+                dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
                 const response = await createInventory(payload);
                 if (response.success){ 
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     toast.success(response.message); 
                     reset();
                     if(fetchAllReceipt){
@@ -117,8 +121,10 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     toast.error("Không có nguyên liệu hoặc sản phẩm để duyệt.");
                     return;
                 }
+                dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
                 const response = await removeInventory(payload);
                 if (response.success){ 
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     toast.success(response.message); 
                     reset();
                     if(fetchAllReceipt){
@@ -126,6 +132,7 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     }
                 }
             } else {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error('Lỗi không xác định');
                 reset();
                     if(fetchAllReceipt){
@@ -133,6 +140,7 @@ export const ReceiptApprovePendingManagementFormAddEdit = ({users, rid, specific
                     }
             }
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage);
             if(fetchAllReceipt){

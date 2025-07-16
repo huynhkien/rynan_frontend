@@ -39,6 +39,8 @@ import { ReceiptImportManagementFormListProductItem } from './receipt-import-man
 import { Specification } from '@/features/specification/type/specificationType';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
 import { ReceiptImportManagementFormListMaterialItem } from './receipt-import-management-form-list-material-item';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 
 
@@ -75,19 +77,23 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, fe
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     
     // xóa phiếu nhập kho
     const handleDelete = async(id: string) => {
       try{
         if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deleteReceipt(id);
         if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           fetchAllReceipt();
           return;
             }
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllReceipt();
       }

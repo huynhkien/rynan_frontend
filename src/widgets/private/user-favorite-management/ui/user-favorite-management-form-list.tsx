@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useMemo,  useEffect, Fragment, useCallback } from 'react';
+import React, { useState, useMemo,  useEffect} from 'react';
 import {
   Paper,
   Table,
@@ -19,104 +19,83 @@ import {
   TableSortLabel,
   Typography,
   Box,
-  Checkbox,
   Chip,
-  Dialog,
 } from '@mui/material';
-import { Add,  AttachMoney,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Delete} from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { Product,} from '@/features/product/type/productType';
-import { deleteProduct, getAllProduct, getProductById } from '@/features/product/api/productApi';
-import Link from 'next/link';
+import { getAllProduct } from '@/features/product/api/productApi';
 import Image from 'next/image';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
 import { Specification } from '@/features/specification/type/specificationType';
-import { isActive } from '@/shared/constant/common';
-import { PriceManagementFormAdd } from '../../price-management/ui/price-management-form-add';
-import { PriceManagementFormList } from '../../price-management/ui/price-management-form-list';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
+import { addFavorite } from '@/features/user/api/userApis';
+import { updateFavorite } from '@/features/user/store/userSlice';
 import { showModal } from '@/shared/store/appSlice';
-import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
-  { id: 'code', label: 'Mã sản phẩm', sortable: true },
-  { id: 'name', label: 'Tên sản phẩm', sortable: true },
+  { id: 'code', label: 'Mã sản phẩm yêu thích', sortable: true },
+  { id: 'name', label: 'Tên sản phẩm yêu thích', sortable: true },
   { id: 'thumb', label: 'Ảnh', sortable: true },
   { id: 'tags', label: 'Tags', sortable: true },
   { id: 'specification', label: 'Quy cách đóng gói', sortable: true },
   { id: 'price_reference', label: 'Giá tham khảo', sortable: true },
-  { id: 'isActive', label: 'Trạng thái', sortable: true },
   { id: 'actions', label: 'Thao tác', sortable: false },
-
 ];
 
 type SortOrder = 'asc' | 'desc';
 
-export const ProductManagementFormList = () => {
+export const UserFavoriteManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [product, setProduct] = useState<Product[] | []>([]);
-    const [productPriceData, setProductPriceData] = useState<Product | null>(null);
+    const dispatch = useAppDispatch();
     const [specification, setSpecification] = useState<Specification[] | []>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
-    const [isShowPriceProduct, setIsShowPriceProduct] = useState<string | null>(null);
-    const [isAddPriceProduct, setIsAddPriceProduct] = useState<boolean>(false);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
-    const [filterActive, setFilterActive] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const {current} = useAppSelector(state => state.user);
     const theme = useTheme();
-    
-    // hiển thị tất cả sản phẩm
-    const fetchAllProduct = async () => {
+    // hiển thị tất cả sản phẩm yêu thích
+    useEffect(() => {
+        if(!current) return;
+        const fetchAllProduct = async () => {
         const response = await getAllProduct();
+        const productFavoriteId = current?.wishlist?.map(el => el);
         if(response.success) {
-          setProduct(response.data || []);
+          setProduct(response.data?.filter(el => productFavoriteId?.includes(el._id)) || []);
         }
       }
-    // HIển thị sản phẩm
-    const fetchProduct = useCallback(async () => {
-      if(!isShowPriceProduct) return;
-      const response = await getProductById(isShowPriceProduct);
-      if(response.success) setProductPriceData(response.data);
-    }, [isShowPriceProduct]);
+      fetchAllProduct();
+    },[current])
 
-    useEffect(() => {
-      fetchProduct();
-    }, [fetchProduct]);
     // Hiển thị quy cách đóng gói
     const fetchAllSpecification = async () => {
       const response = await getAllSpecification();
       if(response.success) setSpecification(response.data || [])
     }
     useEffect(() => {
-      fetchAllProduct();
       fetchAllSpecification();
     },[]);
-    const dispatch = useAppDispatch();
-    
-    
-    // xóa sản phẩm
+    // xóa sản phẩm yêu thích
     const handleDelete = async(id: string) => {
-      try{
-        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+        if(!current){
+          return;
+        } else{
           dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
-          const response = await deleteProduct(id);
-          if(response.success) {
+          const response = await addFavorite(current._id, id);
+          if(response.success){
             dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
-            fetchAllProduct();
-            return;
+            dispatch(updateFavorite(id));
+          }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.error(response.message)
           }
         }
-      }catch(error: unknown){
-        dispatch(showModal({ isShowModal: false, modalType: null }));
-        toast.error(`Lỗi: ${error}`);
-        fetchAllProduct();
       }
-    };
-
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -132,33 +111,9 @@ export const ProductManagementFormList = () => {
         setSortBy(property);
     };
     
-    // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === product.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(product.map(el => el._id));
-        }
-    }
-    
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === product.length && product.length > 0;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length < product.length;
 
     const filteredAndSortedData = useMemo(() => {
       const filtered = product.filter(item => {
-        // Fix lỗi logic tìm kiếm - thiếu || và thêm dấu chấm phẩy
         const matchesSearch =
           item.name_vn.toLowerCase().includes(searchTerm.toLowerCase()) ||
           item.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -169,12 +124,8 @@ export const ProductManagementFormList = () => {
           item.code.toLowerCase().startsWith(filterAlpha.toLowerCase()) ||
           item.name_vn.toLowerCase().startsWith(filterAlpha.toLowerCase());
           
-        // Fix lỗi lọc theo trạng thái - so sánh chính xác
-        const matchesActive =
-          filterActive === 'all' ||
-          item.isActive === filterActive;
-
-        return matchesSearch && matchesAlpha && matchesActive;
+        
+        return matchesSearch && matchesAlpha ;
       });
 
       // Sắp xếp theo field (nếu có)
@@ -198,16 +149,7 @@ export const ProductManagementFormList = () => {
       }
 
       return filtered;
-    }, [searchTerm, sortBy, sortOrder, product, filterAlpha, filterActive]);
-
-   // xử lý thêm giá sản phẩm 
-    const handleShowAddUpdate = () => {
-        if(isAddPriceProduct){
-            setIsAddPriceProduct(prev => !prev)
-        }else{
-            setIsShowPriceProduct(null)
-        }
-    }
+    }, [searchTerm, sortBy, sortOrder, product, filterAlpha]);
    
 return (
     <Box sx={{ width: '100%' }}>
@@ -221,26 +163,8 @@ return (
             }}>
           <Box>
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
-            Quản lý sản phẩm
+            Quản lý sản phẩm yêu thích
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            <Box sx={{p: 1, backgroundColor: theme.palette.primary.main}}>
-                <Link href='/admin/product-management/add' style={{textDecoration: 'none', display: 'flex', alignItems: 'center',  color: theme.palette.text.secondary, cursor: 'pointer' }}>
-                    <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm sản phẩm
-                </Link>
-            </Box>
-            <Box onClick={() => setIsAddPriceProduct(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
-                <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm giá sản phẩm
-             </Box>
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -254,7 +178,7 @@ return (
             <Box >
                 <TextField
                     fullWidth
-                    label='Tìm kiếm sản phẩm'
+                    label='Tìm kiếm sản phẩm yêu thích'
                     variant='outlined'
                     size='small'
                      sx={{
@@ -290,30 +214,10 @@ return (
                 </Select>
                 </FormControl>
             </Box>
-            <Box>
-                <FormControl fullWidth size='small' sx={{ 
-                '& .MuiInputLabel-root': { color: '#000' }, 
-                '& .MuiSelect-select': { color: '#000' }, 
-                '& .MuiOutlinedInput-notchedOutline': { borderColor: '#000' },
-                width: '200px'
-                }}>
-                <InputLabel>Lọc theo trạng thái</InputLabel>
-                <Select
-                    value={filterActive}
-                    label='Lọc theo trạng thái'
-                    onChange={(e) => setFilterActive(e.target.value)}
-                >
-                    <MenuItem value='all'>Tất cả</MenuItem>
-                    {isActive.map((item) => (
-                      <MenuItem key={item._id} value={item._id}>{item.name}</MenuItem>
-                    ))}
-                </Select>
-                </FormControl>
-            </Box>
           </Box>
           <Box>
             <Typography variant='body1' sx={{ mt: 1 }}>
-              Hiển thị: {filteredAndSortedData.length} sản phẩm
+              Hiển thị: {filteredAndSortedData.length} sản phẩm yêu thích
             </Typography>
           </Box>
         </Box>
@@ -334,21 +238,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        indeterminate={isIndeterminate}
-                        onChange={handleAllCheckbox}
-                    />
-                </TableCell>
 
                 {headCells.map((headCell, index) => (
                   <TableCell 
@@ -384,7 +273,7 @@ return (
               {filteredAndSortedData.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={10} align='center' sx={{ py: 4 }}>
-                    {searchTerm || filterAlpha !== 'all' || filterActive !== 'all' ? 'Không tìm thấy sản phẩm nào' : 'Danh sách trống'}
+                    {searchTerm || filterAlpha !== 'all' ? 'Không tìm thấy sản phẩm yêu thích nào' : 'Danh sách trống'}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -392,16 +281,6 @@ return (
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
                     <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item._id)}
-                                onChange={() => handleCheckbox(item._id)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
                           {item.code}
@@ -464,23 +343,8 @@ return (
                           {item.price_reference.toLocaleString()} VNĐ
                         </Typography>
                       </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle' }}>
-                        <Typography variant='body1'>
-                          {isActive.find(status => status._id === item.isActive)?.name || item.isActive}
-                        </Typography>
-                      </TableCell>
-                      
                       <TableCell>
                         {/* Hành động */}
-                            <IconButton 
-                                color='success'
-                                aria-label={`Sửa ${item.name_vn}`}
-                                size='small'
-                            >
-                                <Link href={`/admin/product-management/edit/${item._id}`} style={{color: theme.palette.success.main}}>
-                                  <Edit/>
-                                </Link>
-                            </IconButton>
                             <IconButton 
                                 onClick={() => handleDelete(item._id)} 
                                 color='error'
@@ -488,15 +352,6 @@ return (
                                 size='small'
                             >
                                 <Delete />
-                            </IconButton>
-                            <IconButton 
-                                onClick={() => {
-                                  setIsShowPriceProduct(item._id);
-                                }}
-                                color='warning'
-                                size='small'
-                            >
-                              <AttachMoney/>
                             </IconButton>
                       </TableCell>
                     </TableRow>
@@ -519,28 +374,6 @@ return (
           }
         />
       </Paper>
-      <Fragment>
-        <Dialog
-            open={isAddPriceProduct ||  isShowPriceProduct !== null}
-            onClose={handleShowAddUpdate}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-            PaperProps={{
-                style: {
-                    width: '50%',
-                    height: '60%',
-                    maxWidth: '1000px',
-                    position: 'relative',
-                    borderRadius: 0,
-                    backgroundColor: theme.palette.text.secondary
-                },
-            }}
-        >
-            <Typography onClick={handleShowAddUpdate} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-            {(isShowPriceProduct && productPriceData) && <PriceManagementFormList id={isShowPriceProduct} product={productPriceData} render={fetchProduct}/>}
-            {isAddPriceProduct && <PriceManagementFormAdd/>}
-        </Dialog>
-      </Fragment>
     </Box>
   );
 };

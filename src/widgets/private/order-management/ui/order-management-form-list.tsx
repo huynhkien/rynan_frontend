@@ -33,6 +33,9 @@ import { OrderProductItem, UserData } from '@/features/user/type/userTypes';
 import { getAllUser, getUserById } from '@/features/user/api/userApis';
 import { OrderManagementFormListProduct } from './order-management-form-list-product';
 import { OrderManagementFormListUser } from './order-management-form-list-user';
+import { OrderManagementFormEditStatus } from './order-management-form-edit-status';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
   { id: 'code', label: 'Mã đơn hàng', sortable: true },
@@ -58,6 +61,7 @@ export const OrderManagementFormList = () => {
     const [users, setUsers] = useState<UserData[] | []>([]);
     const [user, setUser] = useState<UserData>();
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
+    const [orderId, setOrderId] = useState<string | null>(null);
     const [quoteId, setQuoteId] = useState<string | null>(null);
     const [isShowUser, setIsShowUser] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -67,6 +71,7 @@ export const OrderManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     
     // hiển thị tất cả đơn hàng
     const fetchAllOrder = async () => {
@@ -105,8 +110,10 @@ export const OrderManagementFormList = () => {
     const handleDelete = async(id: string) => {
       try{
         if (window.confirm('Bạn có chắc muốn xóa đơn hàng không?')) {
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
           const response = await deleteOrder(id);
           if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             fetchAllOrder();
             return;
@@ -116,6 +123,7 @@ export const OrderManagementFormList = () => {
           }
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllOrder();
       }
@@ -202,6 +210,8 @@ export const OrderManagementFormList = () => {
     const handleCloseDialog = async () => {
         if(isShowUser){
             setIsShowUser(null);
+        }else if(orderId){
+          setOrderId(null)
         }else{
             setIsShowProduct(null);
         }
@@ -469,7 +479,7 @@ return (
                                   color='success'
                                   aria-label={`Sửa ${item.name_vn}`}
                                   size='small'
-                                  onClick={() => setQuoteId(item._id as string)}
+                                  onClick={() => setOrderId(item._id as string)}
                               >
                                     <LibraryAddCheck/>
                               </IconButton>
@@ -498,7 +508,7 @@ return (
       </Paper>
       {/* Dialog hiển thị sản phẩm */}
       <Dialog
-        open={isShowProduct !==null || isShowUser !==null}
+        open={isShowProduct !==null || isShowUser !==null || orderId !==null}
         onClose={handleCloseDialog}
         aria-labelledby="product-dialog-title"
         aria-describedby="product-dialog-description"
@@ -519,6 +529,7 @@ return (
           <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
           {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} id={quoteId as string} action='show'/>}
           {isShowUser && <OrderManagementFormListUser user={user as UserData}/>}
+          {orderId && <OrderManagementFormEditStatus orderId={orderId} render={fetchAllOrder}/>}
         </Box>
       </Dialog>
     </Box>

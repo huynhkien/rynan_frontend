@@ -18,6 +18,7 @@ import { getAllProduct, getProductById } from "@/features/product/api/productApi
 import { useParams } from "next/navigation";
 import { ReceiptImportManagementFormAddEditProductItem } from "./receipt-import-management-form-add-edit-product-item";
 import { ReceiptImportManagementFormListProductItem } from "./receipt-import-management-form-list-product-item";
+import { showModal } from "@/shared/store/appSlice";
 
 export const ReceiptImportManagementFormAddEditProduct = () => {
     const theme = useTheme();
@@ -108,14 +109,17 @@ export const ReceiptImportManagementFormAddEditProduct = () => {
                 code: data.code,
                 note: data.note
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createReceiptImport(newDataReceipt as ReceiptData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 dispatch(removeAllProductReceipt());
                 reset();
                 
             }
         }catch(error){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }
@@ -160,15 +164,17 @@ export const ReceiptImportManagementFormAddEditProduct = () => {
                     produced_at: 'Công ty Rynan Smart Agiculture',
                     note: data.note
                 }
-                console.log(newDataReceipt)
+                dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
                 const response = await updateReceipt(newDataReceipt as ReceiptData, id as string);
                 if(response.success){
+                    dispatch(showModal({ isShowModal: false, modalType: null }));
                     toast.success(response.message);
                     dispatch(removeAllProductReceipt());
                     fetchReceipts();
                     fetchReceipt();                
                 }
             }catch(error){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
                 toast.error(errorMessage)
             }

@@ -5,6 +5,8 @@ import { ProductPrice } from "@/features/product/type/productType";
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { PriceType } from "@/shared/constant/common";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import {  useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -14,7 +16,7 @@ export const QuoteManagementFormProductEdit = ({productId, ren}: {productId: str
     const theme = useTheme();
     console.log(productId);
     const { register,  formState: { errors }, reset, control, handleSubmit, watch, setValue} = useForm<ProductPrice>();
-    
+    const dispatch = useAppDispatch();
     // Theo dõi thay đổi của priceType
     const selectedPriceType = watch('priceType');
     
@@ -76,16 +78,20 @@ export const QuoteManagementFormProductEdit = ({productId, ren}: {productId: str
                 endDate: data.endDate,
                 note: data.note || ''
             };
-           
+           dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await addUpdatePriceProduct({
                 updatePrice: priceData,
                 id: productId
             });
-            toast.success(response.message);
-            reset();
-            ren();
+            if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
+                toast.success(response.message);
+                reset();
+                ren();
+            }
             
         } catch (error) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage);
             reset();

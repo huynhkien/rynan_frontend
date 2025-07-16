@@ -31,6 +31,8 @@ import { FieldErrors, useForm, UseFormRegister } from 'react-hook-form';
 import { ControlledSelect } from '@/shared/components/ui/private/ControlledSelect';
 import ProductInputPrice from '@/features/product/components/ProductInputPrice';
 import { Button } from '@/shared/components';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
   { id: 'typePrice', label: 'Loại giá', sortable: true },
@@ -55,14 +57,17 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const [isUpdatePriceProduct, setIsUpdatePriceProduct] = useState<string | null>(null);
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     
     // Hiển thị sản phẩm với giá
     // xóa giá sản phẩm
     const handleDelete = async(id: string, rid: string) => {
       try{
         window.confirm('Bạn có chắc muốn xóa giá sản phẩm không?');
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deletePriceProduct({id, rid});
         if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           render();
         }else{
@@ -70,6 +75,7 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
           render();
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
       }
     };

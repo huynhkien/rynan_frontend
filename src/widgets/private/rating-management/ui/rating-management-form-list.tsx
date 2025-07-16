@@ -29,8 +29,9 @@ import { ProductRatingsData, ProductRatingsRepliesData } from '@/features/produc
 import { addReply, addReplyChild, deleteRating, deleteReply, getAllProduct } from '@/features/product/api/productApi';
 import { UserData } from '@/features/user/type/userTypes';
 import { getAllUser } from '@/features/user/api/userApis';
-import { useAppSelector } from '@/shared/hooks/useAppHook';
+import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { RatingManagementFormReply } from './rating-management-form-reply';
+import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'name', label: 'Khách bình luận', sortable: true },
@@ -61,6 +62,7 @@ export const RatingManagementFormList = () => {
     const {current} = useAppSelector(state => state.user);
     const [replyText, setReplyText] = useState<string | ''>('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     // Hiển thị dropdown
     const toggleRow = (_id: string) => {
       setOpenRows(prev => ({
@@ -151,8 +153,10 @@ export const RatingManagementFormList = () => {
             feedBack: replyText,
             postedBy: current?._id
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await addReply(productId as string, ratingId as string, replyData as ProductRatingsRepliesData);
         if(response.success){
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           fetchProducts();
           setReplyText('');
@@ -160,6 +164,7 @@ export const RatingManagementFormList = () => {
           setProductId(null);
           setRatingId(null);
         }else{
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.error(response.message);
         }
         
@@ -170,8 +175,10 @@ export const RatingManagementFormList = () => {
             feedBack: replyText,
             postedBy: current?._id
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await addReplyChild(productId as string, ratingChildId as string, replyData as ProductRatingsRepliesData);
         if(response.success){
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           fetchProducts();
           setReplyText('');
@@ -179,17 +186,21 @@ export const RatingManagementFormList = () => {
           setProductId(null);
           setRatingChildId(null);
         }else{
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.error(response.message);
         }
     }
     // Xóa đánh giá
     const handleDeleteRating = async({pid, rid}: {pid: string, rid: string}) => {
-      const response = await deleteRating(pid, rid);
       if(confirm('Bạn chắc có xóa đánh giá này không?')){
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+        const response = await deleteRating(pid, rid);
         if(response.success){
-        toast.success(response.message);
-        fetchProducts();
+          dispatch(showModal({ isShowModal: false, modalType: null }));
+          toast.success(response.message);
+          fetchProducts();
         }else{
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.error(response.message)
         }
       }
@@ -197,11 +208,14 @@ export const RatingManagementFormList = () => {
     // Xóa thông tin phản hồi
     const handleDeleteReply = async({pid, rid, repId}: {pid: string, rid: string, repId: string}) => {
       if(confirm('Bạn chắc có xóa phản hồi này không?')){
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deleteReply(pid, rid, repId);
         if(response.success){
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           fetchProducts();
         }else{
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.error(response.message)
         }
       }

@@ -19,6 +19,8 @@ import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { Editor } from '@tinymce/tinymce-react';
 import { toast } from "react-toastify";
 import { useParams } from "next/navigation";
+import { showModal } from "@/shared/store/appSlice";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
 
 const ProductManagementFormUpdateInfo = ({category, specification, preview, setPreview, handleAddProduct, id}: ProductManagementFormEditInfoProps) => {
     const { register, setValue, handleSubmit, watch,  formState: { errors }, control, reset} = useForm<ProductData>();
@@ -398,6 +400,7 @@ export const ProductManagementFormEdit = () => {
     const changeValue = useCallback((value: string) => {
         setPayload(prev => ({ ...prev, description: value }));
     }, []);
+    const dispatch = useAppDispatch();
 
     // Hàm cập nhật bài viết mô tả
     const handleUpdate = async () => {
@@ -405,15 +408,17 @@ export const ProductManagementFormEdit = () => {
             toast.error('Chưa có sản phẩm để cập nhật mô tả');
             return;
         }
-
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await updateDescriptionProduct({
             description: payload.description,
             id: id,
         });
 
         if (response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
         } else {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
         }
     };
@@ -455,14 +460,17 @@ export const ProductManagementFormEdit = () => {
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]);
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateProduct(formData, id);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response.message);
                 return;
             }
 
             toast.success(response.message);
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

@@ -1,5 +1,8 @@
 'use client'
-import React, { useState, useMemo,  useEffect } from 'react';
+import React, { useState, useMemo,  useEffect, useCallback } from 'react';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet'; 
 import {
   Paper,
   Table,
@@ -19,10 +22,10 @@ import {
   TableSortLabel,
   Typography,
   Box,
-  Checkbox,
   Dialog,
+  Collapse,
 } from '@mui/material';
-import {  Cancel,   Delete, ExitToApp, LibraryAddCheck } from '@mui/icons-material';
+import {  Cancel, KeyboardArrowDown, KeyboardArrowUp, LibraryAddCheck } from '@mui/icons-material';
 import {  OrderStatus,  PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
 import { OrderData } from '@/features/order/type/orderType';
 import {  getAllOrder, getOrderById } from '@/features/order/api/orderApi';
@@ -30,6 +33,7 @@ import moment from 'moment';
 import { OrderProductItem} from '@/features/user/type/userTypes';
 import { OrderManagementFormListProduct } from '../../order-management/ui/order-management-form-list-product';
 import { useAppSelector } from '@/shared/hooks/useAppHook';
+import { UserOrderManagementFormEdit } from './user-order-management-form-edit';
 
 const headCells = [
   { id: 'code', label: 'Mã đơn hàng', sortable: true },
@@ -50,32 +54,41 @@ export const UserOrderManagementFormList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const {current} = useAppSelector(state => state.user);
-    console.log(current);
     const [orders, setOrders] = useState<OrderData[] | []>([]);
     const [order, setOrder] = useState<OrderData>();
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
-    const [quoteId, setQuoteId] = useState<string | null>(null);
-    const [isShowUser, setIsShowUser] = useState<string | null>(null);
+    const [orderId, setOrderId] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
+    const [openRows, setOpenRows] = useState<{ [key: string]: boolean }>({});
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+    const Icon = L.icon({
+      iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png', 
+      iconSize: [32, 32], 
+      iconAnchor: [16, 32], 
+      popupAnchor: [0, -32], 
+    });
     const theme = useTheme();
-    
+    // Hiển thị dropdown
+    const toggleRow = (_id: string) => {
+      setOpenRows(prev => ({
+        ...prev,
+        [_id]: !prev[_id]
+      }));
+    };
     // hiển thị tất cả đơn hàng
-    
-    useEffect(() => {
-      if(!current) return;
-      const fetchAllOrder = async () => {
-          const response = await getAllOrder();
-          if(response.success) {
-            setOrders(response.data?.filter(el => el.orderBy === current?._id) || []);
-          }
-      }
+    const fetchAllOrder = useCallback(async () => {
+    if(!current) return;
+    const response = await getAllOrder();
+    if(response.success) {
+        setOrders(response.data?.filter(el => el.orderBy === current?._id) || []);
+    }
+  }, [current]);
+  useEffect(() => {
       fetchAllOrder();
-    },[current]);
+  }, [fetchAllOrder]); 
     // Hiển thị chi tiết đơn hàng
     useEffect(() => {
         if(!isShowProduct) return;
@@ -98,30 +111,6 @@ export const UserOrderManagementFormList = () => {
         setSortBy(property);
     };
     
-    // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === orders.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(orders.map(el => (el._id as string)));
-        }
-    }
-    
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === orders.length && orders.length > 0;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length < orders.length;
-
     const filteredAndSortedData = useMemo(() => {
       const filtered = orders.filter(item => {
         const matchesSearch =
@@ -162,9 +151,9 @@ export const UserOrderManagementFormList = () => {
     }, [searchTerm, sortBy, sortOrder, orders, filterAlpha]);
     // Đóng dialog
     const handleCloseDialog = async () => {
-        if(isShowUser){
-            setIsShowUser(null);
-        }else{
+        if(orderId){
+          setOrderId(null);
+        }else {
             setIsShowProduct(null);
         }
     }
@@ -182,16 +171,6 @@ return (
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
             Quản lý đơn hàng
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -265,21 +244,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        indeterminate={isIndeterminate}
-                        onChange={handleAllCheckbox}
-                    />
-                </TableCell>
 
                 {headCells.map((headCell, index) => (
                   <TableCell 
@@ -322,78 +286,104 @@ return (
                 filteredAndSortedData
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
-                    <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item._id as string)}
-                                onChange={() => handleCheckbox(item._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
-                        <Typography variant='body1' noWrap>
-                          {item.code}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {moment(item.createdAt).format('DD/MM/YY HH:mm:ss')}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {OrderStatus.find((el) => el._id === item.status)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell 
-                          sx={{ 
-                            verticalAlign: 'middle', 
-                            cursor: 'pointer',
-                            '&:hover': {
-                              backgroundColor: theme.palette.action.hover
-                            }
-                          }} 
-                          onClick={() => setIsShowProduct(item._id as string)}
-                        >
-                          <Typography variant='body1'>
-                            {item.products?.length || 0} sản phẩm
+                    <React.Fragment key={item._id}>
+                      <TableRow  hover>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300, display: 'flex' }}>
+                          <IconButton
+                              aria-label='expand row'
+                              size='small'
+                              onClick={() => toggleRow(item._id as string)}
+                            >
+                              {openRows[item._id as string] ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
+                          </IconButton>
+                          <Typography variant='body1' noWrap>
+                            {item.code}
                           </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {PaymentStatuses.find((el) => el._id === item.paymentStatus)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {PaymentMethods.find((el) => el._id === item.paymentMethod)?.name}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {moment(item.paymentDueDate).format('DD/MM/YYYY')}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
-                        <Typography variant='body1'>
-                          {item.total.toLocaleString()} VNĐ
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        {/* Hành động */}
-                        <IconButton 
-                            color='success'
-                            aria-label={`Sửa ${item.name_vn}`}
-                            size='small'
-                            onClick={() => setQuoteId(item._id as string)}
-                        >
-                              <LibraryAddCheck/>
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {moment(item.createdAt).format('DD/MM/YY HH:mm:ss')}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {OrderStatus.find((el) => el._id === item.status)?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell 
+                            sx={{ 
+                              verticalAlign: 'middle', 
+                              cursor: 'pointer',
+                              '&:hover': {
+                                backgroundColor: theme.palette.action.hover
+                              }
+                            }} 
+                            onClick={() => setIsShowProduct(item._id as string)}
+                          >
+                            <Typography variant='body1'>
+                              {item.products?.length || 0} sản phẩm
+                            </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {PaymentStatuses.find((el) => el._id === item.paymentStatus)?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {PaymentMethods.find((el) => el._id === item.paymentMethod)?.name}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {moment(item.paymentDueDate).format('DD/MM/YYYY')}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                          <Typography variant='body1'>
+                            {item.total.toLocaleString()} VNĐ
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          {/* Hành động */}
+                          <IconButton 
+                              color='success'
+                              aria-label={`Sửa ${item.name_vn}`}
+                              size='small'
+                              onClick={() => setOrderId(item._id as string)}
+                          >
+                                <LibraryAddCheck/>
+                          </IconButton>
+                        </TableCell>
+                      </TableRow>
+                      <TableRow>
+                          <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={headCells.length + 1} >
+                            <Collapse in={openRows[item._id as string]} timeout='auto' unmountOnExit>
+                              <Box sx={{ margin: 1 }}>
+                                <Typography variant='body2' gutterBottom component='div'>
+                                  Ví trí đơn hàng
+                                </Typography>
+                                {
+                                  item.location?.lat ?
+                                  <Box sx={{ mt: 2 }}>
+                                  <MapContainer center={[item?.location?.lat, item?.location?.lng]} zoom={13} style={{ height: '500px', width: '100%' }}>
+                                      <TileLayer
+                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                      />
+                                      <Marker position={[item?.location?.lat, item?.location?.lng]} icon={Icon}>
+                                        <Popup>Vị trí của đơn hàng</Popup>
+                                      </Marker>
+                                  </MapContainer>
+                                </Box>
+                                :
+                                'Chưa có thông tin về vị trí đơn hàng'
+                                }
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                    </React.Fragment>
                   ))
               )}
             </TableBody>
@@ -415,7 +405,7 @@ return (
       </Paper>
       {/* Dialog hiển thị sản phẩm */}
       <Dialog
-        open={isShowProduct !==null}
+        open={isShowProduct !==null || orderId !==null}
         onClose={handleCloseDialog}
         aria-labelledby="product-dialog-title"
         aria-describedby="product-dialog-description"
@@ -434,7 +424,8 @@ return (
       >
         <Box sx={{ position: 'relative' }}>
           <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
-          {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} id={quoteId as string} action='show'/>}
+          {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} action='show'/>}
+          {orderId && <UserOrderManagementFormEdit orderId={orderId} render={fetchAllOrder}/>}
         </Box>
       </Dialog>
     </Box>

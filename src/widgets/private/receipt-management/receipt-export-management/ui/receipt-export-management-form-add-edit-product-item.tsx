@@ -5,6 +5,7 @@ import {  ReceiptImportManagementFormAddEditProductItemProps, ReceiptProductData
 import { addProductToReceipt, updateProductByPid } from "@/features/user/store/userSlice";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect"
 import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Button as ButtonItem, Typography, useTheme } from "@mui/material"
 import { useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -110,6 +111,7 @@ export const ReceiptExportManagementFormAddEditProductItem = ({materialId, recei
             toast.error('Không tìm thấy thấy thông id của phiếu');
             return;
             }
+            
             const filteredProduct = productReceipt?.find(el => el.mid === isEditProductState);
             const newData = {
                 name: filteredProduct?.name,
@@ -119,14 +121,17 @@ export const ReceiptExportManagementFormAddEditProductItem = ({materialId, recei
                 expiryDate: selectedExpiryDate,
                 manufacturingDate: selectedManufacturingDate
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateProductReceipt(newData, materialId, isEditProductState as string);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 if(render){
                     render();
                 }
             }
         } catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         } 

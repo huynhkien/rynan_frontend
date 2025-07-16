@@ -24,6 +24,7 @@ import moment from 'moment';
 import { removeItemMaterialReceipt } from '@/features/user/store/userSlice';
 import { deleteMaterialReceipt } from '@/features/receipt/api/receiptApi';
 import { ReceiptExportManagementFormAddEditMaterialItem } from './receipt-export-management-form-add-edit-material-item';
+import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'name', label: 'Tên nguyên liệu', sortable: true },
@@ -62,13 +63,16 @@ export const ReceiptExportManagementFormListMaterialItem = ({receipt, render,mat
     // xóa nguyên liệu trong dữ liệu
     const handleDeleteRid = async(id: string) => {
         if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
           const response = await deleteMaterialReceipt(materialId as string, id)
           if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             if(render){
               render();
             }
           }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message)
           }
       };

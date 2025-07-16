@@ -19,6 +19,7 @@ import { useParams } from "next/navigation";
 import { ReceiptExportManagementFormAddEditProductItem } from "./receipt-export-management-form-add-edit-product-item";
 import { ReceiptExportManagementFormListUser } from "./receipt-export-management-form-list-user";
 import { ReceiptExportManagementFormListProductItem } from "./receipt-export-management-form-list-product-item";
+import { showModal } from "@/shared/store/appSlice";
 
 export const ReceiptExportManagementFormAddEditProduct = () => {
     const theme = useTheme();
@@ -130,14 +131,17 @@ export const ReceiptExportManagementFormAddEditProduct = () => {
                 produced_at: data.produced_at,
                 note: data.note
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createReceiptImport(newDataReceipt as ReceiptData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 dispatch(removeAllProductReceipt());
                 reset();
                 
             }
         }catch(error){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

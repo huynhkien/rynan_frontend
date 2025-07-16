@@ -6,6 +6,8 @@ import { SpecificationData, UpdateSpecification } from "@/features/specification
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { SpecificationType } from "@/shared/constant/common";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useEffect, } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -14,21 +16,26 @@ import { toast } from "react-toastify";
 export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, render} : UpdateSpecification) => {
     const theme = useTheme();
     const { register, handleSubmit,  formState: { errors }, reset, control} = useForm<SpecificationData>();
+    const dispatch = useAppDispatch();
 
     // Thêm quy cách
     const handleAddSpecification = async (data: SpecificationData) => {
         try {
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createSpecification(data);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response?.message);
                 reset();
                 render();
                 return;
             }
             toast.success(response.message);
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             reset();
             render();
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(`Lỗi: ${error}`);
             reset();
             render();
@@ -39,6 +46,7 @@ export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, rende
     const fetchSpecification = async() => {
         if(!isUpdateSpecification) return;
         try {
+            
             const response = await getSpecificationById(isUpdateSpecification);
             if(response.success && response.data) {
                 reset({
@@ -64,14 +72,18 @@ export const SpecificationManagementFormAddEdit = ({isUpdateSpecification, rende
     const handleUpdateSpecification = async (data: SpecificationData) => {
         try {
             if(!isUpdateSpecification) return;
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateSpecification(data, isUpdateSpecification);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response?.message);
                 return;
             }
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             render();
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(`Lỗi: ${error}`);
         }
     }

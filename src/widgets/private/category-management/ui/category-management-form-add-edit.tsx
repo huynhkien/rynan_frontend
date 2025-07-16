@@ -4,6 +4,8 @@ import CategoryFormInput from "@/features/category/components/CategoryFormInput"
 import { CategoryInputImage } from "@/features/category/components/CategoryInputImage";
 import { CategoryData, UpdateCategory } from "@/features/category/type/categoryType";
 import { Button } from "@/shared/components";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -12,6 +14,7 @@ import { toast } from "react-toastify";
 export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : UpdateCategory) => {
     const theme = useTheme();
     const [preview, setPreview] = useState<string | null>(null);
+    const dispatch = useAppDispatch();
     const { register, handleSubmit,  formState: { errors }, reset} = useForm<CategoryData>();
 
     // Thêm danh mục
@@ -23,11 +26,10 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]); 
             }
-            for (const [key, value] of formData.entries()) {
-            console.log(`${key}:`, value);
-            }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createCategory(formData);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response?.message);
                 reset();
                 render();
@@ -40,6 +42,7 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
             setPreview(null);
         } catch (error: unknown) {
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(errorMessage)
             reset();
             setPreview(null);
@@ -74,18 +77,18 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]); 
             }
-            for (const [key, value] of formData.entries()) {
-                console.log(`${key}:`, value);
-            }
             if(!isUpdateCategory) return;
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateCategory(formData, isUpdateCategory);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response?.message);
                 return;
             }
             toast.success(response.message);
             render();
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

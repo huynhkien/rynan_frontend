@@ -7,6 +7,8 @@ import { UserInputImage } from "@/features/user/components/UserInputImage";
 import { UserData, UserDataProps } from "@/features/user/type/userTypes";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { CustomerGender, CustomerSource, CustomerType } from "@/shared/constant/common";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Paper, Typography, useTheme, CircularProgress, Button } from "@mui/material"
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
@@ -19,7 +21,7 @@ export const UserManagementFormAddEdit = () => {
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
     // State cho khách hàng
-    // Lấy thông tin khách hàng
+    const dispatch = useAppDispatch();
     
     // State cho preview image
     const [preview, setPreview] = useState<string | null>(null);
@@ -254,14 +256,16 @@ export const UserManagementFormAddEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
-
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await addUserByAdmin(formData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 reset();
                 setPreview('')
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }
@@ -372,13 +376,15 @@ export const UserManagementFormAddEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
-
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateUserByAdmin(id as string , formData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 reset();
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

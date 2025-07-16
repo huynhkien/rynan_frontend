@@ -18,6 +18,8 @@ import { useCallback, useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { Editor } from '@tinymce/tinymce-react';
 import { toast } from "react-toastify";
+import { showModal } from "@/shared/store/appSlice";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
 
 const ProductManagementFormAddInfo = ({category, specification, preview, setPreview, handleAddProduct}: ProductManagementFormAddInfoProps) => {
     const { register, setValue, handleSubmit, watch,  formState: { errors }, control} = useForm<ProductData>();
@@ -352,6 +354,7 @@ export const ProductManagementFormAdd = () => {
     const [productId, setProductId] = useState<string | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [tabIndex, setTabIndex] = useState<number>(0);
+    const dispatch = useAppDispatch();
 
     // Hàm thay đổi giá trị bài viết mô tả
     const changeValue = useCallback((value: string) => {
@@ -364,16 +367,18 @@ export const ProductManagementFormAdd = () => {
             toast.error('Chưa có sản phẩm để cập nhật mô tả');
             return;
         }
-
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await updateDescriptionProduct({
             description: payload.description,
             id: productId,
         });
 
         if (response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             setPayload({description: ''});
         } else {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
             setPayload({description: ''});
         }
@@ -420,9 +425,10 @@ export const ProductManagementFormAdd = () => {
             if (data.thumb && data.thumb.length > 0) {
                 formData.append("thumb", data.thumb[0]);
             }
-
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createProduct(formData);
             if (!response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(response.message);
                 return;
             }
@@ -432,6 +438,7 @@ export const ProductManagementFormAdd = () => {
             reset();
             setProductId(response.data._id);
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
             setPreview(null);

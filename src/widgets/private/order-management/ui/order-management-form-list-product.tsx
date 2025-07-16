@@ -24,6 +24,7 @@ import { OrderProductProps } from '@/features/order/type/orderType';
 import { PriceType } from '@/shared/constant/common';
 import { OrderManagementFormAddEditProduct } from './order-management-form-add-edit-product';
 import { deleteProductOrder } from '@/features/order/api/orderApi';
+import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -84,8 +85,10 @@ export const OrderManagementFormListProduct = ({
     const handleDeleteProductOrder = async (pid: string) => {
         try {
             if(confirm('Bạn có chắc xóa sản phẩm này không?')){
+              dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
               const response = await deleteProductOrder(oid as string , pid);
                 if(response.success) {
+                  dispatch(showModal({ isShowModal: false, modalType: null }));
                     toast.success(response.message);
                     if(renderOrder){
                       renderOrder();
@@ -93,6 +96,7 @@ export const OrderManagementFormListProduct = ({
                 }
               }
         }catch(error: unknown){
+          dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

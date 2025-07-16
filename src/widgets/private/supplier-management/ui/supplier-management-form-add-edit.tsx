@@ -6,6 +6,8 @@ import { BaseOption, fetchDistricts, fetchProvinces, fetchWards } from "@/featur
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { BANK_LIST,  isActiveSupplier } from "@/shared/constant/common";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, CircularProgress, Typography, useTheme } from "@mui/material"
 import { useCallback, useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -13,6 +15,7 @@ import { toast } from "react-toastify";
 
 export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : UpdateSupplier) => {
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const { register, handleSubmit,  formState: { errors }, reset, control, setValue, watch, getValues} = useForm<SupplierData>();
     // State cho địa chỉ 
     const [provinces, setProvinces] = useState<BaseOption[]>([]);
@@ -147,12 +150,15 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
             address: addressData,
             bank_account: bankAccount
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await createSupplier(supplierData);
         if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             render();
             reset();
         }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
             render();
         }
@@ -238,11 +244,14 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
             address: addressData,
             bank_account: bankAccount
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await updateSupplier(supplierData, isUpdateSupplier as string);
         if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             render();
         }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
             render();
         }

@@ -3,6 +3,8 @@ import { sendMail } from "@/features/contact/api/contactApi";
 import MailFormInput from "@/features/contact/components/MailFormInput";
 import { MailData } from "@/features/contact/type/contactType";
 import { Button } from "@/shared/components";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import { Editor } from "@tinymce/tinymce-react";
 import { useCallback, useState } from "react";
@@ -10,6 +12,7 @@ import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
 import { toast } from "react-toastify";
 export const ContactManagementFormSendMail = ({email, render} : {email: string; render: () => void;}) => {
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const { register, handleSubmit,  formState: { errors }, reset} = useForm<MailData>();
     const [payload, setPayload] = useState<{ description: string }>({
             description: '',
@@ -25,7 +28,9 @@ export const ContactManagementFormSendMail = ({email, render} : {email: string; 
             subject: data.subject,
             html: payload.description
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await sendMail(mailData)
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         if(response.success) {toast.success(response.message); reset(); render();}
         else{ toast.error(response.message);}
     }

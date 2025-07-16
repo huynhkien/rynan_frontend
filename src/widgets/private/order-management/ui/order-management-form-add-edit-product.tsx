@@ -9,6 +9,7 @@ import { OrderProductItem } from "@/features/user/type/userTypes"
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect"
 import { PriceType } from "@/shared/constant/common"
 import { useAppDispatch, useAppSelector} from "@/shared/hooks/useAppHook"
+import { showModal } from "@/shared/store/appSlice"
 import { Box,  Button,  Typography, useTheme } from "@mui/material"
 import { useEffect, useState } from "react"
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form"
@@ -128,14 +129,17 @@ export const OrderManagementFormAddEditProduct = ({
                 toast.error('Loại giá cập nhập với loại giá vừa thêm không trùng khớp. Vui lòng lựa chọn lại!!!');
                 return;
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateProductOrder(newDataUpdate as OrderProductItem, oid as string , pid as string);
             if(response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 if (render) {
                     render();
                 }
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

@@ -5,16 +5,19 @@ import { Product, ProductPrice } from "@/features/product/type/productType";
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { PriceType } from "@/shared/constant/common";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import {  useEffect, useState } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
+import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 
 export const PriceManagementFormAdd = () => {
     const theme = useTheme();
     const { register, handleSubmit,  formState: { errors }, reset, control, watch} = useForm<ProductPrice>();
     const [product, setProduct] = useState<Product[] | []>([]);
-    const productId = watch('productId') as string
+    const productId = watch('productId') as string;
+    const dispatch = useDispatch();
     // Hiển thị thông tin sản phẩm
     const fetchAllProduct = async() => {
         const response = await getAllProduct();
@@ -38,15 +41,18 @@ export const PriceManagementFormAdd = () => {
                 endDate: data.endDate,
                 note: data.note || ''
             };
-           
+           dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await addPriceProduct({
                 prices: priceData,
                 id: productId
             });
-            toast.success(response.message);
-            reset();
-            
+            if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
+                toast.success(response.message);
+                reset();
+            }
         } catch (error) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
             reset();

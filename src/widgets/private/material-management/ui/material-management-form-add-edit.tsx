@@ -4,6 +4,8 @@ import MaterialFormInput from "@/features/material/components/MaterialFormInput"
 import { MaterialData, UpdateMaterial } from "@/features/material/type/materialType";
 import { Button } from "@/shared/components";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Typography, useTheme } from "@mui/material"
 import { useEffect } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -11,6 +13,7 @@ import { toast } from "react-toastify";
 
 export const MaterialManagementFormAddEdit = ({isUpdateMaterial, render, specification} : UpdateMaterial) => {
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const { register, handleSubmit,  formState: { errors }, reset, control} = useForm<MaterialData>();
     
     // Thêm nguyên liệu
@@ -22,12 +25,15 @@ export const MaterialManagementFormAddEdit = ({isUpdateMaterial, render, specifi
             note: data.note,
             specification: data.specification
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await createMaterial(materialData);
         if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             render();
             reset();
         } else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
         }
     }
@@ -57,12 +63,15 @@ export const MaterialManagementFormAddEdit = ({isUpdateMaterial, render, specifi
             note: data.note,
             specification: data.specification
         }
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await updateMaterial(materialData, isUpdateMaterial as string);
         if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             render();
             reset();
         } else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message);
         }
     }

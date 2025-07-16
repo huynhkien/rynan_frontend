@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { QuoteData, QuoteProductData } from "@/features/quote/type/quoteType";
 import { QuoteManagementFormUserList } from "./quote-management-form-user-list";
+import { showModal } from "@/shared/store/appSlice";
 
 export const QuoteManagementFormAddEdit = () => {
     const {control} = useForm<UserDataProps>();
@@ -175,13 +176,16 @@ export const QuoteManagementFormAddEdit = () => {
                 products: quoteProduct as QuoteProductData[],
                 quotation: generateUniqueCode(),
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createQuote(newQuoteData);
             if(response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message)
                 setSelectedUser(null);
                 dispatch(removeAllQuoteProduct())
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }
@@ -207,20 +211,21 @@ export const QuoteManagementFormAddEdit = () => {
             }
             const quoteProductsId = quoteProducts.map((el) => ({pid: el._id}));
             const combinedProducts = [...quoteProductsId, ...quoteProduct];
-            console.log(combinedProducts);
             const newQuoteData = {
                 client: selectedUser as string,
                 products: combinedProducts as QuoteProductData[],
                 quotation: quotation
             }
-            console.log(newQuoteData);
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateQuote(newQuoteData, id as string);
             if(response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message)
                 setSelectedUser(null);
                 dispatch(removeAllQuoteProduct())
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

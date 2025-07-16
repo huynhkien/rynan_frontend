@@ -27,6 +27,8 @@ import { toast } from 'react-toastify';
 import { Specification } from '@/features/specification/type/specificationType';
 import { deleteSpecification, getAllSpecification } from '@/features/specification/api/specificationApi';
 import { SpecificationManagementFormAddEdit } from './specification-management-form-add-edit';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
   { id: 'code', label: 'Mã quy cách', sortable: true },
@@ -57,6 +59,7 @@ export const SpecificationManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const fetchAllSpecification = async () => {
         const response = await getAllSpecification();
         if(response.success) {
@@ -70,20 +73,21 @@ export const SpecificationManagementFormList = () => {
     },[]);
     // xóa quy cách
     const handleDelete = async(id: string) => {
-      try{
-        window.confirm('Bạn có chắc muốn xóa quy cách không?');
-        const response = await deleteSpecification(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllSpecification();
-          return;
-        }else{
-          toast.error(response.message);
+      if(window.confirm('Bạn có chắc muốn xóa quy cách không?')){
+        try{
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteSpecification(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllSpecification();
+            return;
+          }
+        }catch(error: unknown){
+          dispatch(showModal({ isShowModal: false, modalType: null }));
+          toast.error(`Lỗi: ${error}`);
           fetchAllSpecification();
         }
-      }catch(error: unknown){
-        toast.error(`Lỗi: ${error}`);
-        fetchAllSpecification();
       }
     };
 

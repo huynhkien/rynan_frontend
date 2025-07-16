@@ -24,6 +24,7 @@ import { QuoteManagementFormProductEdit } from './quote-management-form-product-
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { removeItemQuoteProduct } from '@/features/user/store/userSlice';
 import { deleteProductQuote } from '@/features/quote/api/quoteApi';
+import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -59,8 +60,10 @@ export const QuoteManagementFormProductList = ({product, render, id}: QuoteFormP
     // Xóa sản phẩm trong dữ liệu
     const handleDeleteById = async(pid: string) => {
       if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deleteProductQuote(id as string, pid);
         if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           render();
         };

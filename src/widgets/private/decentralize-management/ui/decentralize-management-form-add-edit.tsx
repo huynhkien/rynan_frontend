@@ -7,6 +7,8 @@ import { UserInputImage } from "@/features/user/components/UserInputImage";
 import { UserData, UserDataProps } from "@/features/user/type/userTypes";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { CustomerGender, Role } from "@/shared/constant/common";
+import { useAppDispatch } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Paper, Typography, useTheme, CircularProgress, Button } from "@mui/material"
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
@@ -16,6 +18,7 @@ import { toast } from "react-toastify";
 export const DecentralizeManagementFormAddEdit = () => {
     const { register, watch, setValue, formState: { errors }, control, getValues, reset, handleSubmit } = useForm<UserDataProps>();
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
     // State cho preview image
@@ -246,8 +249,10 @@ export const DecentralizeManagementFormAddEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const existingMail = await checkMail(data.email);
             if(!existingMail.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.error(existingMail.message);
                 return;
             }
@@ -259,6 +264,7 @@ export const DecentralizeManagementFormAddEdit = () => {
                 setPreview('')
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }
@@ -361,11 +367,14 @@ export const DecentralizeManagementFormAddEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                     formData.append('avatar', data.avatar[0]);
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateUserByAdmin(id as string , formData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

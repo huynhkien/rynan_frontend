@@ -19,6 +19,7 @@ import { createOrder, getAllOrder, getOrderById, updateOrder } from '@/features/
 import { toast } from 'react-toastify';
 import { removeAllOrderProduct } from '@/features/user/store/userSlice';
 import { OrderManagementFormListUser } from './order-management-form-list-user';
+import { showModal } from '@/shared/store/appSlice';
 
 export const OrderManagementFormAddEdit = () => {
     const { register, formState: { errors }, reset, control, handleSubmit, setValue} = useForm<OrderData>();
@@ -138,8 +139,10 @@ export const OrderManagementFormAddEdit = () => {
                 expectedDeliveryDate: OrderData.expectedDeliveryDate,
                 orderType: 'STAFF_CREATED',
             }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createOrder(newOrderData as OrderData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 dispatch(removeAllOrderProduct());
                 toast.success(response.message);
                 setSelectedUser(null);
@@ -147,6 +150,7 @@ export const OrderManagementFormAddEdit = () => {
                 reset();
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

@@ -9,6 +9,7 @@ import {  UserDataProps } from "@/features/user/type/userTypes";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
 import { CustomerGender } from "@/shared/constant/common";
 import {  useAppDispatch, useAppSelector } from "@/shared/hooks/useAppHook";
+import { showModal } from "@/shared/store/appSlice";
 import { Box, Paper, Typography, useTheme, CircularProgress, Button } from "@mui/material"
 import { useEffect, useState, useCallback } from "react";
 import { FieldErrors, useForm, UseFormRegister } from "react-hook-form";
@@ -258,9 +259,10 @@ export const UserInfoManagementFormEdit = () => {
             if (data.avatar && data.avatar.length > 0) {
                 formData.append('avatar', data.avatar[0]);
             }
-
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateInfoByUser(current?._id as string, formData);
             if (response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 // Cập nhật thông tin user trong Redux store
                 const dataUpdate = {
@@ -271,6 +273,7 @@ export const UserInfoManagementFormEdit = () => {
                 
             }
         } catch (error: unknown) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage);
         }

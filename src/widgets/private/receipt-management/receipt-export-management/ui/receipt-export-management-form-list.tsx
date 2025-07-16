@@ -39,6 +39,8 @@ import { ReceiptExportManagementFormListMaterialItem } from './receipt-export-ma
 import { Specification } from '@/features/specification/type/specificationType';
 import { ReceiptExportManagementFormListProductItem } from './receipt-export-management-form-list-product-item';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 
 
@@ -76,19 +78,23 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, fe
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     
     // xóa phiếu xuất kho
     const handleDelete = async(id: string) => {
       try{
         if(window.confirm('Bạn có chắc muốn xóa phiếu xuất kho không?')){
-        const response = await deleteReceipt(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllReceipt();
-          return;
-            }
-        }
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipt(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            return;
+              }
+          }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllReceipt();
       }

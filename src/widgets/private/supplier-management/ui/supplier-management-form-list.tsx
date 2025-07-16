@@ -28,6 +28,8 @@ import { SupplierData } from '@/features/supplier/type/supplierType';
 import { deleteSupplier, getAllSupplier } from '@/features/supplier/api/supplierApi';
 import { SupplierManagementFormAddEdit } from './supplier-management-form-add-edit';
 import { BANK_LIST } from '@/shared/constant/common';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { showModal } from '@/shared/store/appSlice';
 
 
 const headCells = [
@@ -60,6 +62,7 @@ export const SupplierManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     // Hiển thị thông tin quy cách
     const fetchAllSupplier = async () => {
         const response = await getAllSupplier();
@@ -77,14 +80,17 @@ export const SupplierManagementFormList = () => {
     const handleDelete = async(id: string) => {
       try{
         if(window.confirm('Bạn có chắc muốn xóa nhà cung cấp không?')){
-        const response = await deleteSupplier(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllSupplier();
-          return;
-            }
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteSupplier(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllSupplier();
+            return;
+              }
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllSupplier();
       }

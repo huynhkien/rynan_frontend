@@ -21,6 +21,7 @@ import { getAllMaterial, getMaterialById } from "@/features/material/api/materia
 import { Specification } from "@/features/specification/type/specificationType";
 import { getAllSpecification } from "@/features/specification/api/specificationApi";
 import { useParams } from "next/navigation";
+import { showModal } from "@/shared/store/appSlice";
 
 export const ReceiptImportManagementFormAddEditMaterial = () => {
     const theme = useTheme();
@@ -139,15 +140,17 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                 paymentStatus: data.paymentStatus,
                 note: data.note
             }
-            console.log(newDataReceipt)
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createReceiptImport(newDataReceipt as ReceiptData);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 dispatch(removeAllMaterialReceipt());
                 reset();
                 
             }
         }catch(error){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }
@@ -203,15 +206,17 @@ export const ReceiptImportManagementFormAddEditMaterial = () => {
                 paymentStatus: data.paymentStatus,
                 note: data.note
             }
-            console.log(newDataReceipt)
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateReceipt(newDataReceipt as ReceiptData, id as string);
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 dispatch(removeAllMaterialReceipt());
                 fetchReceipts();
                 fetchReceipt();                
             }
         }catch(error){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage)
         }

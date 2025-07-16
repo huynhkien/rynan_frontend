@@ -28,6 +28,8 @@ import { deleteUser, getAllUser } from '@/features/user/api/userApis';
 import Link from 'next/link';
 import moment from 'moment';
 import { CustomerGender } from '@/shared/constant/common';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
   { id: 'code', label: 'ID khách hàng', sortable: true },
@@ -57,6 +59,7 @@ export const UserManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const fetchAllUser = async () => {
         const response = await getAllUser();
         if(response.success) {
@@ -70,21 +73,22 @@ export const UserManagementFormList = () => {
     },[]);
     // xóa người dùng
     const handleDelete = async(id: string) => {
+      if(window.confirm('Bạn có chắc muốn xóa người dùng không?')){
       try{
-        window.confirm('Bạn có chắc muốn xóa người dùng không?');
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deleteUser(id);
         if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           fetchAllUser();
           return;
-        }else{
-          toast.error(response.message);
-          fetchAllUser();
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllUser();
       }
+    }
     };
 
     const handleChangePage = (event: unknown, newPage: number) => {

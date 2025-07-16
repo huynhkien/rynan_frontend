@@ -24,6 +24,7 @@ import moment from 'moment';
 import { removeItemProductReceipt } from '@/features/user/store/userSlice';
 import { ReceiptImportManagementFormAddEditProductItem } from './receipt-import-management-form-add-edit-product-item';
 import { deleteProductReceipt } from '@/features/receipt/api/receiptApi';
+import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -50,6 +51,7 @@ export const ReceiptImportManagementFormListProductItem = ({productReceipt, mate
     // xóa sản phẩm theo trạng thái
     const handleDelete = async(id: string) => {
         if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+          
           dispatch(removeItemProductReceipt({
             pid: id
           }));
@@ -59,13 +61,16 @@ export const ReceiptImportManagementFormListProductItem = ({productReceipt, mate
     // xóa nguyên liệu trong dữ liệu
     const handleDeletePid = async(id: string) => {
         if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
           const response = await deleteProductReceipt(materialId as string, id)
           if(response.success){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
             if(render){
               render();
             }
           }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.error(response.message)
           }
       };

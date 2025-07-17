@@ -15,15 +15,15 @@ const nextConfig: NextConfig = {
   experimental: {
     reactCompiler: false,
   },
-
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://rynan-backend.onrender.com/:path*', // Thay bằng domain BE của bạn
+        destination: 'https://rynan-backend.onrender.com/api/:path*', 
       },
     ];
   },
+
 };
 
 export default nextConfig;

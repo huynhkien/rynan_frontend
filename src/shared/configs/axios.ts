@@ -3,7 +3,7 @@ import { Env } from "./env";
 
 const axiosInstance = axios.create({
   baseURL: Env.API_URL,
-  timeout: 10000,
+  timeout: 30000,
   withCredentials: true,
   headers: {
     'Cache-Control': 'no-cache, no-store, must-revalidate',

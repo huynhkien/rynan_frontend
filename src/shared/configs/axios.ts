@@ -1,8 +1,7 @@
 import axios from "axios";
-import { Env } from "./env";
 
 const axiosInstance = axios.create({
-  baseURL: Env.API_URL,
+  baseURL: '/api',
   timeout: 30000,
   withCredentials: true,
   headers: {

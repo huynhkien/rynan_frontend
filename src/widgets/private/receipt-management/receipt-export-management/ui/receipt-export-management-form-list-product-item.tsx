@@ -58,9 +58,9 @@ export const ReceiptExportManagementFormListProductItem = ({productReceipt, mate
           toast.success('Xóa sản phẩm thành công')
       };
     }
-    // xóa nguyên liệu trong dữ liệu
+    // xóa sản phẩm trong dữ liệu
     const handleDeletePid = async(id: string) => {
-        if (window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')) {
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
           dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
           const response = await deleteProductReceipt(materialId as string, id)
           if(response.success){
@@ -255,7 +255,8 @@ return (
                     height: '60%',
                     maxWidth: '1000px',
                     position: 'relative',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.text.secondary
                 },
             }}
         >

@@ -30,6 +30,7 @@ export const ReceiptExportManagementFormAddEditProductItem = ({materialId, recei
         setValue('expiryDate', '');
         setValue('manufacturingDate', ''); 
         setValue('batchNumber', ''); 
+        setValue('price', 0);
     } 
     // Hiển thị giá trị quy cách
     useEffect(() => {
@@ -84,6 +85,7 @@ export const ReceiptExportManagementFormAddEditProductItem = ({materialId, recei
                     name: filteredProduct?.name,
                     specification: specifications.find(el => el._id === filteredProduct?.specification)?.name,
                     quantity: filteredProduct?.quantity,
+                    price: filteredProduct?.price,
                     batchNumber: filteredProduct?.batchNumber,
                     expiryDate: (filteredProduct?.expiryDate as string).split('T')[0],
                     manufacturingDate: (filteredProduct?.manufacturingDate as string).split('T')[0],
@@ -97,7 +99,8 @@ export const ReceiptExportManagementFormAddEditProductItem = ({materialId, recei
                 pid: isEditProductState,
                 name: filteredProduct?.name,
                 specification: filteredProduct?.specification,
-                quantity: selectedQuantity,
+                quantity: isNumberQuantity,
+                price: isNumberPrice,
                 batchNumber: selectedBatchNumber,
                 expiryDate: selectedExpiryDate,
                 manufacturingDate: selectedManufacturingDate

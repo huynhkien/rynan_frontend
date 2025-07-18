@@ -388,7 +388,7 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.total.toLocaleString()} VNĐ
+                          {item.total?.toLocaleString()} VNĐ
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
@@ -777,7 +777,7 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
-                          {item.total.toLocaleString()} VNĐ
+                          {item.total?.toLocaleString()} VNĐ
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle' }}>

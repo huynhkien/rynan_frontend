@@ -1,4 +1,4 @@
-import { createReceiptImport, getAllReceipt, getReceiptById, updateReceipt } from "@/features/receipt/api/receiptApi";
+import { createReceiptExport, getAllReceipt, getReceiptById, updateReceipt } from "@/features/receipt/api/receiptApi";
 import ReceiptFormInput from "@/features/receipt/components/ReceiptFormInput";
 import { ReceiptData, ReceiptProductData } from "@/features/receipt/type/receiptType";
 import { getAllSpecification } from "@/features/specification/api/specificationApi";
@@ -132,7 +132,7 @@ export const ReceiptExportManagementFormAddEditProduct = () => {
                 note: data.note
             }
             dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
-            const response = await createReceiptImport(newDataReceipt as ReceiptData);
+            const response = await createReceiptExport(newDataReceipt as ReceiptData);
             if(response.success){
                 dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);

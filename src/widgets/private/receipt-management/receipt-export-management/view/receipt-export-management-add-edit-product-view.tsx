@@ -16,7 +16,7 @@ export const ReceiptExportManagementAddEditProductView = () => {
                 <Breadcrumb
                     type='Admin'
                     breadcrumb={[{
-                        name: 'Quản lý xuất kho kho',
+                        name: 'Quản lý xuất kho',
                         url: '/admin/receipt-management/export',
                     },
                     {

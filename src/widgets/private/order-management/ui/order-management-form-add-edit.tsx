@@ -169,7 +169,8 @@ export const OrderManagementFormAddEdit = () => {
                 paymentStatus: response.data.paymentStatus || '',
                 paymentMethod: response.data.paymentMethod || '',
                 paymentDueDate: (response.data.paymentDueDate as string).split('T')[0] || '',
-                note: response.data.note || ''
+                note: response.data.note || '',
+                orderType: response.data.orderType
             });
             setValue('orderBy', response.data.orderBy || '');
             setSelectedUser(response.data.orderBy);
@@ -211,14 +212,16 @@ export const OrderManagementFormAddEdit = () => {
                 expectedDeliveryDate: data.expectedDeliveryDate,
                 orderType: 'STAFF_CREATED',
             }
-            console.log(newOrderData);
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await updateOrder(newOrderData as OrderData, id as string);
             if(response.success) {
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 dispatch(removeAllOrderProduct());
                 fetchOrder();
             }
         }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
             toast.error(errorMessage);
             fetchOrder();
@@ -311,6 +314,19 @@ export const OrderManagementFormAddEdit = () => {
                                     defaultValue={OrderStatus.find(el => el._id === 'Processing')?.name}
                                 />
                                 }
+                                {id ? 
+                                <ControlledSelect
+                                    label='Loại đơn hàng'
+                                    placeholder='Lựa chọn loại đơn hàng'
+                                    important
+                                    disabled
+                                    sx={{ width: '100%' }}
+                                    name='orderType'
+                                    control={control}
+                                    options={OrderType}
+                                    rules={{ required: 'Vui lòng chọn loại đơn hàng' }}
+                                />
+                                :
                                 <OrderFormInput
                                     label='Loại đơn hàng'
                                     important
@@ -320,7 +336,8 @@ export const OrderManagementFormAddEdit = () => {
                                     id='orderType'
                                     validate={{ required: 'Loại đơn hàng không được để trống' }}
                                     defaultValue={OrderType.find(el => el._id === 'STAFF_CREATED')?.name}
-                                />
+                                />    
+                                }
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', gap: 2}}>
                                     <ControlledSelect
                                         label='Nhân viên xử lý'

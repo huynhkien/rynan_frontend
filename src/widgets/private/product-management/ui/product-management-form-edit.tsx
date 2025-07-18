@@ -467,7 +467,7 @@ export const ProductManagementFormEdit = () => {
                 toast.error(response.message);
                 return;
             }
-
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             toast.success(response.message);
         } catch (error: unknown) {
             dispatch(showModal({ isShowModal: false, modalType: null }));

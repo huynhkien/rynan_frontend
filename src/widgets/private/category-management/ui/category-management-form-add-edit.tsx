@@ -29,13 +29,14 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
             dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
             const response = await createCategory(formData);
             if (!response.success) {
-                dispatch(showModal({ isShowModal: false, modalType: null }));
+                dispatch(showModal({ isShowModal: false, modalType: null }))
                 toast.error(response?.message);
                 reset();
                 render();
                 setPreview(null);
                 return;
             }
+            dispatch(showModal({ isShowModal: false, modalType: null }))
             toast.success(response.message);
             reset();
             render();
@@ -85,6 +86,7 @@ export const CategoryManagementFormAddEdit = ({isUpdateCategory, render} : Updat
                 toast.error(response?.message);
                 return;
             }
+            dispatch(showModal({ isShowModal: false, modalType: null }))
             toast.success(response.message);
             render();
         } catch (error: unknown) {

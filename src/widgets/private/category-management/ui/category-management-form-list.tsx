@@ -28,6 +28,8 @@ import { CategoryManagementFormAddEdit } from './category-management-form-add-ed
 import { deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
 import { Category } from '@/features/category/type/categoryType';
 import { toast } from 'react-toastify';
+import { showModal } from '@/shared/store/appSlice';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
 
 const headCells = [
   { id: 'name', label: 'Tên sản phẩm', sortable: true },
@@ -51,6 +53,7 @@ export const CategoryManagementFormList = () => {
     const [isAddCategory, setIsAddCategory] = useState<boolean>(false);
     const [isUpdateCategory, setIsUpdateCategory] = useState<string | null>(null);
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const fetchAllCategory = async () => {
         const response = await getAllCategory();
         if(response.success) {
@@ -66,15 +69,19 @@ export const CategoryManagementFormList = () => {
     // xóa danh mục
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa danh mục không?');
-        const response = await deleteCategory(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllCategory();
-          return;
-        }else{
-          toast.error(response.message);
-          fetchAllCategory();
+        if(window.confirm('Bạn có chắc muốn xóa danh mục không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+          const response = await deleteCategory(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }))
+            toast.success(response.message);
+            fetchAllCategory();
+            return;
+          }else{
+            dispatch(showModal({ isShowModal: false, modalType: null }))
+            toast.error(response.message);
+            fetchAllCategory();
+          }
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);

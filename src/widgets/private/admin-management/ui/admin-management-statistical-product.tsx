@@ -1,6 +1,5 @@
-import { Box, Paper, Typography, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Box, Paper, Typography } from '@mui/material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useState, useMemo } from 'react';
 import { Product } from '@/features/product/type/productType';
 import { CustomProductTooltipProps, ProductStatusData } from '@/features/admin/type/adminType';
 
@@ -9,71 +8,42 @@ import { CustomProductTooltipProps, ProductStatusData } from '@/features/admin/t
 export const AdminManagementStatisticalProduct = ({ 
   products 
 }: { products: Product[] }) => {
-  const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1);
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
-  const availableMonths = useMemo(() => Array.from({ length: 12 }, (_, i) => i + 1), []);
-
-  const availableYears = useMemo(() => {
-    if (!products || products.length === 0) return [];
-    const years = new Set<number>();
-    products.forEach(product => {
-      if (product.createdAt) {
-        const date = new Date(product.createdAt);
-        if (!isNaN(date.getTime())) {
-          years.add(date.getFullYear());
-        }
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  }, [products]);
-
-  const filteredProducts = useMemo(() => {
-    if (!products || products.length === 0) return [];
-    return products.filter(product => {
-      if (!product.createdAt) return false;
-      const productDate = new Date(product.createdAt);
-      if (isNaN(productDate.getTime())) return false;
-      const productMonth = productDate.getMonth() + 1;
-      const productYear = productDate.getFullYear();
-      return productMonth === selectedMonth && productYear === selectedYear;
-    });
-  }, [products, selectedMonth, selectedYear]);
 
   const ratingData: ProductStatusData[] = [
     { 
       name: '0 - 1 sao', 
-      value: filteredProducts.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
+      value: products.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).length || 0, 
+      countRating: products.filter(product => product.totalRatings > 0 && product.totalRatings <= 1).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#EF5350' 
     },
     { 
       name: '1 - 2 sao', 
-      value: filteredProducts.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
+      value: products.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).length || 0, 
+      countRating: products.filter(product => product.totalRatings > 1 && product.totalRatings <= 2).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#FF9800' 
     },
     { 
       name: '2 - 3 sao', 
-      value: filteredProducts.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
+      value: products.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).length || 0, 
+      countRating: products.filter(product => product.totalRatings > 2 && product.totalRatings <= 3).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#FFC107' 
     },
     { 
       name: '3 - 4 sao', 
-      value: filteredProducts.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
+      value: products.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).length || 0, 
+      countRating: products.filter(product => product.totalRatings > 3 && product.totalRatings <= 4).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#8BC34A' 
     },
     { 
       name: '4 - 5 sao', 
-      value: filteredProducts.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).length || 0, 
-      countRating: filteredProducts.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
+      value: products.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).length || 0, 
+      countRating: products.filter(product => product.totalRatings > 4 && product.totalRatings <= 5).reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0,
       color: '#4CAF50' 
     },
   ];
 
-  const totalProductCount = filteredProducts.length || 0;
-  const countRating = filteredProducts.reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0;
+  const totalProductCount = products.length || 0;
+  const countRating = products.reduce((acc, product) => acc + Number(product?.ratings?.length), 0) || 0;
   const CustomTooltip = ({ active, payload, label }: CustomProductTooltipProps) => {
     if (active && payload && payload.length) {
       return (
@@ -99,45 +69,12 @@ export const AdminManagementStatisticalProduct = ({
         <Typography variant='h5' component='h2' sx={{ fontWeight: 600, color: 'text.secondary' }}>
           Thống kê đánh giá sản phẩm
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          {/* Lựa chọn tháng */}
-          <FormControl size='small' sx={{ minWidth: 120 }}>
-            <InputLabel id='month-select-label'>Chọn tháng</InputLabel>
-            <Select
-              labelId='month-select-label'
-              value={selectedMonth}
-              label='Chọn tháng'
-              onChange={(e) => setSelectedMonth(Number(e.target.value))}
-            >
-              {availableMonths.map(month => (
-                <MenuItem key={month} value={month}>{`Tháng ${month}`}</MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {/* Lựa chọn năm */}
-          <FormControl size='small' sx={{ minWidth: 120 }}>
-            <InputLabel id='year-select-label'>Chọn năm</InputLabel>
-            <Select
-              value={availableYears.includes(selectedYear) ? selectedYear : ''}
-              onChange={(e) => setSelectedYear(e.target.value as number)}
-            >
-              {availableYears.map((year) => (
-                <MenuItem key={year} value={year}>
-                  {year}
-                </MenuItem>
-              ))}
-          </Select>
-          </FormControl>
-        </Box>
       </Box>
 
-      {filteredProducts.length === 0 ? (
+      {products.length === 0 ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 400, flexDirection: 'column' }}>
           <Typography variant='h6' color='text.secondary'>
-            Không có dữ liệu cho tháng {selectedMonth}/{selectedYear}
-          </Typography>
-          <Typography variant='body1' color='text.secondary'>
-            Vui lòng chọn tháng khác
+            Không có dữ liệu đánh giá về sản phẩm
           </Typography>
         </Box>
       ) : (
@@ -176,9 +113,9 @@ export const AdminManagementStatisticalProduct = ({
           </Box>
 
           <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Typography variant='h6' color='text.secondary' sx={{ mb: 1 }}>
+            {/* <Typography variant='h6' color='text.secondary' sx={{ mb: 1 }}>
               Tháng {selectedMonth}/{selectedYear}
-            </Typography>
+            </Typography> */}
             
             {/* Thống kê tổng quan */}
             <Box sx={{ p: 2, borderRadius: 2, backgroundColor: 'rgba(33, 150, 243, 0.1)', border: '1px solid rgba(33, 150, 243, 0.2)' }}>

@@ -175,6 +175,10 @@ export interface OrderProductItem {
   price?: number;
   thumb?: string;
 }
+export interface ChatbotResponse {
+  success: boolean,
+  data: string
+}
 // input
 export type UserFormInputProps = FormInputProps<UserDataProps>;
 export type UserImageInputProps = InputImageProps<UserDataProps>;

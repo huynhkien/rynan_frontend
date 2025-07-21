@@ -2,6 +2,7 @@ export const UserEndpoints = {
     REGISTER: '/user/register',
     CHECK_MAIL: '/user/check-mail',
     LOGIN: '/user/login',
+    CHATBOT: '/user/chatbot',
     LOGOUT: '/user/logout',
     FORGOT_PASSWORD: '/user/forgot-password',
     RESET_PASSWORD: '/user/reset-password',

@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse, UsersResponse } from "../type/userTypes";
+import { ChatbotResponse, LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse, UsersResponse } from "../type/userTypes";
 import { UserEndpoints } from "./userEndpoints";
 
 
@@ -69,5 +69,10 @@ export const deleteUser = async (id: string): Promise<UserResponse> =>
 // thêm sản phẩm vào danh sách yêu thích
 export const addFavorite = async (uid: string, pid: string): Promise<RegisterResponse> => 
   axiosInstance.post(UserEndpoints.ADD_FAVORITE, {uid, pid}, {
+    withCredentials: true,
+});
+// chatbot
+export const chatbot = async (message: string): Promise<ChatbotResponse> => 
+  axiosInstance.post(UserEndpoints.CHATBOT, {message}, {
     withCredentials: true,
 });

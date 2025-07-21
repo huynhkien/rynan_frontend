@@ -57,8 +57,8 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
           <div
             style={{
               position: 'fixed',
-              bottom: 30,
-              right: 30,
+              bottom: 50,
+              right: 50,
               cursor: 'pointer'
             }}
             onClick={() => setShowChatbot(true)}

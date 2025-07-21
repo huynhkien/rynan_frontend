@@ -203,7 +203,7 @@ export const OrderManagementFormAddEdit = () => {
                 products: productsData,
                 status: data.status,
                 orderBy: selectedUser,
-                total: totalOrder,
+                total: orderTotalUpdate,
                 paymentMethod: data.paymentMethod,
                 paymentStatus: data.paymentStatus,
                 paymentDueDate: data.paymentDueDate,

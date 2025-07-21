@@ -85,7 +85,7 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
                 right: 50,
                 margin: 0,
                 width: '400px',
-                height: '500px',
+                height: '600px',
                 borderRadius: '12px',
                 backgroundColor: theme.palette.text.secondary
                 

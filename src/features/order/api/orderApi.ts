@@ -7,8 +7,15 @@ import { OrderProductItem } from "@/features/user/type/userTypes";
 export const createOrder = async (data: OrderData): Promise<OrderResponse> => 
   axiosInstance.post(OrderEndpoints.CREATE, data, {
     withCredentials: true,
-    
 });
+// Thanh toán với vnapy
+export const createOrderVnPay = async(data: OrderData): Promise<OrderResponse> => 
+  axiosInstance.post(OrderEndpoints.CREATE_ORDER_VNPAY, data, {
+    withCredentials: true,
+});
+// Trả về kết quả thành toán
+export const returnOrderVnPay =  async(): Promise<OrdersResponse> => 
+    axiosInstance.get(OrderEndpoints.RETURN_ORDER_VNPAY);
 // Cập nhật đơn hàng
 export const updateOrder = async (data: OrderData, id: string): Promise<OrderResponse> => 
   axiosInstance.put(OrderEndpoints.UPDATE(id), data, {

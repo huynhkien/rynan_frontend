@@ -1,5 +1,7 @@
 export const OrderEndpoints = {
     CREATE: '/order',
+    CREATE_ORDER_VNPAY: '/order/create-order-vnp',
+    RETURN_ORDER_VNPAY: '/order/return-order-vnp',
     GET_ALL: '/order',
     GET_BY_ID: (id: string | number) => `/order/${id}`,
     UPDATE: (id: string | number) => `/order/${id}`,

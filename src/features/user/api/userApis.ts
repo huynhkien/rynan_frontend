@@ -76,3 +76,8 @@ export const chatbot = async (message: string): Promise<ChatbotResponse> =>
   axiosInstance.post(UserEndpoints.CHATBOT, {message}, {
     withCredentials: true,
 });
+// chatbot model ai 
+export const chatbotModel = async (message: string): Promise<ChatbotResponse> => 
+  axiosInstance.post(UserEndpoints.CHATBOT_MODEL, {message}, {
+    withCredentials: true,
+});

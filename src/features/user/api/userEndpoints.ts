@@ -3,6 +3,7 @@ export const UserEndpoints = {
     CHECK_MAIL: '/user/check-mail',
     LOGIN: '/user/login',
     CHATBOT: '/user/chatbot',
+    CHATBOT_MODEL: '/user/chatbot-model-ai',
     LOGOUT: '/user/logout',
     FORGOT_PASSWORD: '/user/forgot-password',
     RESET_PASSWORD: '/user/reset-password',

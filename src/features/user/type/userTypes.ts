@@ -177,7 +177,8 @@ export interface OrderProductItem {
 }
 export interface ChatbotResponse {
   success: boolean,
-  data: string
+  data: string,
+  message?: string;
 }
 // input
 export type UserFormInputProps = FormInputProps<UserDataProps>;

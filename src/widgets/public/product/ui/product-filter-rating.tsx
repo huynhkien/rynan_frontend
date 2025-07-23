@@ -39,13 +39,13 @@ export const ProductFilterRating = ({handleSelectValue, selectedStar} : {handleS
                     transform: 'translateX(5px)',
                   },
                   transition: 'all 0.3s ease',
-                  backgroundColor: `${selectedStar === star ? theme.palette.background.paper : theme.palette.text.secondary}`
+                  backgroundColor: `${selectedStar === star ? theme.palette.primary.main : ''}`
                 }}
               >
                 {[...Array(star)].map((_, i) => (
                   <StarIcon key={i} fontSize="small" sx={{ color: theme.palette.warning.main,  }} />
                 ))}
-                trở lên
+                <Typography component='span' sx={{color: `${selectedStar === star ? theme.palette.text.secondary : ''}`}}>trở lên</Typography>
               </Typography>
             </Box>
           ))}

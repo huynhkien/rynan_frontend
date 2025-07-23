@@ -95,7 +95,8 @@ const ProductCard = ({ data }: { data: Product }) => {
         boxShadow: hovering ? 6 : 6,
         transition: 'all 0.3s ease',
         transform: hovering ? 'translateY(-5px)' : 'translateY(0)',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        position: 'relative',
       }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
@@ -189,23 +190,6 @@ const ProductCard = ({ data }: { data: Product }) => {
             <ShoppingCartIcon sx={{ color: theme.palette.primary.light,  fontSize: theme.typography.fontSize }} />
           </IconButton>
         </Box>
-
-        {/* Giảm giá(nếu có) */}
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 12,
-            right: 12,
-            backgroundColor: '#ff5722',
-            color: theme.palette.text.secondary,
-            padding: '4px 8px',
-            borderRadius: '4px',
-            fontSize: {xs: '12px' , md: theme.typography.body1.fontSize},
-            fontWeight: theme.typography.fontWeightBold
-          }}
-        >
-          -20%
-        </Box>
       </Box>
       {/* Thông tin */}
       <CardContent sx={{ p:1, height: '200px', display: 'flex', flexDirection: 'column' }}>
@@ -225,41 +209,70 @@ const ProductCard = ({ data }: { data: Product }) => {
         >
           {categories.find((el) => el._id === data.category)?.name}
         </Typography>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt:1 }}>
-          <Chip 
-            label='913 đã bán' 
-            size='small' 
-            sx={{ 
-              backgroundColor: theme.palette.primary.main,
-              color: theme.palette.text.secondary,
-              fontSize: {xs: `calc(${theme.typography.body1.fontSize} - 4px)`, md: `calc(${theme.typography.body1.fontSize} - 2px)`}
-            }}
-          />
-        </Box>
-
-        {/* Đánh giá */}
-        <Box 
-          sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: 1 ,
-          }}
-        >
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Box
-                key={star}
-                sx={{
-                  color: theme.palette.warning.main
-                }}
-              >
-                ★
-              </Box>
-            ))}
+        <Box sx={{position: 'absolute', bottom: 10}}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, my:2 }}>
+            <Chip 
+              label={`Đã bán: ${data.sold}`} 
+              size='small' 
+              sx={{ 
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.text.secondary,
+                fontSize: {xs: `calc(${theme.typography.body1.fontSize} - 4px)`, md: `calc(${theme.typography.body1.fontSize} - 2px)`}
+              }}
+            />
           </Box>
-          <Typography variant='body1'>
-            (5.0)
-          </Typography>
+          {/* Đánh giá */}
+          <Box 
+            sx={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: 1 ,
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                {[1, 2, 3, 4, 5].map((star) => {
+                  const rating = data.totalRatings || 0;
+                  
+                  return (
+                    <Box
+                      key={star}
+                      sx={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        fontSize: '20px',
+                        lineHeight: 1
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          color: theme.palette.text.primary,
+                          position: 'absolute',
+                          top: 0,
+                          left: 0
+                        }}
+                      >
+                        ★
+                      </Box>
+                      
+                      <Box
+                        sx={{
+                          color: theme.palette.warning.main,
+                          overflow: 'hidden',
+                          width: rating >= star ? '100%' : 
+                                rating >= star - 0.5 ? '50%' : '0%',
+                          position: 'relative'
+                        }}
+                      >
+                        ★
+                      </Box>
+                    </Box>
+                  );
+                })}
+              </Box>
+              <Typography variant='body1' sx={{ ml: 1 }}>
+                ({data.totalRatings})
+              </Typography>
+          </Box>
         </Box>
       </CardContent>
     </Card>

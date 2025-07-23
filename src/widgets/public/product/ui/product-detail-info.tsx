@@ -12,7 +12,6 @@ import { Button } from '@/shared/components';
 import { Quantity } from '@/shared/components/ui/public/Quantity';
 import { useAppDispatch} from '@/shared/hooks/useAppHook';
 import { hideModal, showModal } from '@/shared/store/appSlice';
-import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -356,25 +355,59 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
                         gap: 1,
                         py: 0.5
                     }}>
-                    <Box sx={{ display: 'flex', gap: 0.5 }}>
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <Box
+                    <Box 
+                        sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1 ,
+                        }}
+                    >
+                        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
+                            {[1, 2, 3, 4, 5].map((star) => {
+                            const rating = productSlug.totalRatings || 0;
+                            
+                            return (
+                                <Box
                                 key={star}
                                 sx={{
-                                    color: theme.palette.warning.main
+                                    position: 'relative',
+                                    display: 'inline-block',
+                                    fontSize: '20px',
+                                    lineHeight: 1
                                 }}
-                            >
-                                <Star sx={{
-                                    fontSize: theme.typography.body1.fontSize
-                                }}/>
-                            </Box>
-                        ))}
+                                >
+                                <Box
+                                    sx={{
+                                    color: theme.palette.text.primary,
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0
+                                    }}
+                                >
+                                    ★
+                                </Box>
+                                
+                                <Box
+                                    sx={{
+                                    color: theme.palette.warning.main,
+                                    overflow: 'hidden',
+                                    width: rating >= star ? '100%' : 
+                                            rating >= star - 0.5 ? '50%' : '0%',
+                                    position: 'relative'
+                                    }}
+                                >
+                                    ★
+                                </Box>
+                                </Box>
+                            );
+                            })}
+                        </Box>
                     </Box>
                     <Typography variant='body1'>
-                        (5.0) 
+                        ({productSlug.totalRatings}) 
                     </Typography>
                     <Typography variant='body1'>
-                        - 12 lượt đánh giá
+                        - {productSlug.ratings?.length || 0} lượt đánh giá
                     </Typography>
                 </Box>
 

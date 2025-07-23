@@ -59,10 +59,11 @@ export const ProductFilterCategory = ({categories, products, handleSelectValue, 
               onClick={() => handleSelectValue(el._id)}
               sx={{
                 flexShrink: 0, 
-                backgroundColor: `${selectedCategory === el._id ? theme.palette.background.paper : theme.palette.text.secondary}`
+                backgroundColor: `${selectedCategory === el._id ? theme.palette.primary.main : ''}`
               }}
             >
               <Typography sx={{
+                color: `${selectedCategory === el._id ? theme.palette.text.secondary : theme.palette.text.primary}`,
                 '&:hover': {
                   color: theme.palette.warning.main,
                   transform: 'translateX(5px)',

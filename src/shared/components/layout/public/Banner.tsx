@@ -25,7 +25,7 @@ export const Banner = ({category, breadcrumb}: BannerBreadcrumbProps) => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: 'url(/banner/banner-9.jpg)',
+            backgroundImage: 'url(/banner/banner-12.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',

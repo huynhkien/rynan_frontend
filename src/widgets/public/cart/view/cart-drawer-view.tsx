@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook';
 import { removeItemCart } from '@/features/user/store/userSlice';
 import { toast } from 'react-toastify';
 import Swal, { SweetAlertResult } from 'sweetalert2';
+import { hideModal, showModal } from '@/shared/store/appSlice';
 
 export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const theme = useTheme();
@@ -33,7 +34,13 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                 if(rs.isConfirmed) router.push('/login')
           });
         }
-        router.push('/checkout')
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+            setTimeout(() => {
+                router.push('/checkout');
+                setTimeout(() => {
+                    dispatch(hideModal())
+                }, 500);
+          }, 1000)
       }
     const handleCart = () => {
       if(!current){
@@ -47,7 +54,13 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                 if(rs.isConfirmed) router.push('/login')
           });
         }
-        router.push('/cart')
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+            setTimeout(() => {
+                router.push('/cart');
+                setTimeout(() => {
+                    dispatch(hideModal())
+                }, 500);
+          }, 1000)
     }
     // Xóa sản phẩm trong giỏ hàng
     const handleDeleteCart = async(id: string) => {

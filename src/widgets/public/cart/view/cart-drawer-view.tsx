@@ -17,23 +17,37 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
     const theme = useTheme();
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const {cart} = useAppSelector((state) => state.user);
+    const {cart, current} = useAppSelector((state) => state.user);
     const handleClose = () => {
         setOpen(false);
     };
     const handleCheckOut = () => {
-      return Swal.fire({
-                text: 'Vui lòng đăng nhập',
-                icon: 'info',
-                cancelButtonText: 'Không phải bây giờ',
-                showCancelButton: true,
-                confirmButtonText: 'Chuyển đến trang đăng nhập'
-             }).then((rs: SweetAlertResult) => {
+      if(!current){
+        return Swal.fire({
+             text: 'Vui lòng đăng nhập',
+             icon: 'info',
+             cancelButtonText: 'Không phải bây giờ',
+             showCancelButton: true,
+             confirmButtonText: 'Chuyển đến trang đăng nhập'
+              }).then((rs: SweetAlertResult) => {
                 if(rs.isConfirmed) router.push('/login')
-             })
-    }
+          });
+        }
+        router.push('/checkout')
+      }
     const handleCart = () => {
-      router.push('/cart')
+      if(!current){
+        return Swal.fire({
+             text: 'Vui lòng đăng nhập',
+             icon: 'info',
+             cancelButtonText: 'Không phải bây giờ',
+             showCancelButton: true,
+             confirmButtonText: 'Chuyển đến trang đăng nhập'
+              }).then((rs: SweetAlertResult) => {
+                if(rs.isConfirmed) router.push('/login')
+          });
+        }
+        router.push('/cart')
     }
     // Xóa sản phẩm trong giỏ hàng
     const handleDeleteCart = async(id: string) => {
@@ -82,7 +96,7 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                 }
               }}
             >
-              {cart.map((item, index) => (
+              {cart.length > 0 ? cart.map((item, index) => (
                 <Box
                   key={index} 
                   sx={{
@@ -170,7 +184,12 @@ export const CartDrawerView = ({open, setOpen} : CartDrawerProps) => {
                     {((item.price || 0) * item.quantity).toLocaleString()} VNĐ
                   </Typography>
                 </Box>
-              ))}
+              ))
+              :
+              <Box >
+                <Typography sx={{p:2}}>Giỏ hàng trống</Typography>
+              </Box>
+            }
             </Box>
 
             <Box sx={{ 

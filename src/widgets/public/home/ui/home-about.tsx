@@ -21,7 +21,7 @@ export const HomeAbout = () => {
             <Box
                 sx={{
                     position: 'absolute',
-                    top: -53,
+                    top: -50,
                     width: '100%',
                     zIndex: 5,
                 }}

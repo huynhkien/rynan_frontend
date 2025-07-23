@@ -17,7 +17,7 @@ export const ContactInfo = () => {
                 }}
             >
                 <Image
-                    src='/banner/banner-5.jpg'
+                    src='/banner/banner-10.jpg'
                     alt='banner-7'
                     fill
                     style={{
@@ -27,7 +27,7 @@ export const ContactInfo = () => {
             </Box>
             <Card
                 sx={{
-                    background: theme.palette.warning.main,
+                    background: theme.palette.primary.main,
                     borderRadius: 4,
                     color: theme.palette.text.secondary,
                     overflow: 'hidden',

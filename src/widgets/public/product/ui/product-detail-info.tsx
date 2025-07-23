@@ -11,6 +11,7 @@ import { addToCart } from '@/features/user/store/userSlice';
 import { Button } from '@/shared/components';
 import { Quantity } from '@/shared/components/ui/public/Quantity';
 import { useAppDispatch} from '@/shared/hooks/useAppHook';
+import { hideModal, showModal } from '@/shared/store/appSlice';
 import { Star } from '@mui/icons-material';
 import { Box, Card, Typography, useTheme } from '@mui/material';
 import Image from 'next/image';
@@ -117,7 +118,6 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
     };
     const handleBuyNow = () => {
         const existingProductInventory = inventories.find(el => el.productId === productSlug?._id)
-        console.log(existingProductInventory);
         if(existingProductInventory && Number(existingProductInventory.currentStock) < 50){
             toast.error('Số lượng sản phẩm hiện quá thấp. Mong quý khách thông cảm vì sự bất tiện này.');
             return;
@@ -141,7 +141,13 @@ export const ProductDetailInfo = ({slug}: {slug: string}) => {
             quantity: qty,
             thumb: productSlug?.thumb.url || ''
         }));
-        router.push('/cart')
+         dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          setTimeout(() => {
+              router.push('/cart');
+              setTimeout(() => {
+                  dispatch(hideModal())
+              }, 500);
+        }, 1000)
     }
 
     // Xử lý khi di chuyển chuột vào ảnh

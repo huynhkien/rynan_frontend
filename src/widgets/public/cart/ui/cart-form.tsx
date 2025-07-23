@@ -14,6 +14,7 @@ import { removeItemCart, updateQuantityCart } from '@/features/user/store/userSl
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Swal, { SweetAlertResult } from 'sweetalert2';
+import { hideModal, showModal } from '@/shared/store/appSlice';
 
 export const CartForm = () => {
   const { cart, current, isLogin } = useAppSelector((state) => state.user);
@@ -55,7 +56,13 @@ export const CartForm = () => {
   // Xử chuyển đến trang thanh toán
   const handleCheckOut = async() => {
     if(isLogin && current){
-       router.push('/checkout');
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+            setTimeout(() => {
+                router.push('/checkout');
+                setTimeout(() => {
+                    dispatch(hideModal())
+                }, 500);
+          }, 1000)
     }else{
        return Swal.fire({
           text: 'Vui lòng đăng nhập',

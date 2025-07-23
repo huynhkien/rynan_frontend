@@ -11,7 +11,11 @@ const images: string[] = [
   '/logo/logo-2.png', 
   '/logo/logo-3.png', 
   '/logo/logo-4.png',
+  '/logo/logo-1.png',
   '/logo/logo-5.png',
+  '/logo/logo-2.png',
+
+  
 ];
 
 
@@ -77,8 +81,8 @@ export const HomePartner: React.FC = () => {
             disableOnInteraction: false,
             }}
             loop={true}
-            spaceBetween={20}
-            slidesPerView={4}
+            spaceBetween={25}
+            slidesPerView={5}
             breakpoints={{
                 0: {
                 slidesPerView: 1,
@@ -101,7 +105,7 @@ export const HomePartner: React.FC = () => {
             {images.map((src, index) => (
             <SwiperSlide key={index}>
                 <Box sx={{
-                    position: 'relative', width: '30%', height: 'auto', aspectRatio: '5/4' 
+                    position: 'relative', width: '40%', height: 'auto', aspectRatio: '5/4' 
                 }}>
                     <Image
                         src={src}

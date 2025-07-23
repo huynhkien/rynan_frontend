@@ -7,23 +7,26 @@ export const AboutWelcome = () => {
         const content = [
             {
                 title: 'Phân Bón Thông Minh',
-                text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+                image: '/banner/banner-10.jpg',
+                text: 'Sử dụng công nghệ giải phóng chậm, phân bón thông minh cung cấp dưỡng chất theo nhu cầu thực tế của cây trồng, giảm thiểu thất thoát và ô nhiễm môi trường.',
             },
             {
-                title: 'Thiết Bị Thông Minh',
-                text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+                title: 'Thiết Bị Canh Tác Tự Động',
+                image: '/banner/banner-11.jpg',
+                text: 'Các thiết bị như cảm biến độ ẩm, hệ thống tưới tiêu tự động và drone nông nghiệp giúp bà con tiết kiệm công sức, tăng năng suất và kiểm soát dễ dàng hơn.',
             },
             {
-                title: 'Công Nghệ Nông Nghiệp',
-                text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+                title: 'Chuyển Đổi Số Trong Nông Nghiệp',
+                image: '/banner/banner-12.jpg',
+                text: 'Áp dụng nền tảng số để quản lý mùa vụ, theo dõi thời tiết, dự báo sâu bệnh và tối ưu hóa quy trình sản xuất – hướng đến nền nông nghiệp hiện đại và bền vững.',
             },
             {
-                title: 'Công Nghệ Nông Nghiệp',
-                text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+                title: 'Truy Xuất Nguồn Gốc Thông Minh',
+                image: '/banner/banner-13.png',
+                text: 'Nhờ công nghệ blockchain và mã QR, người tiêu dùng có thể dễ dàng truy xuất nguồn gốc sản phẩm, tạo niềm tin và nâng cao giá trị nông sản Việt.',
             },
-        ]
-            
-        // Debug function
+        ];
+
         const handleMouseEnter = (index: number) => {
             setIsHovered(index);
         }
@@ -161,7 +164,7 @@ export const AboutWelcome = () => {
                                     sx={{
                                         position: 'relative',
                                         my: 1,
-                                        backgroundImage: 'url(/portfolio/box-portfolio-1.jpg)',
+                                        backgroundImage: `url(${el.image})`,
                                         backgroundSize: 'cover',
                                         backgroundPosition: 'center',
                                         width: { xs: '200px', md: '380px' },

@@ -47,12 +47,14 @@ interface OrderProductData {
 export interface OrderResponse {
     success: boolean;
     message?: string;
-    data?: OrderData
+    data?: OrderData;
+    paymentUrl?: string
 }
 export interface OrdersResponse {
     success: boolean;
     message?: string;
     data?: OrderData[];
+    paymentUrl?: string
 }
 //
 export interface OrderManagementFormAddProductProps {

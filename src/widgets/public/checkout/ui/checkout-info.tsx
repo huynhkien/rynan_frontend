@@ -1,6 +1,6 @@
 'use client'
 
-import { createOrder, getAllOrder } from '@/features/order/api/orderApi'
+import { createOrder, createOrderVnPay, getAllOrder } from '@/features/order/api/orderApi'
 import { OrderData } from '@/features/order/type/orderType'
 import { removeAllCart } from '@/features/user/store/userSlice'
 import { Button } from '@/shared/components'
@@ -9,18 +9,21 @@ import { useAppDispatch, useAppSelector } from '@/shared/hooks/useAppHook'
 import { CheckoutInfoProps } from '@/types/widgets/checkout'
 import { InvalidFieldProps } from '@/types/widgets/contact'
 import { Email, LocationCity, Person, Phone } from '@mui/icons-material'
-import { Box, Container, Typography, useTheme } from '@mui/material'
+import { Box, Container, Typography, useTheme, Chip } from '@mui/material'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import Swal, { SweetAlertResult } from 'sweetalert2'
+
 
 export const CheckoutInfo = () => {
   const theme = useTheme();
   const router = useRouter();
   const { cart, current } = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
-  const [orders, setOrders] = useState<OrderData[] | []>([]);
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<string>('cash');
+
   const [payload, setPayload] = useState<CheckoutInfoProps>({
     name: '',
     email: '',
@@ -95,40 +98,67 @@ export const CheckoutInfo = () => {
 
     try {
       // Tạo mã đơn hàng tự động
-      const orderCode = generateUniqueCode();
-      const orderData = {
-        orderBy: current._id,
-        products: cart,
-        total: totalAmount,
-        note: payload.note,
-        status: 'Processing',
-        code: orderCode,
-        customerInfo: {
-          name: payload.name,
-          email: payload.email,
-          phone: payload.phone,
-          address: payload.address
+      if(paymentMethod === 'cash'){
+        const orderCode = generateUniqueCode();
+        const orderData = {
+          orderBy: current._id,
+          products: cart,
+          total: totalAmount,
+          note: payload.note,
+          status: 'Processing' ,
+          code: orderCode,
+          customerInfo: {
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            address: payload.address
+          }
+        };
+        
+        const response = await createOrder(orderData as OrderData);
+        if (response.success) {
+          dispatch(removeAllCart());
         }
-      };
-      
-      const response = await createOrder(orderData as OrderData);
-      
-      if (response.success) {
-        dispatch(removeAllCart());
         Swal.fire({
-          text: `Đặt hàng thành công! Mã đơn hàng: ${orderCode}`,
-          icon: 'success',
-          confirmButtonText: 'OK'
-        }).then(() => {
-          // Có thể redirect về trang orders hoặc reset form
-          router.push('/');
-        });
-      } else {
+            text: `Đặt hàng thành công! Mã đơn hàng: ${orderCode}.`,
+            icon: 'success',
+            confirmButtonText: 'Trở về',
+            timer: 3000,
+            timerProgressBar: true
+          }).then(() => {
+            router.push('/');
+          });
+      }else{
+        const orderCode = generateUniqueCode();
+        const orderData = {
+          orderBy: current._id,
+          products: cart,
+          total: totalAmount,
+          note: payload.note,
+          status: 'Processing' ,
+          code: orderCode,
+          paymentMethod: 'BANK_TRANSFER', 
+          paymentStatus: 'UNPAID',
+          customerInfo: {
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            address: payload.address
+          }
+        };
+        const response = await createOrderVnPay(orderData as OrderData);
+        if (response.success) {
+          dispatch(removeAllCart());
         Swal.fire({
-          text: 'Đặt hàng thất bại. Vui lòng thử lại!',
-          icon: 'error',
-          confirmButtonText: 'OK'
-        });
+            text: `Đặt hàng thành công! Mã đơn hàng: ${orderCode}. Chuyển hướng đến VNPay...`,
+            icon: 'success',
+            confirmButtonText: 'Trở về',
+            timer: 3000,
+            timerProgressBar: true
+          }).then(() => {
+            window.location.href = response.paymentUrl as string;
+          });
+        }
       }
     } catch (error: unknown) {
       const errorMessage = (error as Error)?.message || 'Đã xảy ra lỗi không xác định';
@@ -139,6 +169,7 @@ export const CheckoutInfo = () => {
       });
     }
   };
+
   useEffect(() => {
       if(current){
           setPayload({
@@ -158,6 +189,11 @@ export const CheckoutInfo = () => {
 
   const [invalidFields, setInValidFields] = useState<InvalidFieldProps[]>([]);
 
+  // Handler cho việc thay đổi payment method
+  const handlePaymentMethodChange = (method: string) => {
+    setPaymentMethod(method);
+  };
+
   return (
     <Container maxWidth='xl'
       sx={{
@@ -168,7 +204,7 @@ export const CheckoutInfo = () => {
           gap: 2,
           width: '100%'
       }}>
-      <Box sx={{width: "60%"}}>
+      <Box sx={{width: '60%'}}>
         <Box sx={{
             backgroundColor: theme.palette.primary.main,
             height: '59px',
@@ -313,7 +349,7 @@ export const CheckoutInfo = () => {
             </Box>
         </Box>
       </Box>
-      <Box sx={{ overflow: 'hidden', width: "40%" }}>
+      <Box sx={{ overflow: 'hidden', width: '40%' }}>
         {/* Header */}
         <Box
           sx={{
@@ -327,7 +363,7 @@ export const CheckoutInfo = () => {
           }}
         >
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{
               color: theme.palette.text.secondary,
               fontWeight: theme.typography.fontWeightBold
@@ -394,7 +430,7 @@ export const CheckoutInfo = () => {
                     />
                   </Box>
                   <Typography
-                    variant="body1"
+                    variant='body1'
                     sx={{
                       fontWeight: theme.typography.fontWeightMedium,
                       mx: 1,
@@ -416,7 +452,7 @@ export const CheckoutInfo = () => {
                   </Typography>
                 </Box>
                 <Typography
-                  variant="body1"
+                  variant='body1'
                   sx={{
                     fontWeight: theme.typography.fontWeightBold,
                     color: theme.palette.primary.main
@@ -439,13 +475,13 @@ export const CheckoutInfo = () => {
           }}
         >
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{ fontWeight: theme.typography.fontWeightBold }}
           >
             Tổng:
           </Typography>
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{
               fontWeight: theme.typography.fontWeightBold,
               color: theme.palette.primary.main
@@ -454,6 +490,37 @@ export const CheckoutInfo = () => {
             {totalAmount.toLocaleString()} VNĐ
           </Typography>
         </Box>
+        
+        {/* Payment Method Selection */}
+        <Box sx={{ px: 2, py: 2 }}>
+          <Typography
+            variant='body2'
+            sx={{ 
+              fontWeight: theme.typography.fontWeightBold,
+              mb: 1.5
+            }}
+          >
+            Chọn hình thức thanh toán:
+          </Typography>
+          
+          <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+            <Chip
+              label='💵 Tiền mặt'
+              variant={paymentMethod === 'cash' ? 'filled' : 'outlined'}
+              color={paymentMethod === 'cash' ? 'primary' : 'default'}
+              onClick={() => handlePaymentMethodChange('cash')}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Chip
+              label='🏦 VNPay'
+              variant={paymentMethod === 'vnpay' ? 'filled' : 'outlined'}
+              color={paymentMethod === 'vnpay' ? 'primary' : 'default'}
+              onClick={() => handlePaymentMethodChange('vnpay')}
+              sx={{ cursor: 'pointer' }}
+            />
+          </Box>
+        </Box>
+
         <Box
           sx={{
             display: 'flex',
@@ -465,25 +532,26 @@ export const CheckoutInfo = () => {
           }}
         >
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{ fontWeight: theme.typography.fontWeightBold }}
           >
             Hình thức thanh toán:
           </Typography>
           <Typography
-            variant="body2"
+            variant='body2'
             sx={{
               fontWeight: theme.typography.fontWeightBold,
               color: theme.palette.primary.main
             }}
           >
-            Tiền mặt 
+            {paymentMethod === 'cash' ? 'Tiền mặt' : 'VNPay'}
           </Typography>
         </Box>
-        <Box sx={{ p: 2 }}>
+
+        <Box sx={{ p: 2, borderBottomLeftRadius: '5px', borderBottomRightRadius: '5px', backgroundColor: theme.palette.background.paper }}>
           <Button 
             handleOnClick={handleCheckout}
-            name='Thanh Toán'
+            name={paymentMethod === 'cash' ? 'Thanh Toán' : 'Thanh toán VNPay'}
           />
         </Box>
       </Box>

@@ -393,7 +393,7 @@ export const CheckoutInfo = () => {
               }
             }}
           >
-            {cart.map((item, index) => (
+            {cart.length > 0 ? cart.map((item, index) => (
               <Box
                 key={index} 
                 sx={{
@@ -461,7 +461,12 @@ export const CheckoutInfo = () => {
                   {(item.quantity * (item.price || 0)).toLocaleString()} VNĐ
                 </Typography>
               </Box>
-            ))}
+            ))
+            :
+            <Box >
+              <Typography sx={{p:2}}>Không có sản phẩm</Typography>
+            </Box>
+          }
           </Box>
         </Box>
         <Box

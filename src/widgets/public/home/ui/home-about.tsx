@@ -21,7 +21,7 @@ export const HomeAbout = () => {
             <Box
                 sx={{
                     position: 'absolute',
-                    top: -43,
+                    top: -53,
                     width: '100%',
                     zIndex: 5,
                 }}
@@ -34,7 +34,7 @@ export const HomeAbout = () => {
                     sizes="110vw"
                     style={{
                         width: '100%',
-                        height: '50px',
+                        height: '60px',
                         objectFit: 'cover'
                     }}
                 />

@@ -25,7 +25,7 @@ export const HomeWhyUs = () => {
                 sizes="110vw"
                 style={{
                     width: '100%',
-                    height: '55px',
+                    height: '60px',
                     objectFit: 'cover'
                 }}
             />

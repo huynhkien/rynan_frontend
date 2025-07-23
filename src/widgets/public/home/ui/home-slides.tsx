@@ -12,6 +12,8 @@ interface SlideContent {
 }
 
 const images: string[] = [
+  '/banner/banner-10.jpg', 
+  '/banner/banner-12.jpg', 
   '/banner/banner-1.jpg', 
   '/banner/banner-2.jpg', 
   '/banner/banner-3.jpg'
@@ -19,21 +21,32 @@ const images: string[] = [
 
 const slideContents: SlideContent[] = [
   {
-    title: 'Chuyên Cung Cấp Các Dòng Sản Phẩm Chất Lượng',
-    subtitle: 'Vì mục tiêu cung cấp các sản phẩm nông nghiệp giá rẻ phục vụ cho bà con nông dân',
+    title: '',
+    subtitle: '',
+    buttonText: '',
+  },
+  {
+    title: '',
+    subtitle: '',
+    buttonText: '',
+  },
+  {
+    title: 'Sản Phẩm Nông Nghiệp Chất Lượng Cao',
+    subtitle: 'Cam kết mang đến sản phẩm an toàn, giá cả hợp lý phục vụ bà con nông dân trên toàn quốc.',
     buttonText: 'Liên hệ',
   },
   {
-    title: 'Chuyên Cung Cấp Các Dòng Sản Phẩm Chất Lượng',
-    subtitle: 'Vì mục tiêu cung cấp các sản phẩm nông nghiệp giá rẻ phục vụ cho bà con nông dân',
+    title: 'Phân Phối Toàn Quốc - Giao Hàng Nhanh',
+    subtitle: 'Hệ thống vận chuyển linh hoạt giúp sản phẩm đến tay bà con nhanh chóng và đúng hẹn.',
     buttonText: 'Liên hệ',
   },
   {
-    title: 'Chuyên Cung Cấp Các Dòng Sản Phẩm Chất Lượng',
-    subtitle: 'Vì mục tiêu cung cấp các sản phẩm nông nghiệp giá rẻ phục vụ cho bà con nông dân',
+    title: 'Đa Dạng Chủng Loại - Phù Hợp Mọi Nhu Cầu',
+    subtitle: 'Từ phân bón, thuốc trừ sâu đến giống cây trồng – đáp ứng mọi nhu cầu nông nghiệp.',
     buttonText: 'Liên hệ',
   },
 ];
+
 
 export const HomeSlides: React.FC = () => {
     const theme = useTheme();
@@ -197,7 +210,8 @@ export const HomeSlides: React.FC = () => {
                 >
                   {slideContents[index]?.subtitle}
                 </Typography>
-                <Button
+               {slideContents[index]?.buttonText?.trim() !== '' && (
+                 <Button
                         variant='outlined'
                         size='large'
                         className='slide-button'
@@ -258,6 +272,7 @@ export const HomeSlides: React.FC = () => {
                                 }}
                             />
                         </Button>  
+               )}
               </Box>
           </SwiperSlide>
         ))}

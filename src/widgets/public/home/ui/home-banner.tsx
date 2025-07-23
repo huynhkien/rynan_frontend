@@ -22,7 +22,7 @@ export const HomeBanner = () => {
               sizes="110vw"
               style={{
                   width: '100%',
-                  height: '55px',
+                  height: '60px',
                   objectFit: 'cover'
               }}
           />
@@ -44,7 +44,7 @@ export const HomeBanner = () => {
             left: 0,
             width: '100%',
             height: '100%',
-            backgroundImage: 'url(/banner/banner-5.jpg)',
+            backgroundImage: 'url(/banner/banner-14.jpg)',
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',

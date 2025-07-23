@@ -7,20 +7,17 @@ import Image from 'next/image';
 
 
 const images: string[] = [
-  '/banner/banner-1.jpg', 
-  '/banner/banner-2.jpg', 
-  '/banner/banner-3.jpg',
-  '/banner/banner-3.jpg',
-  '/banner/banner-3.jpg',
-  '/banner/banner-3.jpg',
-  '/banner/banner-3.jpg',
-  '/banner/banner-3.jpg',
+  '/logo/logo-1.png', 
+  '/logo/logo-2.png', 
+  '/logo/logo-3.png', 
+  '/logo/logo-4.png',
+  '/logo/logo-5.png',
 ];
 
 
 export const HomePartner: React.FC = () => {
   return (
-    <Box sx={{position: 'relative', py: {md: 1}}}>
+    <Box sx={{position: 'relative', py: {md: 5}}}>
         <Box
             sx={{
                 position: 'absolute',
@@ -80,8 +77,8 @@ export const HomePartner: React.FC = () => {
             disableOnInteraction: false,
             }}
             loop={true}
-            spaceBetween={10}
-            slidesPerView={6}
+            spaceBetween={20}
+            slidesPerView={4}
             breakpoints={{
                 0: {
                 slidesPerView: 1,
@@ -104,7 +101,7 @@ export const HomePartner: React.FC = () => {
             {images.map((src, index) => (
             <SwiperSlide key={index}>
                 <Box sx={{
-                    position: 'relative', width: '100%', height: 'auto', aspectRatio: '5/4' 
+                    position: 'relative', width: '30%', height: 'auto', aspectRatio: '5/4' 
                 }}>
                     <Image
                         src={src}

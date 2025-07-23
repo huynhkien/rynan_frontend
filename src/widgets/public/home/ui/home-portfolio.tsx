@@ -9,17 +9,21 @@ export const HomePortfolio = () => {
     const content = [
         {
             title: 'Phân Bón Thông Minh',
-            text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+            image: '/banner/banner-10.jpg',
+            text: 'Ứng dụng công nghệ giải phóng chậm, phân bón thông minh cung cấp dưỡng chất theo nhu cầu thực tế của cây trồng, giảm thất thoát và nâng cao hiệu quả canh tác.',
         },
         {
-            title: 'Thiết Bị Thông Minh',
-            text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+            title: 'Thiết Bị Canh Tác Thông Minh',
+            image: '/banner/banner-13.png',
+            text: 'Từ cảm biến độ ẩm, hệ thống tưới nhỏ giọt tự động đến thiết bị giám sát môi trường – nông dân dễ dàng kiểm soát quá trình canh tác mọi lúc, mọi nơi qua điện thoại.',
         },
         {
-            title: 'Công Nghệ Nông Nghiệp',
-            text: 'Phân bón thông minh là loại phân bón được thiết kế với công nghệ tiên tiến giúp giải phóng chất dinh dưỡng theo thời gian hoặc theo điều kiện môi trường như độ ẩm, nhiệt độ, độ pH... '
+            title: 'Giải Pháp Công Nghệ Cho Nông Nghiệp',
+            image: '/banner/banner-4.jpg',
+            text: 'Áp dụng AI, IoT và dữ liệu lớn vào quản lý mùa vụ, dự báo sâu bệnh, tối ưu hóa phân phối và tăng năng suất – hướng tới nền nông nghiệp chính xác và bền vững.',
         },
-    ]
+    ];
+
         
     // Debug function
     const handleMouseEnter = (index: number) => {
@@ -111,7 +115,7 @@ export const HomePortfolio = () => {
                             sx={{
                                 position: 'relative',
                                 my: 1,
-                                backgroundImage: 'url(/portfolio/box-portfolio-1.jpg)',
+                                backgroundImage: `url(${el.image})`,
                                 backgroundSize: 'cover',
                                 backgroundPosition: 'center',
                                 width: { xs: '300px', md: '380px' },

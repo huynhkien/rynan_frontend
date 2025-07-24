@@ -22,10 +22,10 @@ import {
   Checkbox,
   Dialog
 } from '@mui/material';
-import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add, Cancel, Delete, Edit} from '@mui/icons-material';
 import Image from 'next/image';
 import { CategoryManagementFormAddEdit } from './category-management-form-add-edit';
-import { deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
+import { deleteCategories, deleteCategory, getAllCategory } from '@/features/category/api/categoryApi';
 import { Category } from '@/features/category/type/categoryType';
 import { toast } from 'react-toastify';
 import { showModal } from '@/shared/store/appSlice';
@@ -51,6 +51,7 @@ export const CategoryManagementFormList = () => {
     const [filterCategory, setFilterCategory] = useState('all');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [isAddCategory, setIsAddCategory] = useState<boolean>(false);
+    console.log(selectedItems);
     const [isUpdateCategory, setIsUpdateCategory] = useState<string | null>(null);
     const theme = useTheme();
     const dispatch = useAppDispatch();
@@ -63,7 +64,6 @@ export const CategoryManagementFormList = () => {
 
     // hiển thị tất cả danh mục
     useEffect(() => {
-      
       fetchAllCategory();
     },[]);
     // xóa danh mục
@@ -88,6 +88,22 @@ export const CategoryManagementFormList = () => {
         fetchAllCategory();
       }
     };
+    // Xóa nhiều danh mục
+    const handleDeleteCategories = async() => {
+      try{
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+        const response = await deleteCategories(selectedItems);
+        if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }))
+          toast.success(response.message);
+          fetchAllCategory();
+        }
+      }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }))
+        const errorMessage = (error as Error).message;
+        toast.error(errorMessage);
+      }
+    }
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -185,9 +201,8 @@ return (
                 <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm danh mục
             </Box>
             {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
+                <Box onClick={handleDeleteCategories} sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
                 </Box>
             )}
           </Box>

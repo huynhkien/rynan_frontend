@@ -23,10 +23,10 @@ import {
   Chip,
   Dialog,
 } from '@mui/material';
-import { Add,  AttachMoney,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,  AttachMoney,  Cancel,  Delete, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { Product,} from '@/features/product/type/productType';
-import { deleteProduct, getAllProduct, getProductById } from '@/features/product/api/productApi';
+import { deleteProduct, deleteProducts, getAllProduct, getProductById } from '@/features/product/api/productApi';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
@@ -36,6 +36,7 @@ import { PriceManagementFormAdd } from '../../price-management/ui/price-manageme
 import { PriceManagementFormList } from '../../price-management/ui/price-management-form-list';
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { ProductManagementFormExport } from './product-management-form-export';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -95,6 +96,11 @@ export const ProductManagementFormList = () => {
       fetchAllSpecification();
     },[]);
     const dispatch = useAppDispatch();
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedProducts = useMemo(() => {
+      if (!selectedItems.length || !product.length) return [];
+      return product.filter(item => selectedItems.includes(item._id));
+    }, [selectedItems, product]);
     
     
     // xóa sản phẩm
@@ -116,6 +122,24 @@ export const ProductManagementFormList = () => {
         fetchAllProduct();
       }
     };
+    // Xóa nhiều sản phẩm
+        const handleDeleteProducts = async() => {
+          try{
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+            const response = await deleteProducts(selectedItems);
+            if(response.success) {
+              dispatch(showModal({ isShowModal: false, modalType: null }))
+              toast.success(response.message);
+              setSelectedItems([]);
+              fetchAllSpecification();
+            }
+          }catch(error: unknown){
+            dispatch(showModal({ isShowModal: false, modalType: null }))
+            const errorMessage = (error as Error).message;
+            toast.error(errorMessage);
+          }
+        }
+    
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -237,8 +261,8 @@ return (
              </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteProducts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ProductManagementFormExport specifications={specification} products={getSelectedProducts}/></Box>
                 </Box>
             )}
           </Box>

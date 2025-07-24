@@ -96,6 +96,7 @@ export const CategoryManagementFormList = () => {
         if(response.success) {
           dispatch(showModal({ isShowModal: false, modalType: null }))
           toast.success(response.message);
+          setSelectedItems([]);
           fetchAllCategory();
         }
       }catch(error: unknown){

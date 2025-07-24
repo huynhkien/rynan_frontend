@@ -25,3 +25,8 @@ export const GetBySlug = async(slug: string): Promise<CategoryResponse> =>
 // Xóa danh mục
 export const deleteCategory = async(id: string): Promise<CategoryResponse> => 
     axiosInstance.delete(CategoryEndpoints.DELETE(id))
+// Xóa nhiều danh mục
+export const deleteCategories = async (ids: string[]): Promise<CategoryResponse> => 
+    axiosInstance.delete(CategoryEndpoints.DELETE_CATEGORIES, {
+        data: { categoriesId: ids }
+});

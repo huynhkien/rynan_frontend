@@ -259,7 +259,7 @@ return (
             <Box onClick={() => setIsAddPriceProduct(true)} sx={{ display: 'flex', alignItems: 'center', backgroundColor: theme.palette.primary.main, color: theme.palette.text.secondary, p: 1, cursor: 'pointer' }}>
                 <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm giá sản phẩm
              </Box>
-            {isIndeterminate && (
+            {isIndeterminate || isAllSelected  && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
                     <Box onClick={handleDeleteProducts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
                     <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ProductManagementFormExport specifications={specification} products={getSelectedProducts}/></Box>

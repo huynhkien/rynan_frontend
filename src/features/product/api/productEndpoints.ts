@@ -1,6 +1,7 @@
 export const ProductEndpoints = {
     CREATE: '/product',
     GET_ALL: '/product',
+    DELETE_PRODUCTS: '/product/delete-products',
     ADD_RATING: '/product/add-rating',
     ADD_REPLY: (pid: string | number, rid: string | number) => `/product/add-reply/${pid}/${rid}`,
     ADD_REPLY_CHILD: (pid: string | number, cid: string | number) => `/product/add-reply-child/${pid}/${cid}`,

@@ -91,3 +91,8 @@ export const addReplyChild = async(id: string, cid: string, data: ProductRatings
 // Xóa phản hồi
 export const deleteReply = async(id: string, rid: string, repId: string): Promise<ProductResponse> => 
     axiosInstance.delete(ProductEndpoints.DELETE_REPLY(id, rid, repId));
+// Xóa nhiều sản phẩm
+export const deleteProducts = async (ids: string[]): Promise<ProductResponse> => 
+    axiosInstance.delete(ProductEndpoints.DELETE_PRODUCTS, {
+        data: { productsId: ids }
+});

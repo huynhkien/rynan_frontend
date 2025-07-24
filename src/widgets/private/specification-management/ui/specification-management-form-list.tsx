@@ -22,10 +22,10 @@ import {
   Checkbox,
   Dialog
 } from '@mui/material';
-import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add, Cancel, Delete, Edit} from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { Specification } from '@/features/specification/type/specificationType';
-import { deleteSpecification, getAllSpecification } from '@/features/specification/api/specificationApi';
+import { deleteSpecification, deleteSpecifications, getAllSpecification } from '@/features/specification/api/specificationApi';
 import { SpecificationManagementFormAddEdit } from './specification-management-form-add-edit';
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
@@ -90,6 +90,23 @@ export const SpecificationManagementFormList = () => {
         }
       }
     };
+    // Xóa nhiều quy cách
+    const handleDeleteSpecifications = async() => {
+      try{
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+        const response = await deleteSpecifications(selectedItems);
+        if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }))
+          toast.success(response.message);
+          setSelectedItems([]);
+          fetchAllSpecification();
+        }
+      }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }))
+        const errorMessage = (error as Error).message;
+        toast.error(errorMessage);
+      }
+    }
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -196,8 +213,7 @@ return (
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteSpecifications} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
                 </Box>
             )}
           </Box>

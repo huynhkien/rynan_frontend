@@ -23,3 +23,8 @@ export const getSpecificationById = async(id: string): Promise<SpecificationResp
 // Xóa quy cách đóng gói
 export const deleteSpecification = async(id: string): Promise<SpecificationResponse> => 
     axiosInstance.delete(SpecificationEndpoints.DELETE(id))
+// Xóa nhiều quy cách 
+export const deleteSpecifications = async (ids: string[]): Promise<SpecificationResponseById> => 
+    axiosInstance.delete(SpecificationEndpoints.DELETE_SPECIFICATIONS, {
+        data: { specificationsId: ids }
+});

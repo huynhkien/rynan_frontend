@@ -41,5 +41,6 @@ export interface SpecificationResponse{
 export interface SpecificationResponseById{
     success: boolean;
     data: Specification;
+    message?: string;
 }
 export type SpecificationFormInputProps = FormInputProps<SpecificationData>;

@@ -47,3 +47,8 @@ export const deleteOrder = async(id: string): Promise<OrderResponse> =>
 // Xóa sản phẩm trong đơn hàng
 export const deleteProductOrder = async(id: string, pid: string): Promise<OrderResponse> => 
     axiosInstance.delete(OrderEndpoints.DELETE_PRODUCT_ORDER(id, pid))
+// Xóa nhiều đơn hàng
+export const deleteOrders = async (ids: string[]): Promise<OrderResponse> => 
+    axiosInstance.delete(OrderEndpoints.DELETE_ORDERS, {
+        data: { ordersId: ids }
+});

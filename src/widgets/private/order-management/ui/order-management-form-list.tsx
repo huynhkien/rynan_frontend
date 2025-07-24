@@ -22,12 +22,12 @@ import {
   Checkbox,
   Dialog,
 } from '@mui/material';
-import { Add,   Cancel,   Delete, Edit, ExitToApp, LibraryAddCheck } from '@mui/icons-material';
+import { Add,   Cancel,   Delete, Edit, LibraryAddCheck } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import {  OrderStatus, OrderType, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
 import { OrderData } from '@/features/order/type/orderType';
-import { deleteOrder, getAllOrder, getOrderById } from '@/features/order/api/orderApi';
+import { deleteOrder, deleteOrders, getAllOrder, getOrderById } from '@/features/order/api/orderApi';
 import moment from 'moment';
 import { OrderProductItem, UserData } from '@/features/user/type/userTypes';
 import { getAllUser, getUserById } from '@/features/user/api/userApis';
@@ -36,6 +36,7 @@ import { OrderManagementFormListUser } from './order-management-form-list-user';
 import { OrderManagementFormEditStatus } from './order-management-form-edit-status';
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { OrderManagementFormExport } from './order-management-form-export';
 
 const headCells = [
   { id: 'code', label: 'Mã đơn hàng', sortable: true },
@@ -105,7 +106,11 @@ export const OrderManagementFormList = () => {
         }
         fetchOrder()
     },[isShowProduct]);
-    
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedOrders = useMemo(() => {
+      if (!selectedItems.length || !orders.length || selectedItems.length > 1) return [];
+      return orders.find(item => item._id === selectedItems[0]);
+    }, [selectedItems, orders]);
     // xóa đơn hàng
     const handleDelete = async(id: string) => {
       try{
@@ -128,6 +133,24 @@ export const OrderManagementFormList = () => {
         fetchAllOrder();
       }
     };
+    // Xóa nhiều đơn hàng
+    const handleDeleteOrders = async() => {
+      try{
+        dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+        const response = await deleteOrders(selectedItems);
+        if(response.success) {
+          dispatch(showModal({ isShowModal: false, modalType: null }))
+          toast.success(response.message);
+          setSelectedItems([]);
+          fetchAllOrder();
+        }
+      }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }))
+        const errorMessage = (error as Error).message;
+        toast.error(errorMessage);
+      }
+    }
+        
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -239,12 +262,17 @@ return (
                     <Add sx={{fontSize: theme.typography.fontSize}}/> Thêm đơn hàng mới
                 </Link>
             </Box>
-            {isIndeterminate && (
+            {(isIndeterminate || isAllSelected) && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteOrders} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
                 </Box>
             )}
+             {selectedItems.length === 1 && (
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><OrderManagementFormExport
+                      users={users as UserData[]}
+                      order={getSelectedOrders as OrderData}
+                    /></Box>
+              )}
           </Box>
         </Box>
         <Box

@@ -81,3 +81,9 @@ export const chatbotModel = async (message: string): Promise<ChatbotResponse> =>
   axiosInstance.post(UserEndpoints.CHATBOT_MODEL, {message}, {
     withCredentials: true,
 });
+// Xóa nhiều người dùng 
+export const deleteUsers = async (ids: string[]): Promise<UserResponse> => 
+    axiosInstance.delete(UserEndpoints.DELETE_USERS, {
+        data: { usersId: ids }
+});
+

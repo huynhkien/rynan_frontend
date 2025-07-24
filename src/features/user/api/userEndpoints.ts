@@ -4,6 +4,7 @@ export const UserEndpoints = {
     LOGIN: '/user/login',
     CHATBOT: '/user/chatbot',
     CHATBOT_MODEL: '/user/chatbot-model-ai',
+    DELETE_USERS: '/user/delete-users',
     LOGOUT: '/user/logout',
     FORGOT_PASSWORD: '/user/forgot-password',
     RESET_PASSWORD: '/user/reset-password',

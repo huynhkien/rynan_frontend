@@ -21,13 +21,16 @@ import {
   Box,
   Checkbox,
 } from '@mui/material';
-import { Add, Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add, Delete, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { UserData} from '@/features/user/type/userTypes';
-import { deleteUser, getAllUser } from '@/features/user/api/userApis';
+import { deleteUser, deleteUsers, getAllUser } from '@/features/user/api/userApis';
 import Link from 'next/link';
 import moment from 'moment';
 import { CustomerGender } from '@/shared/constant/common';
+import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { showModal } from '@/shared/store/appSlice';
+import { DecentralizeManagementFormExport } from './decentralize-management-form-export';
 
 const headCells = [
   { id: 'code', label: 'ID nhân viên hàng', sortable: true },
@@ -57,6 +60,7 @@ export const DecentralizeManagementFormList = () => {
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const dispatch = useAppDispatch();
     const fetchAllUser = async () => {
         const response = await getAllUser();
         if(response.success) {
@@ -71,17 +75,18 @@ export const DecentralizeManagementFormList = () => {
     // xóa nhân viên
     const handleDelete = async(id: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa nhân viên không?');
-        const response = await deleteUser(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllUser();
-          return;
-        }else{
-          toast.error(response.message);
-          fetchAllUser();
+        if(window.confirm('Bạn có chắc muốn xóa nhân viên không?')){;
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+          const response = await deleteUser(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }))
+            toast.success(response.message);
+            fetchAllUser();
+            return;
+          }
         }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }))
         toast.error(`Lỗi: ${error}`);
         fetchAllUser();
       }
@@ -153,7 +158,27 @@ export const DecentralizeManagementFormList = () => {
 
     return filtered;
   }, [searchTerm, sortBy, sortOrder, user, filterAlpha]);
-   
+   const handleDeleteUsers = async() => {
+      try{
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
+          const response = await deleteUsers(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }))
+            toast.success(response.message);
+            setSelectedItems([]);
+            fetchAllUser();
+          }
+        }catch(error: unknown){
+          dispatch(showModal({ isShowModal: false, modalType: null }))
+          const errorMessage = (error as Error).message;
+          toast.error(errorMessage);
+        }
+      }
+  // Hiển thi người dùng theo selectId
+  const getSelectedUsers = useMemo(() => {
+    if (!selectedItems.length || !user.length) return [];
+    return user.filter(item => selectedItems.includes(item._id));
+  }, [selectedItems, user]);
 return (
     <Box sx={{ width: '100%' }}>
       {/* Toolbar với tìm kiếm và filter */}
@@ -179,8 +204,8 @@ return (
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteUsers} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><DecentralizeManagementFormExport users={getSelectedUsers} /></Box>
                 </Box>
             )}
           </Box>

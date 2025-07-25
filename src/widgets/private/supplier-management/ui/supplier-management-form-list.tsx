@@ -22,10 +22,10 @@ import {
   Checkbox,
   Dialog
 } from '@mui/material';
-import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add, Cancel, Delete, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { SupplierData } from '@/features/supplier/type/supplierType';
-import { deleteSupplier, getAllSupplier } from '@/features/supplier/api/supplierApi';
+import { deleteSupplier, deleteSuppliers, getAllSupplier } from '@/features/supplier/api/supplierApi';
 import { SupplierManagementFormAddEdit } from './supplier-management-form-add-edit';
 import { BANK_LIST } from '@/shared/constant/common';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
@@ -92,6 +92,26 @@ export const SupplierManagementFormList = () => {
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
+        fetchAllSupplier();
+      }
+    };
+    // Xóa nhiều thông tin
+    const handleDeleteSuppliers = async() => {
+      try{
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteSuppliers(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllSupplier();
+            return;
+        }
+      }
+      }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        const errorMessage = (error as Error).message;
+        toast.error(errorMessage);
         fetchAllSupplier();
       }
     };
@@ -202,8 +222,7 @@ return (
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteSuppliers} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
                 </Box>
             )}
           </Box>

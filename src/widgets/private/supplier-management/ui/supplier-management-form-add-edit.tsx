@@ -118,7 +118,8 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
 }, [provinces, districts, wards, selectedProvince, selectedDistrict, selectedWard, getValues]);
     // Thêm nhà cung cấp
     const handleAddSupplier = async (data: SupplierData) => {
-        const addressData = {
+        try{
+            const addressData = {
             province: {
                     code: selectedProvince,
                     name: provinces.find(p => p._id === selectedProvince)?.name || '',
@@ -133,34 +134,35 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
                 },
                 detail: getFullAddress(),
                 addressAdd: getValues('address.addressAdd'),
-        }
-        const bankAccount = {
-            bank_name: data.bank_account.bank_name,
-            account_number: data.bank_account.account_number
-        }
-        const supplierData = {
-            name: data.name,
-            note: data.note,
-            code: data.code,
-            contact_person: data.contact_person,
-            phone: data.phone,
-            email: data.email,
-            tax_code: data.tax_code,
-            isActive: data.isActive ,
-            address: addressData,
-            bank_account: bankAccount
-        }
-        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
-        const response = await createSupplier(supplierData);
-        if(response.success){
+            }
+            const bankAccount = {
+                bank_name: data.bank_account.bank_name,
+                account_number: data.bank_account.account_number
+            }
+            const supplierData = {
+                name: data.name,
+                note: data.note,
+                code: data.code,
+                contact_person: data.contact_person,
+                phone: data.phone,
+                email: data.email,
+                tax_code: data.tax_code,
+                isActive: data.isActive ,
+                address: addressData,
+                bank_account: bankAccount
+            }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+            const response = await createSupplier(supplierData);
+            if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
+                toast.success(response.message);
+                render();
+                reset();
+            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error).message;
             dispatch(showModal({ isShowModal: false, modalType: null }));
-            toast.success(response.message);
-            render();
-            reset();
-        }else{
-            dispatch(showModal({ isShowModal: false, modalType: null }));
-            toast.error(response.message);
-            render();
+            toast.error(errorMessage);
         }
     }
     // Cập nhật 
@@ -212,7 +214,8 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
         fetchSupplier();
     },[isUpdateSupplier, reset, loadDistricts, loadWards, setValue])
     const handleUpdateSupplier = async (data: SupplierData) => {
-        const addressData = {
+        try{
+            const addressData = {
             province: {
                     code: selectedProvince,
                     name: provinces.find(p => p._id === selectedProvince)?.name || '',
@@ -227,32 +230,34 @@ export const SupplierManagementFormAddEdit = ({isUpdateSupplier, render} : Updat
                 },
                 detail: getFullAddress(),
                 addressAdd: getValues('address.addressAdd'),
-        }
-        const bankAccount = {
-            bank_name: data.bank_account.bank_name,
-            account_number: data.bank_account.account_number
-        }
-        const supplierData = {
-            name: data.name,
-            note: data.note,
-            code: data.code,
-            contact_person: data.contact_person,
-            phone: data.phone,
-            email: data.email,
-            tax_code: data.tax_code,
-            isActive: data.isActive ,
-            address: addressData,
-            bank_account: bankAccount
-        }
-        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
-        const response = await updateSupplier(supplierData, isUpdateSupplier as string);
-        if(response.success){
+            }
+            const bankAccount = {
+                bank_name: data.bank_account.bank_name,
+                account_number: data.bank_account.account_number
+            }
+            const supplierData = {
+                name: data.name,
+                note: data.note,
+                code: data.code,
+                contact_person: data.contact_person,
+                phone: data.phone,
+                email: data.email,
+                tax_code: data.tax_code,
+                isActive: data.isActive ,
+                address: addressData,
+                bank_account: bankAccount
+            }
+            dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+            const response = await updateSupplier(supplierData, isUpdateSupplier as string);
+            if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
+                toast.success(response.message);
+                render();
+            }
+        }catch(error: unknown){
+            const errorMessage = (error as Error).message;
             dispatch(showModal({ isShowModal: false, modalType: null }));
-            toast.success(response.message);
-            render();
-        }else{
-            dispatch(showModal({ isShowModal: false, modalType: null }));
-            toast.error(response.message);
+            toast.error(errorMessage);
             render();
         }
     }

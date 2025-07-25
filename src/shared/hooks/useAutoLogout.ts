@@ -6,21 +6,17 @@ const useAutoLogout = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    let isLoggingOut = false;
-
-    const performLogout = () => {
-      if (isLoggingOut) return;
-      isLoggingOut = true;
+    const handleBeforeUnload = () => {
+      const url = 'https://rynan-api.onrender.com/api/user/logout';
+      const data = null; 
+      
+      const success = navigator.sendBeacon(url, data);
+      
+      if (!success) {
+        console.error('Failed to queue logout request');
+      }
 
       dispatch(logout());
-
-      navigator.sendBeacon?.('/api/user/logout'); 
-    };
-
-   
-
-    const handleBeforeUnload = () => {
-      performLogout();
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);

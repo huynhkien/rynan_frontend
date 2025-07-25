@@ -136,6 +136,7 @@ export const OrderManagementFormList = () => {
     // Xóa nhiều đơn hàng
     const handleDeleteOrders = async() => {
       try{
+         if(window.confirm('Bạn có chắc muốn xóa đơn hàng không?')){
         dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
         const response = await deleteOrders(selectedItems);
         if(response.success) {
@@ -144,6 +145,7 @@ export const OrderManagementFormList = () => {
           setSelectedItems([]);
           fetchAllOrder();
         }
+      }
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }))
         const errorMessage = (error as Error).message;

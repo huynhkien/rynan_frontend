@@ -24,11 +24,11 @@ import {
   Tab,
   Dialog,
 } from '@mui/material';
-import { Add,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,  Cancel,  Delete, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { ReceiptData,  ReceiptProductData } from '@/features/receipt/type/receiptType';
-import { deleteReceipt, getAllReceipt } from '@/features/receipt/api/receiptApi';
+import { deleteReceipt, deleteReceipts, getAllReceipt } from '@/features/receipt/api/receiptApi';
 import moment from 'moment';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
@@ -41,6 +41,7 @@ import { getAllSpecification } from '@/features/specification/api/specificationA
 import { ReceiptImportManagementFormListMaterialItem } from './receipt-import-management-form-list-material-item';
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { ReceiptImportManagementFormExport } from './receipt-import-management-form-export';
 
 
 
@@ -95,6 +96,31 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, fe
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
+        fetchAllReceipt();
+      }
+    };
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedReceipts = useMemo(() => {
+      if (!selectedItems.length || !receipts.length || selectedItems.length > 1) return [];
+      return receipts.find(item => item._id === selectedItems[0]);
+    }, [selectedItems, receipts]);
+    // xóa phiếu nhập kho
+    const handleDeleteReceipts = async() => {
+      try{
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipts(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            setSelectedItems([]);
+          }
+        }
+      }catch(error: unknown){
+        const errorMessage = (error as Error).message
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        toast.error(errorMessage);
         fetchAllReceipt();
       }
     };
@@ -195,10 +221,10 @@ return (
                         <Add sx={{fontSize: theme.typography.fontSize}}/> Tạo phiếu nhập kho
                       </Link>
                 </Box>
-            {isIndeterminate && (
+            {(isIndeterminate || isAllSelected) && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteReceipts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    {selectedItems.length === 1 && <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ReceiptImportManagementFormExport users={users} receipt={getSelectedReceipts as ReceiptData} specifications={specifications as Specification[]} suppliers={suppliers as SupplierData[]}/></Box>}
                 </Box>
             )}
           </Box>
@@ -449,7 +475,8 @@ return (
                     height: '50%',
                     maxWidth: '1000px',
                     position: 'relative',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    backgroundColor: theme.palette.text.secondary
                 },
         }}
       >
@@ -464,6 +491,7 @@ return (
 export const ReceiptImportManagementFormListProduct = ({receipts, users, fetchAllReceipt, specifications}: {receipts:ReceiptData[]; fetchAllReceipt: () => void; users: UserData[], specifications?: Specification[]}) => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const dispatch = useAppDispatch();
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -478,15 +506,44 @@ export const ReceiptImportManagementFormListProduct = ({receipts, users, fetchAl
     const handleDelete = async(id: string) => {
       try{
         if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
-        const response = await deleteReceipt(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllReceipt();
-          return;
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipt(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            return;
+              }
+          }
+      }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        toast.error(`Lỗi: ${error}`);
+        fetchAllReceipt();
+      }
+    };
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedReceipts = useMemo(() => {
+      if (!selectedItems.length || !receipts.length || selectedItems.length > 1) return [];
+      return receipts.find(item => item._id === selectedItems[0]);
+    }, [selectedItems, receipts]);
+    // xóa phiếu nhập kho
+    const handleDeleteReceipts = async() => {
+      try{
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipts(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            setSelectedItems([]);
+            return;
             }
         }
       }catch(error: unknown){
-        toast.error(`Lỗi: ${error}`);
+        const errorMessage = (error as Error).message
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        toast.error(errorMessage);
         fetchAllReceipt();
       }
     };
@@ -587,8 +644,8 @@ return (
                 </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteReceipts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    {selectedItems.length === 1 && <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ReceiptImportManagementFormExport users={users} receipt={getSelectedReceipts as ReceiptData} specifications={specifications as Specification[]}/></Box>}
                 </Box>
             )}
           </Box>
@@ -834,7 +891,8 @@ return (
                           height: '50%',
                           maxWidth: '1000px',
                           position: 'relative',
-                          borderRadius: 0
+                          borderRadius: 0,
+                          backgroundColor: theme.palette.text.secondary
                       },
               }}
             >

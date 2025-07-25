@@ -24,11 +24,11 @@ import {
   Tab,
   Dialog,
 } from '@mui/material';
-import { Add,  Cancel,  Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,  Cancel,  Delete, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { ReceiptData, ReceiptMaterialData, ReceiptProductData } from '@/features/receipt/type/receiptType';
-import { deleteReceipt, getAllReceipt } from '@/features/receipt/api/receiptApi';
+import { deleteReceipt, deleteReceipts, getAllReceipt } from '@/features/receipt/api/receiptApi';
 import moment from 'moment';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
@@ -41,6 +41,7 @@ import { ReceiptExportManagementFormListProductItem } from './receipt-export-man
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
+import { ReceiptExportManagementFormExportPDF } from './receipt-export-management-form-export-pdf';
 
 
 
@@ -99,6 +100,31 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, fe
         fetchAllReceipt();
       }
     };
+    const handleDeleteReceipts = async() => {
+      try{
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipts(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            setSelectedItems([]);
+            return;
+            }
+        }
+      }catch(error: unknown){
+        const errorMessage = (error as Error).message
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        toast.error(errorMessage);
+        fetchAllReceipt();
+      }
+    };
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedReceipts = useMemo(() => {
+      if (!selectedItems.length || !receipts.length || selectedItems.length > 1) return [];
+      return receipts.find(item => item._id === selectedItems[0]);
+    }, [selectedItems, receipts]);
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -198,8 +224,8 @@ return (
                 </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteReceipts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    {selectedItems.length === 1 && <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ReceiptExportManagementFormExportPDF users={users} receipt={getSelectedReceipts as ReceiptData} specifications={specifications as Specification[]} suppliers={suppliers as SupplierData[]}/></Box>}
                 </Box>
             )}
           </Box>
@@ -449,7 +475,8 @@ return (
                           height: '50%',
                           maxWidth: '1000px',
                           position: 'relative',
-                          borderRadius: 0
+                          borderRadius: 0,
+                          backgroundColor: theme.palette.text.secondary
                       },
               }}
             >
@@ -472,25 +499,54 @@ export const ReceiptExportManagementFormListProduct = ({receipts, users, fetchAl
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
     const theme = useTheme();
-    
+    const dispatch = useAppDispatch();
+    // Hiển thi sản phẩm theo selectId
+    const getSelectedReceipts = useMemo(() => {
+      if (!selectedItems.length || !receipts.length || selectedItems.length > 1) return [];
+      return receipts.find(item => item._id === selectedItems[0]);
+    }, [selectedItems, receipts]);
+
     
     // xóa phiếu xuất kho
     const handleDelete = async(id: string) => {
       try{
         if(window.confirm('Bạn có chắc muốn xóa phiếu xuất kho không?')){
-        const response = await deleteReceipt(id);
-        if(response.success) {
-          toast.success(response.message);
-          fetchAllReceipt();
-          return;
-            }
-        }
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipt(id);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            return;
+              }
+          }
       }catch(error: unknown){
+        dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);
         fetchAllReceipt();
       }
     };
-
+    // xóa phiếu nhập kho
+    const handleDeleteReceipts = async() => {
+      try{
+        if(window.confirm('Bạn có chắc muốn xóa phiếu nhập kho không?')){
+          dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
+          const response = await deleteReceipts(selectedItems);
+          if(response.success) {
+            dispatch(showModal({ isShowModal: false, modalType: null }));
+            toast.success(response.message);
+            fetchAllReceipt();
+            setSelectedItems([]);
+            return;
+            }
+        }
+      }catch(error: unknown){
+        const errorMessage = (error as Error).message
+        dispatch(showModal({ isShowModal: false, modalType: null }));
+        toast.error(errorMessage);
+        fetchAllReceipt();
+      }
+    };
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
@@ -587,8 +643,8 @@ return (
                 </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteReceipts} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
+                    {selectedItems.length === 1 && <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ReceiptExportManagementFormExportPDF users={users} receipt={getSelectedReceipts as ReceiptData} specifications={specifications as Specification[]} /></Box>}
                 </Box>
             )}
           </Box>
@@ -839,7 +895,8 @@ return (
                                 height: '50%',
                                 maxWidth: '1000px',
                                 position: 'relative',
-                                borderRadius: 0
+                                borderRadius: 0,
+                                backgroundColor: theme.palette.text.secondary
                             },
                     }}
                   >

@@ -19,12 +19,11 @@ import {
   TableSortLabel,
   Typography,
   Box,
-  Checkbox,
   Tabs,
   Tab,
   Dialog,
 } from '@mui/material';
-import {   AssignmentTurnedIn,  Cancel,  Delete,  ExitToApp } from '@mui/icons-material';
+import {   AssignmentTurnedIn,  Cancel } from '@mui/icons-material';
 import { ReceiptData, ReceiptMaterialData, ReceiptProductData } from '@/features/receipt/type/receiptType';
 import {  getAllReceipt } from '@/features/receipt/api/receiptApi';
 import moment from 'moment';
@@ -74,7 +73,6 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, sp
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [isShowMaterial, setIsShowMaterial] = useState<string| null>(null);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const [isApprove, setIsApprove] = useState<string | null>(null);
@@ -94,26 +92,7 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, sp
         setSortBy(property);
     };
     // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === receipts?.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(receipts.map(el => el._id as string));
-        }
-    }
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === receipts?.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
+
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts?.filter(item => {
         const matchesSearch =
@@ -167,16 +146,6 @@ return (
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
             Quản lý nhập kho
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -250,20 +219,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        onClick={handleAllCheckbox}
-                    />
-                </TableCell>
 
                 {filteredMaterial.map((headCell, index) => (
                   <TableCell 
@@ -306,16 +261,6 @@ return (
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
                     <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item?._id as string)}
-                                onChange={() => handleCheckbox(item?._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
                           {item.code}
@@ -435,7 +380,6 @@ const ReceiptImportManagementFormListProduct = ({receipts, users, specifications
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const [isApprove, setIsApprove] = useState<string | null>(null);
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
@@ -454,28 +398,6 @@ const ReceiptImportManagementFormListProduct = ({receipts, users, specifications
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(property);
     };
-    // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === receipts?.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(receipts.map(el => el._id as string));
-        }
-    }
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === receipts?.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
-
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts.filter(item => {
         const matchesSearch =
@@ -528,16 +450,6 @@ return (
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
             Quản lý nhập kho
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -611,21 +523,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        onClick={handleAllCheckbox}
-                    />
-                </TableCell>
-
                 {filteredHeadCells.map((headCell, index) => (
                   <TableCell 
                     key={index}
@@ -667,16 +564,6 @@ return (
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
                     <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item?._id as string)}
-                                onChange={() => handleCheckbox(item?._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
                           {item.code}
@@ -792,7 +679,6 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, sp
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [isShowMaterial, setIsShowMaterial] = useState<string | null>(null);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const [isApprove, setIsApprove] = useState<string | null>(null);
@@ -813,27 +699,6 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, sp
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(property);
     };
-    // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === receipts?.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(receipts.map(el => el._id as string));
-        }
-    }
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === receipts?.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts?.filter(item => {
         const matchesSearch =
@@ -889,16 +754,6 @@ return (
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
             Quản lý xuất kho
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -972,20 +827,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        onClick={handleAllCheckbox}
-                    />
-                </TableCell>
 
                 {filteredHeadCells.map((headCell, index) => (
                   <TableCell 
@@ -1028,16 +869,6 @@ return (
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
                     <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item?._id as string)}
-                                onChange={() => handleCheckbox(item?._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
                           {item.code}
@@ -1156,7 +987,6 @@ const ReceiptExportManagementFormListProduct = ({receipts, users,specifications,
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const [isApprove, setIsApprove] = useState<string | null>(null);
@@ -1175,27 +1005,6 @@ const ReceiptExportManagementFormListProduct = ({receipts, users,specifications,
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(property);
     };
-    // click chọn tất cả
-    const handleAllCheckbox = () => {
-        if(selectedItems.length === receipts?.length){
-            setSelectedItems([]);
-        }else{
-            setSelectedItems(receipts.map(el => el._id as string));
-        }
-    }
-    // click chọn từng item
-    const handleCheckbox = (id: string) => {
-        setSelectedItems(prev => {
-            if(prev.includes(id)){
-                return prev.filter(item => item !== id)
-            }else{
-                return [...prev, id];
-            }
-        });
-    }
-    // Kiểm tra trạng thái checkbox "Chọn tất cả"
-    const isAllSelected = selectedItems.length === receipts?.length;
-    const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= receipts.length;
     const filteredAndSortedData = useMemo(() => {
         const filtered = receipts.filter(item => {
         const matchesSearch =
@@ -1246,16 +1055,6 @@ return (
             <Typography variant='h6' sx={{ flexGrow: 1, color: theme.palette.primary.main }}>
             Quản lý xuất kho
           </Typography>
-          </Box>
-          <Box
-            sx={{display: 'flex', gap: 2}}
-          >
-            {isIndeterminate && (
-                <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
-                </Box>
-            )}
           </Box>
         </Box>
         <Box
@@ -1329,21 +1128,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                    <Checkbox
-                        sx={{
-                            '&.Mui-checked': {
-                            color: 'text.secondary',
-                            }
-                        }}
-                        inputProps={{
-                        'aria-label': 'select all desserts',
-                        }}
-                        checked={isAllSelected}
-                        onClick={handleAllCheckbox}
-                    />
-                </TableCell>
-
                 {filteredHeadCells.map((headCell, index) => (
                   <TableCell 
                     key={index}
@@ -1385,16 +1169,6 @@ return (
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((item) => (
                     <TableRow key={item._id} hover>
-                        <TableCell padding='checkbox'>
-                            <Checkbox
-                                color='primary'
-                                checked={selectedItems.includes(item?._id as string)}
-                                onChange={() => handleCheckbox(item?._id as string)}
-                                inputProps={{
-                                'aria-label': 'select all desserts',
-                                }}
-                            />
-                        </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>
                         <Typography variant='body1' noWrap>
                           {item.code}

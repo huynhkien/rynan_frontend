@@ -22,10 +22,10 @@ import {
   Checkbox,
   Dialog
 } from '@mui/material';
-import { Add, Cancel, Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add, Cancel, Delete, Edit} from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import { MaterialData } from '@/features/material/type/materialType';
-import { deleteMaterial, getAllMaterial } from '@/features/material/api/materialApi';
+import { deleteMaterial, deleteMaterials, getAllMaterial } from '@/features/material/api/materialApi';
 import { MaterialManagementFormAddEdit } from './material-management-form-add-edit';
 import { Specification } from '@/features/specification/type/specificationType';
 import { getAllSpecification } from '@/features/specification/api/specificationApi';
@@ -71,7 +71,6 @@ export const MaterialManagementFormList = () => {
 
     // hiển thị tất cả nguyên liệu
     useEffect(() => {
-      
       fetchAllMaterial();
     },[]);
     // xóa nguyên liệu
@@ -87,6 +86,23 @@ export const MaterialManagementFormList = () => {
         }
       }catch(error: unknown){
         toast.error(`Lỗi: ${error}`);
+        fetchAllMaterial();
+      }
+    };
+    // Xóa nhiều 
+    const handleDeleteMaterials = async() => {
+      try{
+         if(window.confirm('Bạn có chắc muốn xóa nguyên liệu không?')){
+        const response = await deleteMaterials(selectedItems);
+        if(response.success) {
+          toast.success(response.message);
+          fetchAllMaterial();
+          return;
+        }
+      }
+      }catch(error: unknown){
+        const errorMessage = (error as Error).message;
+        toast.error(errorMessage);
         fetchAllMaterial();
       }
     };
@@ -188,8 +204,7 @@ return (
             </Box>
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box onClick={handleDeleteMaterials} sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
                 </Box>
             )}
           </Box>

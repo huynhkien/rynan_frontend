@@ -125,6 +125,7 @@ export const ProductManagementFormList = () => {
     // Xóa nhiều sản phẩm
         const handleDeleteProducts = async() => {
           try{
+             if(window.confirm('Bạn có chắc muốn xóa sản phẩm không?')){
             dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
             const response = await deleteProducts(selectedItems);
             if(response.success) {
@@ -133,6 +134,7 @@ export const ProductManagementFormList = () => {
               setSelectedItems([]);
               fetchAllSpecification();
             }
+          }
           }catch(error: unknown){
             dispatch(showModal({ isShowModal: false, modalType: null }))
             const errorMessage = (error as Error).message;

@@ -7,7 +7,7 @@ const useAutoLogout = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      const url = 'https://rynan-api.onrender.com/api/user/logout';
+      const url = 'https://rynan-backend.onrender.com/api/user/logout';
       const data = null; 
       
       const success = navigator.sendBeacon(url, data);

@@ -44,3 +44,8 @@ export const deleteProductReceipt = async(id: string, pid: string): Promise<Rece
 // Xóa nguyên liệu trong phiếu
 export const deleteMaterialReceipt = async(id: string, mid: string): Promise<ReceiptResponse> => 
     axiosInstance.delete(ReceiptEndpoints.DELETE_MATERIAL_RECEIPT(id, mid))
+// Xóa thông tin nhiều phiếu
+export const deleteReceipts = async (ids: string[]): Promise<ReceiptResponse> => 
+    axiosInstance.delete(ReceiptEndpoints.DELETE_RECEIPTS, {
+        data: { receiptsId: ids }
+});

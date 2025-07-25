@@ -22,3 +22,8 @@ export const getMaterialById = async(id: string): Promise<MaterialResponse> =>
 // Xóa nguyên liệu
 export const deleteMaterial = async(id: string): Promise<MaterialResponse> => 
     axiosInstance.delete(MaterialEndpoints.DELETE(id))
+// Xóa nhiều
+export const deleteMaterials = async (ids: string[]): Promise<MaterialResponse> => 
+    axiosInstance.delete(MaterialEndpoints.DELETE_MATERIALS, {
+        data: { materialsId: ids }
+});

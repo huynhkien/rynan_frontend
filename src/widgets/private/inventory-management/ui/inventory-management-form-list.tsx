@@ -24,7 +24,7 @@ import {
   IconButton,
   Collapse,
 } from '@mui/material';
-import { Delete, Error, ExitToApp, KeyboardArrowDown, KeyboardArrowUp, Warning } from '@mui/icons-material';
+import {  Error, KeyboardArrowDown, KeyboardArrowUp, Warning } from '@mui/icons-material';
 import moment from 'moment';
 import { getAllUser } from '@/features/user/api/userApis';
 import { UserData } from '@/features/user/type/userTypes';
@@ -36,6 +36,7 @@ import { Product } from '@/features/product/type/productType';
 import { getAllProduct } from '@/features/product/api/productApi';
 import { MaterialData } from '@/features/material/type/materialType';
 import { getAllMaterial } from '@/features/material/api/materialApi';
+import { InventoryManagementFormExport } from './inventory-management-form-export';
 
 
 
@@ -112,6 +113,10 @@ const InventoryManagementFormListMaterial = ({inventory, users, specifications, 
             }
         });
     }
+    // Hiển thị dnah sách tồn kho
+    const getSelectedInventory = useMemo(() => {
+      return inventory.filter(el => selectedItems.includes(el._id as string));
+    },[selectedItems, inventory])
     // Kiểm tra trạng thái checkbox "Chọn tất cả"
     const isAllSelected = selectedItems.length === inventory?.length;
     const isIndeterminate = selectedItems.length > 0 && selectedItems.length <= inventory.length;
@@ -223,8 +228,7 @@ return (
           >
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><InventoryManagementFormExport inventories={getSelectedInventory} users={users} specifications={specifications} materials={materials}/></Box>
                 </Box>
             )}
           </Box>
@@ -514,6 +518,10 @@ const InventoryManagementFormListProduct = ({inventory, users, specifications, p
         setSortOrder(isAsc ? 'desc' : 'asc');
         setSortBy(property);
     };
+    // Hiển thị dnah sách tồn kho
+    const getSelectedInventory = useMemo(() => {
+      return inventory.filter(el => selectedItems.includes(el._id as string));
+    },[selectedItems, inventory])
     // click chọn tất cả
     const handleAllCheckbox = () => {
         if(selectedItems.length === inventory?.length){
@@ -644,8 +652,7 @@ return (
           >
             {isIndeterminate && (
                 <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary,  cursor: 'pointer' }}>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center'}}><Delete sx={{fontSize: theme.typography.fontSize}}/> Xóa tất cả</Box>
-                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><ExitToApp sx={{fontSize: theme.typography.fontSize}}/> Xuất dữ liệu</Box>
+                    <Box sx={{p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center'}}><InventoryManagementFormExport inventories={getSelectedInventory} users={users} specifications={specifications} products={products}/></Box>
                 </Box>
             )}
           </Box>

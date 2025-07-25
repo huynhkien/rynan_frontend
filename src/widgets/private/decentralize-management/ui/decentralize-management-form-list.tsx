@@ -75,7 +75,7 @@ export const DecentralizeManagementFormList = () => {
     // xóa nhân viên
     const handleDelete = async(id: string) => {
       try{
-        if(window.confirm('Bạn có chắc muốn xóa nhân viên không?')){;
+        if(window.confirm('Bạn có chắc muốn xóa nhân viên không?')){
           dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
           const response = await deleteUser(id);
           if(response.success) {
@@ -160,6 +160,7 @@ export const DecentralizeManagementFormList = () => {
   }, [searchTerm, sortBy, sortOrder, user, filterAlpha]);
    const handleDeleteUsers = async() => {
       try{
+         if(window.confirm('Bạn có chắc muốn xóa nhân viên không?')){
           dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
           const response = await deleteUsers(selectedItems);
           if(response.success) {
@@ -168,6 +169,7 @@ export const DecentralizeManagementFormList = () => {
             setSelectedItems([]);
             fetchAllUser();
           }
+        }
         }catch(error: unknown){
           dispatch(showModal({ isShowModal: false, modalType: null }))
           const errorMessage = (error as Error).message;

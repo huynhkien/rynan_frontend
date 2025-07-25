@@ -17,21 +17,15 @@ const useAutoLogout = () => {
       navigator.sendBeacon?.('/api/user/logout'); 
     };
 
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        performLogout();
-      }
-    };
+   
 
     const handleBeforeUnload = () => {
       performLogout();
     };
 
-    document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [dispatch]);

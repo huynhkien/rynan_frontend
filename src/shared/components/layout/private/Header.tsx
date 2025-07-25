@@ -19,8 +19,8 @@ import {
   Person,
   Settings,
   ExitToApp,
-  DarkMode,
-  Language,
+  Home,
+  ContactEmergency,
 } from '@mui/icons-material';
 import { HEADER_HEIGHT } from '@/shared/constant/common';
 import { ContactData } from '@/features/contact/type/contactType';
@@ -59,58 +59,62 @@ export const Header = () => {
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
   };
-const renderProfileMenu = () => (
-    <Menu
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
-      onClose={handleProfileMenuClose}
-      PaperProps={{
-        sx: { width: 250, mt: 1.5, backgroundColor: theme.palette.text.secondary },
-      }}
-    >
-      <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
-        <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
-          Admin User
-        </Typography>
-        <Typography variant='body2' color='text.primary'>
-          {current?.email}
-        </Typography>
-      </Box>
-      <MenuItem onClick={handleProfileMenuClose}>
-        <ListItemIcon>
-          <Person fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>Hồ sơ cá nhân</ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuClose}>
-        <ListItemIcon>
-          <Settings fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>Cài đặt</ListItemText>
-      </MenuItem>
-      <MenuItem>
-        <ListItemIcon>
-            <DarkMode fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>
-            Chế độ tối
-        </ListItemText>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuClose}>
-        <ListItemIcon>
-          <Language fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>Ngôn ngữ</ListItemText>
-      </MenuItem>
-      <Divider />
-      <MenuItem onClick={handleLogout}>
-        <ListItemIcon>
-          <ExitToApp fontSize='small' />
-        </ListItemIcon>
-        <ListItemText>Đăng xuất</ListItemText>
-      </MenuItem>
-    </Menu>
-  );
+  const renderProfileMenu = () => (
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        PaperProps={{
+          sx: { width: 250, mt: 1.5, backgroundColor: theme.palette.text.secondary },
+        }}
+      >
+        <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+          <Typography variant='subtitle1' sx={{ fontWeight: 600 }}>
+            Admin User
+          </Typography>
+          <Typography variant='body1' color='text.primary'>
+            {current?.email}
+          </Typography>
+        </Box>
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/user' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemIcon>
+                <Person fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Hồ sơ cá nhân</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemIcon>
+                <Home fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Giao diện web</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/admin/contact' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemIcon>
+                <ContactEmergency fontSize='small' />
+              </ListItemIcon>
+              <ListItemText>Liên hệ</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleLogout}>
+          <ListItemIcon>
+            <ExitToApp fontSize='small' />
+          </ListItemIcon>
+          <ListItemText>Đăng xuất</ListItemText>
+        </MenuItem>
+      </Menu>
+    );
   // Xử lý số lượng tin liên hệ
   const fetchContacts = async() => {
     const response = await getAllContact();

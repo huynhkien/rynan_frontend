@@ -93,6 +93,7 @@ export const SpecificationManagementFormList = () => {
     // Xóa nhiều quy cách
     const handleDeleteSpecifications = async() => {
       try{
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
         dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
         const response = await deleteSpecifications(selectedItems);
         if(response.success) {
@@ -101,6 +102,7 @@ export const SpecificationManagementFormList = () => {
           setSelectedItems([]);
           fetchAllSpecification();
         }
+      }
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }))
         const errorMessage = (error as Error).message;

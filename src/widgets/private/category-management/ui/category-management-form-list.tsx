@@ -91,6 +91,7 @@ export const CategoryManagementFormList = () => {
     // Xóa nhiều danh mục
     const handleDeleteCategories = async() => {
       try{
+        if(window.confirm('Bạn có chắc muốn xóa danh mục không?')){
         dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
         const response = await deleteCategories(selectedItems);
         if(response.success) {
@@ -98,6 +99,7 @@ export const CategoryManagementFormList = () => {
           toast.success(response.message);
           setSelectedItems([]);
           fetchAllCategory();
+        }
         }
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }))

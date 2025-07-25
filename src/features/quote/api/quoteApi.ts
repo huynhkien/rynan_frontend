@@ -25,3 +25,9 @@ export const deleteQuote = async(id: string): Promise<QuoteResponse> =>
 // Xóa sản phẩm báo giá
 export const deleteProductQuote = async(id: string, pid: string): Promise<QuoteResponse> => 
     axiosInstance.delete(QuoteEndpoints.DELETE_PRODUCT_QUOTE(id, pid))
+
+// Xóa nhiều báo giá
+export const deleteQuotes = async (ids: string[]): Promise<QuoteResponse> => 
+    axiosInstance.delete(QuoteEndpoints.DELETE_QUOTES, {
+        data: { quotesId: ids }
+});

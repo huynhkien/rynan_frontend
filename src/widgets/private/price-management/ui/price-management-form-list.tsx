@@ -63,17 +63,15 @@ export const PriceManagementFormList = ({id, product, render}: ProductPriceData)
     // xóa giá sản phẩm
     const handleDelete = async(id: string, rid: string) => {
       try{
-        window.confirm('Bạn có chắc muốn xóa giá sản phẩm không?');
+         if(window.confirm('Bạn có chắc muốn xóa giá tiền không?')){
         dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
         const response = await deletePriceProduct({id, rid});
         if(response.success) {
           dispatch(showModal({ isShowModal: false, modalType: null }));
           toast.success(response.message);
           render();
-        }else{
-          toast.error(response.message);
-          render();
         }
+      }
       }catch(error: unknown){
         dispatch(showModal({ isShowModal: false, modalType: null }));
         toast.error(`Lỗi: ${error}`);

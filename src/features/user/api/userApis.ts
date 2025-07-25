@@ -37,7 +37,7 @@ export const resetPassword = async (password: string, token: string): Promise<Lo
 });
 // Đăng xuất
 export const logoutUser = async (): Promise<LoginResponse> => 
-  axiosInstance.get(UserEndpoints.LOGOUT, { withCredentials: true });
+  axiosInstance.post(UserEndpoints.LOGOUT, { withCredentials: true });
 // Lấy thông tin người dùng theo id
 export const getUserById = async (id: string): Promise<UserResponse> => 
   axiosInstance.get(UserEndpoints.GET_BY_ID(id));

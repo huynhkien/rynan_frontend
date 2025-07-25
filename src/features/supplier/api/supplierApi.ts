@@ -22,3 +22,8 @@ export const getSupplierById = async(id: string): Promise<SupplierResponse> =>
 // Xóa nguyên liệu
 export const deleteSupplier = async(id: string): Promise<SupplierResponse> => 
     axiosInstance.delete(SupplierEndpoints.DELETE(id))
+// Xóa thông tin nhiều nguyên liệu
+export const deleteSuppliers = async (ids: string[]): Promise<SupplierResponse> => 
+    axiosInstance.delete(SupplierEndpoints.DELETE_SUPPLIERS, {
+        data: { suppliersId: ids }
+});

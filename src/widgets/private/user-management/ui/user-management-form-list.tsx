@@ -94,6 +94,7 @@ export const UserManagementFormList = () => {
     // Xóa nhiều người dùng
     const handleDeleteUsers = async() => {
       try{
+        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
           dispatch(showModal({ isShowModal: true, modalType: 'loading' }))
           const response = await deleteUsers(selectedItems);
           if(response.success) {
@@ -102,6 +103,7 @@ export const UserManagementFormList = () => {
             setSelectedItems([]);
             fetchAllUser();
           }
+        }
         }catch(error: unknown){
           dispatch(showModal({ isShowModal: false, modalType: null }))
           const errorMessage = (error as Error).message;

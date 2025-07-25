@@ -258,7 +258,9 @@ export const DecentralizeManagementFormAddEdit = () => {
             }
 
             const response = await addRole(formData);
+            dispatch(showModal({ isShowModal: false, modalType: null }));
             if(response.success){
+                dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message);
                 reset();
                 setPreview('')

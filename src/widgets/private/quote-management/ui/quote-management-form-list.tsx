@@ -22,11 +22,11 @@ import {
   Checkbox,
   Dialog,
 } from '@mui/material';
-import { Add,   Cancel,   Delete, Edit, ExitToApp } from '@mui/icons-material';
+import { Add,   Cancel,   Delete, Edit,  } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { QuoteData} from '@/features/quote/type/quoteType';
-import { deleteQuote, getAllQuote, getQuoteById } from '@/features/quote/api/quoteApi';
+import { deleteQuote, deleteQuotes, getAllQuote, getQuoteById } from '@/features/quote/api/quoteApi';
 import { UserData } from '@/features/user/type/userTypes';
 import { getAllUser } from '@/features/user/api/userApis';
 import Image from 'next/image';
@@ -274,11 +274,28 @@ export const QuoteManagementFormList = () => {
     }, [isIdQuote, products]);
 
     
-    // xóa sản phẩm
+    // xóa báo giá
     const handleDelete = async(id: string) => {
       try{
-        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
+        if (window.confirm('Bạn có chắc muốn xóa báo giá không?')) {
           const response = await deleteQuote(id);
+          if(response.success) {
+            toast.success(response.message);
+            fetchAllQuote();
+            return;
+          }else{
+            toast.error(response.message);
+            fetchAllQuote();
+          }
+        }
+      }catch(error: unknown){
+        toast.error(`Lỗi: ${error}`);
+      }
+    };
+    const handleDeleteQuotes = async() => {
+      try{
+        if (window.confirm('Bạn có chắc muốn xóa báo giá không?')) {
+          const response = await deleteQuotes(selectedItems);
           if(response.success) {
             toast.success(response.message);
             fetchAllQuote();
@@ -392,13 +409,10 @@ return (
                 <Add sx={{ fontSize: theme.typography.fontSize }} /> Thêm báo giá
               </Link>
             </Box>
-            {isIndeterminate && (
+            {(isIndeterminate || isAllSelected) && (
               <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', color: theme.palette.text.secondary, cursor: 'pointer' }}>
-                <Box sx={{ p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center' }}>
+                <Box onClick={handleDeleteQuotes} sx={{ p: 1, backgroundColor: theme.palette.error.main, display: 'flex', alignItems: 'center' }}>
                   <Delete sx={{ fontSize: theme.typography.fontSize }} /> Xóa tất cả
-                </Box>
-                <Box sx={{ p: 1, backgroundColor: theme.palette.info.main, display: 'flex', alignItems: 'center' }}>
-                  <ExitToApp sx={{ fontSize: theme.typography.fontSize }} /> Xuất dữ liệu
                 </Box>
               </Box>
             )}

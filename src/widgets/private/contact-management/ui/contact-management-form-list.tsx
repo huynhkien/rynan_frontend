@@ -221,9 +221,6 @@ return (
                   fontWeight: theme.typography.fontWeightBold,
                 }}
               >
-                <TableCell padding='checkbox'>
-                </TableCell>
-
                 {headCells.map((headCell, index) => (
                   <TableCell 
                     key={index}

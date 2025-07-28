@@ -1,32 +1,24 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useAppDispatch } from './useAppHook';
 import { logout } from '@/features/user/store/userSlice';
 
 const useAutoLogout = () => {
   const dispatch = useAppDispatch();
+  const timeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      const url = 'https://rynan-backend.onrender.com/api/user/logout';
-      const data = null; 
-      
-      const success = navigator.sendBeacon(url, data);
-      
-      if (!success) {
-        console.error('Failed to queue logout request');
-      }
-
+    const TWO_DAYS_IN_MS = 1 * 24 * 60 *60 * 1000;
+    const autoLogout = () => {
       dispatch(logout());
+      window.location.href = '/';
     };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
+    timeoutRef.current = window.setTimeout(autoLogout, TWO_DAYS_IN_MS);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
     };
   }, [dispatch]);
-
-  return null;
 };
 
 export default useAutoLogout;

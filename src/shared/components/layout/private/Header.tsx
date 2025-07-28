@@ -50,6 +50,7 @@ export const Header = () => {
           if(response.success){
             toast.success(response.message);
             dispatch(logout());
+            window.location.href = '/';
           }else{
             toast.error(response.message);
           }

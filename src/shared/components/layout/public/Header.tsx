@@ -14,6 +14,10 @@ import {
   TextField,
   InputAdornment,
   Slide,
+  MenuItem,
+  Menu as MenuList,
+  ListItemText,
+  Divider,
 } from '@mui/material';
 import {
   Facebook,
@@ -25,7 +29,7 @@ import {
   Menu, 
   Home,
   Logout,
-  Search
+  Search,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
 import Image from 'next/image';
@@ -53,6 +57,7 @@ const Transition = forwardRef<
 
 export const Header = () => {
     const theme = useTheme();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [openCart, setOpenCart] = useState<boolean>(false);
     const dispatch = useAppDispatch();
     const {current} = useAppSelector((state) => state.user);
@@ -95,8 +100,57 @@ export const Header = () => {
           router.push(`/search/${slug}?q=${encodeURIComponent(keyword)}`);
           setSearchValue('');
           setOpenSearch(false);
-        }
-  }
+      }
+    }
+    const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleProfileMenuClose = () => {
+    setAnchorEl(null);
+  };
+    const renderProfileMenu = () => (
+      <MenuList
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleProfileMenuClose}
+        PaperProps={{
+          sx: { width: 250, mt: 1.5, backgroundColor: theme.palette.text.secondary },
+        }}
+      >
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemText>Trang chủ</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/products' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemText>Sản phẩm</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/contact' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemText>Liên hệ</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        <Divider />
+        <MenuItem onClick={handleProfileMenuClose}>
+          <LinkTransition href='/about' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+            <Box sx={{display: 'flex'}}>
+              <ListItemText>Giới thiệu</ListItemText>
+            </Box>
+          </LinkTransition>
+        </MenuItem>
+        
+      </MenuList>
+    );
 
 return (
     <Box sx={{position: 'relative'}}>
@@ -291,21 +345,24 @@ return (
               </>
               }
               <IconButton
+                onClick={handleProfileMenuOpen}
                 sx={{
                   display: {xs: 'flex', md: 'none'},
                   backgroundColor: theme.palette.primary.main,
                   color: theme.palette.text.secondary,
+                  marginLeft: {xs: 10},
                   width: '40px',
                     height: '40px',
                   '&:hover': {
-                    backgroundColor: '#e0e0e0'
+                    backgroundColor: theme.palette.primary.light
                   }
                 }}
               >
-                <Badge badgeContent={0} color="warning">
+                <Badge color="warning">
                   <Menu />
                 </Badge>
               </IconButton>
+              {renderProfileMenu()}
             </Box>
           </Toolbar>
         </Container>

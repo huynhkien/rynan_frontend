@@ -166,7 +166,7 @@ export const ProductsView = () => {
                 }}
             >
                 <Box sx={{
-                    width: '30%',
+                    width: {xs: '40%', md: '30%'},
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 5
@@ -194,7 +194,7 @@ export const ProductsView = () => {
                         selectedTag={selectedTag as string}
                     />
                 </Box>
-                <Box sx={{ width: '70%' }}>
+                <Box sx={{ width: {xs: '60%', md: '70%'}, }}>
                     <Box sx={{ 
                         pb: 5,
                         display: 'flex',

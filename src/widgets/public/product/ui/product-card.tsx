@@ -89,8 +89,8 @@ const ProductCard = ({ data }: { data: Product }) => {
   return (
     <Card
       sx={{ 
-        width: {xs: '40%', md: '250px'}, 
-        height: {xs: '310px', md: '400px'}, 
+        width: {xs: '100%', md: '250px'}, 
+        height: {xs: '400px', md: '400px'}, 
         borderRadius: '12px', 
         boxShadow: hovering ? 6 : 6,
         transition: 'all 0.3s ease',

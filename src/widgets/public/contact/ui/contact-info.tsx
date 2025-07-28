@@ -10,8 +10,8 @@ export const ContactInfo = () => {
             <Box
                 sx={{
                     position: 'relative', 
-                    width: '100%', 
-                    height: '250px', 
+                    width: {xs: '100%', md: '100%'}, 
+                    height: {xs: '100%', md: '250px'}, 
                     aspectRatio: '5/4' ,
                     mb:3
                 }}
@@ -34,13 +34,14 @@ export const ContactInfo = () => {
                     position: 'relative',
                 }}
             >
-                <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                <CardContent sx={{ p: {xs:1, md:4}, position: 'relative', zIndex: 1 }}>
                     <Stack spacing={4}>
                     {/* Địa chỉ */}
                     <Box>
                         <Stack direction='row' spacing={2} alignItems='flex-start'>
                             <Avatar
                                 sx={{
+                                    display: {xs: 'none', md: 'flex'},
                                     bgcolor: 'rgba(0, 0, 0, 0.2)',
                                     width: 56,
                                     height: 56,
@@ -78,6 +79,7 @@ export const ContactInfo = () => {
                     <Stack direction='row' spacing={2} alignItems='flex-start'>
                         <Avatar
                             sx={{
+                                display: {xs: 'none', md: 'flex'},
                                 bgcolor: 'rgba(0, 0, 0, 0.2)',
                                 width: 56,
                                 height: 56,
@@ -115,6 +117,7 @@ export const ContactInfo = () => {
                         <Stack direction='row' spacing={2} alignItems='flex-start'>
                             <Avatar
                             sx={{
+                                display: {xs: 'none', md: 'flex'},
                                 bgcolor: 'rgba(0, 0, 0, 0.2)',
                                 width: 56,
                                 height: 56,

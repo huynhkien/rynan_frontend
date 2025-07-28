@@ -66,7 +66,7 @@ export const ContactForm = () => {
                     width: '100%'
                 }}>
                     <ContactFormInput
-                        label="Tên người liên hệ"
+                        label="Tên liên hệ"
                         important
                         placeholder='Nhập tên người liên hệ'
                         register={register as UseFormRegister<ContactData>}

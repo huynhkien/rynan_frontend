@@ -39,6 +39,8 @@ import { ReceiptImportManagementFormListProductItem } from '../../../receipt-imp
 import { ReceiptExportManagementFormListProductItem } from '../../../receipt-export-management/ui/receipt-export-management-form-list-product-item';
 import { ReceiptExportManagementFormListMaterialItem } from '../../../receipt-export-management/ui/receipt-export-management-form-list-material-item';
 import { ReceiptApprovePendingManagementFormAddEdit } from './receipt-approve-pending-management-form-add-edit';
+import { useAppSelector } from '@/shared/hooks/useAppHook';
+import Swal from 'sweetalert2';
 
 
 
@@ -78,6 +80,7 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, sp
     const [isApprove, setIsApprove] = useState<string | null>(null);
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const filteredMaterial = headCellsMaterial.filter(el => el.id !== 'users')
+    const {current} = useAppSelector(state => state.user);
     const theme = useTheme();
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -130,6 +133,14 @@ const ReceiptImportManagementFormListMaterial = ({receipts, users, suppliers, sp
         setIsApprove(null);
       }else{
         setIsShowMaterial(null)
+      }
+    }
+    // Xử lý chức năng kiểm duyệt
+    const handleToggleApprove = async(id: string) => {
+      if(current?.role === '2006'){
+        setIsApprove(id)
+      }else{
+        Swal.fire('Giới hạn quyền', 'Bạn không có quyền thực hiện chức năng này!!!', 'warning');
       }
     }
 return (
@@ -322,7 +333,7 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
-                                onClick={() => setIsApprove(item._id as string)}
+                                onClick={() => handleToggleApprove(item._id as string)}
                             >
                                   <AssignmentTurnedIn/>
                             </IconButton>
@@ -368,7 +379,7 @@ return (
         <Box sx={{ position: 'relative' }}>
           <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
           {isShowMaterial && <ReceiptImportManagementFormListMaterialItem action='show' materialReceipt={(receipts.find(el => el._id === isShowMaterial)?.materials)} specifications={specifications as Specification[]}/>}
-            {isApprove && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
+            {(current?.role==='2006' && isApprove) && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
         </Box>
       </Dialog>  
     </Box>
@@ -385,6 +396,7 @@ const ReceiptImportManagementFormListProduct = ({receipts, users, specifications
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
+    const {current} = useAppSelector(state => state.user);
     const filteredHeadCells = headCellsProduct.filter(el => el.id !== 'total' && el.id !== 'users');
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -435,6 +447,14 @@ const ReceiptImportManagementFormListProduct = ({receipts, users, specifications
           }else{
             setIsShowProduct(null);
           }
+    }
+    // Xử lý chức năng kiểm duyệt
+    const handleToggleApprove = async(id: string) => {
+      if(current?.role === '2006'){
+        setIsApprove(id)
+      }else{
+        Swal.fire('Giới hạn quyền', 'Bạn không có quyền thực hiện chức năng này!!!', 'warning');
+      }
     }
 return (
     <Box sx={{ width: '100%' }}>
@@ -620,7 +640,7 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
-                                onClick={() => setIsApprove(item._id as string)}
+                                onClick={() => handleToggleApprove(item._id as string)}
                             >
                                   <AssignmentTurnedIn/>
                             </IconButton>
@@ -666,7 +686,7 @@ return (
               <Box sx={{ position: 'relative' }}>
                 <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
                 {isShowProduct && <ReceiptImportManagementFormListProductItem action='show' productReceipt={(receipts.find(el => el._id === isShowProduct)?.products as ReceiptProductData[]) } specifications={specifications as Specification[]}/>}
-                {isApprove && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
+                {(current?.role === '2006' && isApprove) && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
               </Box>
             </Dialog>
     </Box>
@@ -683,6 +703,7 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, sp
     const [filterAlpha, setFilterAlpha] = useState<string>('all');
     const [isApprove, setIsApprove] = useState<string | null>(null);
     const filteredHeadCells = headCellsMaterial.filter(el => el.id !== 'supplier');
+    const {current} = useAppSelector(state => state.user);
     const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
     const theme = useTheme();
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -738,6 +759,14 @@ const ReceiptExportManagementFormListMaterial = ({receipts, users, suppliers, sp
         setIsApprove(null);
       }else{
         setIsShowMaterial(null);
+      }
+    }
+    // Xử lý chức năng kiểm duyệt
+    const handleToggleApprove = async(id: string) => {
+      if(current?.role === '2006'){
+        setIsApprove(id)
+      }else{
+        Swal.fire('Giới hạn quyền', 'Bạn không có quyền thực hiện chức năng này!!!', 'warning');
       }
     }
 return (
@@ -930,7 +959,7 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
-                                onClick={() => setIsApprove(item._id as string)}
+                                onClick={() => handleToggleApprove(item._id as string)}
                             >
                                   <AssignmentTurnedIn/>
                             </IconButton>
@@ -975,7 +1004,7 @@ return (
               <Box sx={{ position: 'relative' }}>
                 <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
                 {isShowMaterial && <ReceiptExportManagementFormListMaterialItem action='show' materialReceipt={(receipts.find(el => el._id === isShowMaterial)?.materials as ReceiptMaterialData[]) } specifications={specifications as Specification[]}/>}
-                {isApprove && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
+                {(current?.role === '2006' && isApprove) && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
               </Box>
             </Dialog> 
     </Box>
@@ -992,6 +1021,7 @@ const ReceiptExportManagementFormListProduct = ({receipts, users,specifications,
     const [isApprove, setIsApprove] = useState<string | null>(null);
     const [isShowProduct, setIsShowProduct] = useState<string| null>(null);
     const theme = useTheme();
+    const {current} = useAppSelector(state => state.user);
     const filteredHeadCells = headCellsProduct.filter(el => el.id !== 'produced_at');
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -1039,6 +1069,14 @@ const ReceiptExportManagementFormListProduct = ({receipts, users,specifications,
         setIsApprove(null);
       }else{
         setIsShowProduct(null)
+      }
+    }
+    // Xử lý chức năng kiểm duyệt
+    const handleToggleApprove = async(id: string) => {
+      if(current?.role === '2006'){
+        setIsApprove(id)
+      }else{
+        Swal.fire('Giới hạn quyền', 'Bạn không có quyền thực hiện chức năng này!!!', 'warning');
       }
     }
 return (
@@ -1230,7 +1268,7 @@ return (
                                 color='success'
                                 aria-label={`Sửa ${item.name}`}
                                 size='small'
-                                onClick={() => setIsApprove(item._id as string)}
+                                onClick={() => handleToggleApprove(item._id as string)}
                             >
                                   <AssignmentTurnedIn/>
                             </IconButton>
@@ -1276,7 +1314,7 @@ return (
                     <Box sx={{ position: 'relative' }}>
                       <Typography onClick={handleCloseDialog} color='text.secondary' component='span' sx={{position: 'absolute', right: 10, top: 10}}><Cancel /></Typography>
                       {isShowProduct && <ReceiptExportManagementFormListProductItem action='show' productReceipt={(receipts.find(el => el._id === isShowProduct)?.products as ReceiptProductData[]) } specifications={specifications as Specification[]}/>}
-                      {isApprove && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
+                      {(current?.role === '2006' && isApprove) && <ReceiptApprovePendingManagementFormAddEdit users={users} rid={isApprove} specifications={specifications as Specification[]} fetchAllReceipt={fetchAllReceipt}/>}
                     </Box>
                   </Dialog>
     </Box>

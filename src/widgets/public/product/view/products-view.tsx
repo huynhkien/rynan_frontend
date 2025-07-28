@@ -31,7 +31,7 @@ export const ProductsView = () => {
     
     // States
     const initialMin = 0;
-    const initialMax = 10000000;
+    const initialMax = 5000000;
     const [sortValue, setSortValue] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);

@@ -1,5 +1,5 @@
 import axiosInstance from "@/shared/configs/axios";
-import { ChatbotResponse, LoginData, LoginResponse, RegisterData, RegisterResponse, UserResponse, UsersResponse } from "../type/userTypes";
+import { ChatbotResponse, LoginData, LoginResponse, RegisterData, RegisterResponse, TokenResponse, UserResponse, UsersResponse } from "../type/userTypes";
 import { UserEndpoints } from "./userEndpoints";
 
 
@@ -53,6 +53,9 @@ export const addUserByAdmin = async (data: FormData): Promise<RegisterResponse> 
   axiosInstance.post(UserEndpoints.ADD, data, {
     withCredentials: true,
 });
+// tạo accessToken mới
+export const refreshToken = async (): Promise<TokenResponse> => 
+  axiosInstance.get(UserEndpoints.REFRESH_TOKEN);
 // cập nhật thông tin
 export const updateUserByAdmin = async (id: string, data: FormData): Promise<RegisterResponse> => 
   axiosInstance.put(UserEndpoints.UPDATE(id), data, {

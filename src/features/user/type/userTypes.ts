@@ -100,6 +100,11 @@ export interface UsersResponse {
   success: boolean;
   data: UserData[] ;
 }
+export interface TokenResponse {
+  success: boolean;
+  data?: string;
+  message?: string;
+}
 export interface RegisterResponse {
   success: boolean;
   message: string;

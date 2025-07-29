@@ -6,6 +6,7 @@ export const UserEndpoints = {
     CHATBOT_MODEL: '/user/chatbot-model-ai',
     DELETE_USERS: '/user/delete-users',
     LOGOUT: '/user/logout',
+    REFRESH_TOKEN: '/user/refresh-token',
     FORGOT_PASSWORD: '/user/forgot-password',
     RESET_PASSWORD: '/user/reset-password',
     ADD_ROLE: '/user/add-role',

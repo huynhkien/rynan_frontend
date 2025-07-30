@@ -97,16 +97,18 @@ export const Header = () => {
             </Box>
           </LinkTransition>
         </MenuItem>
-        <MenuItem onClick={handleProfileMenuClose}>
-          <LinkTransition href='/admin/contact' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
-            <Box sx={{display: 'flex'}}>
-              <ListItemIcon>
-                <ContactEmergency fontSize='small' />
-              </ListItemIcon>
-              <ListItemText>Liên hệ</ListItemText>
-            </Box>
-          </LinkTransition>
+        {(current?.role !== '2000') &&(
+          <MenuItem onClick={handleProfileMenuClose}>
+            <LinkTransition href='/admin/contact' style={{textDecoration: 'none', color:theme.palette.text.primary}}>
+              <Box sx={{display: 'flex'}}>
+                <ListItemIcon>
+                  <ContactEmergency fontSize='small' />
+                </ListItemIcon>
+                <ListItemText>Liên hệ</ListItemText>
+              </Box>
+            </LinkTransition>
         </MenuItem>
+        )}
         <Divider />
         <MenuItem onClick={handleLogout}>
           <ListItemIcon>

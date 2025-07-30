@@ -372,13 +372,13 @@ return (
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
                           {item.role === '2000'
-                            ? 'nhân viên hàng'
+                            ? 'Khách hàng'
                             : item.role === '2002'
                             ? 'Nhân viên'
                             : item.role === '2004'
                             ? 'Quản lý'
                             :
-                            'Quản lý'
+                            'Quản trị hệ thống'
                             }
                         </Typography>
                       </TableCell>

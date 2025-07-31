@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
   },
   productImage: {
     width: 30,
-    height: 30,
+    height: 34.5,
     margin: 5,
   },
   noteItem: {

@@ -141,8 +141,8 @@ export const Footer: React.FC = () => {
                             <Box display="flex" alignItems="flex-start" gap={1}>
                                 <LocationOn sx={{ color: theme.palette.text.secondary, mt: 0.5 }} />
                                 <Typography variant="body1">
-                                Khu CN Long Đức, xã Long Đức<br />
-                                TP. Trà Vinh, Tỉnh Trà Vinh
+                                Khu CN Long Đức, phường Long Đức<br />
+                                Tỉnh Vĩnh Long
                                 </Typography>
                             </Box>
                             <Box display="flex" alignItems="center" gap={1}>

@@ -3,10 +3,9 @@
 import { getAllProduct } from "@/features/product/api/productApi";
 import { Product } from "@/features/product/type/productType";
 import { getAllUser, getUserById} from "@/features/user/api/userApis";
-import { addProductToQuote, removeAllQuoteProduct } from "@/features/user/store/userSlice";
 import { UserData, UserDataProps } from "@/features/user/type/userTypes";
 import { ControlledSelect } from "@/shared/components/ui/private/ControlledSelect";
-import { useAppDispatch, useAppSelector } from "@/shared/hooks/useAppHook";
+import { useAppDispatch} from "@/shared/hooks/useAppHook";
 import { Box, Paper, Typography, useTheme, Button} from "@mui/material"
 import { useParams } from "next/navigation";
 import { useCallback, useEffect, useState} from "react";
@@ -15,14 +14,13 @@ import { QuoteManagementFormProductList } from "./quote-management-form-proudct-
 import { createQuote, getAllQuote, getQuoteById, updateQuote } from "@/features/quote/api/quoteApi";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
-import { QuoteData, QuoteProductData } from "@/features/quote/type/quoteType";
+import { QuoteData } from "@/features/quote/type/quoteType";
 import { QuoteManagementFormUserList } from "./quote-management-form-user-list";
 import { showModal } from "@/shared/store/appSlice";
 
 export const QuoteManagementFormAddEdit = () => {
     const {control} = useForm<UserDataProps>();
     const theme = useTheme();
-    const {quoteProduct} = useAppSelector((state) => state.user);
     const dispatch = useAppDispatch();
     // Lấy id khi có cập nhật thông tin
     const {id} = useParams();
@@ -35,8 +33,6 @@ export const QuoteManagementFormAddEdit = () => {
     // State khi lựa chọn thông tin khách hàng
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const [user, setUser] = useState<UserData>();
-    // State cho sản phẩm đã được filter
-    const [filteredProducts, setFilteredProducts] = useState<Product[] | []>([]);
     // Hiển thị thông tin báo giá
     useEffect(() => {
         const fetchQuotes = async() => {
@@ -100,34 +96,11 @@ export const QuoteManagementFormAddEdit = () => {
         fetchQuote();
     }, [id, products]);
 
-    // Xử lý lựa chọn sản phẩm
-    const handleSelectionChangeProduct = (value: string | number) => {
-        if(id){
-            const existingProduct = quoteProducts.find((el) => el._id === value);
-            if(existingProduct){
-                alert('Sản phẩm hiện đã có trong dữ liệu. Vui lòng thêm sản phẩm khác')
-            }else{
-                dispatch(addProductToQuote({pid: value}));
-            }
-        }else{
-            dispatch(addProductToQuote({pid: value}));
-        }
-    }
     // Xử lý lựa chọn khách hàng
     const handleSelectionChangeUser = (id: string | number) => {
         setSelectedUser(id as string)
     }
     
-    // Tìm kiếm sản phẩm xuất hiện trong quoteProduct state
-    useEffect(() => {
-        const fetchProductToQuote = () => {
-            const filtered = products.filter((el) => {
-                return quoteProduct.some((item) => item.pid === el._id);
-            });
-            setFilteredProducts(filtered);
-        }
-        fetchProductToQuote();
-    }, [products, quoteProduct]);
     // Hàm tạo mã số báo giá tự động
     const generateUniqueCode = useCallback(() => {
         const currentYear = new Date().getFullYear();
@@ -163,17 +136,11 @@ export const QuoteManagementFormAddEdit = () => {
             );
             return;
             }
-            if (quoteProduct.length < 0) {
-                Swal.fire(
-                    'Thiếu thông tin!',
-                    'Vui lòng chọn sản phẩm để tạo phiếu báo giá.',
-                    'warning'
-                );
-                return;
-            }
             const newQuoteData = {
                 client: selectedUser as string,
-                products: quoteProduct as QuoteProductData[],
+                products: products.map(el => ({
+                    pid: el._id
+                })),
                 quotation: generateUniqueCode(),
             }
             dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
@@ -182,7 +149,6 @@ export const QuoteManagementFormAddEdit = () => {
                 dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message)
                 setSelectedUser(null);
-                dispatch(removeAllQuoteProduct())
             }
         }catch(error: unknown){
             dispatch(showModal({ isShowModal: false, modalType: null }));
@@ -201,19 +167,10 @@ export const QuoteManagementFormAddEdit = () => {
             );
             return;
             }
-            if (quoteProduct.length < 0) {
-                Swal.fire(
-                    'Thiếu thông tin!',
-                    'Vui lòng chọn sản phẩm để tạo phiếu báo giá.',
-                    'warning'
-                );
-                return;
-            }
-            const quoteProductsId = quoteProducts.map((el) => ({pid: el._id}));
-            const combinedProducts = [...quoteProductsId, ...quoteProduct];
+           
             const newQuoteData = {
                 client: selectedUser as string,
-                products: combinedProducts as QuoteProductData[],
+                products: quoteProducts.map((el) => ({pid: el._id})),
                 quotation: quotation
             }
             dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
@@ -222,7 +179,6 @@ export const QuoteManagementFormAddEdit = () => {
                 dispatch(showModal({ isShowModal: false, modalType: null }));
                 toast.success(response.message)
                 setSelectedUser(null);
-                dispatch(removeAllQuoteProduct())
             }
         }catch(error: unknown){
             dispatch(showModal({ isShowModal: false, modalType: null }));
@@ -247,23 +203,7 @@ export const QuoteManagementFormAddEdit = () => {
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                         {/* Lựa chọn sản phẩm */}
-                        <Box>
-                            <ControlledSelect
-                                label='Lựa chọn sản phẩm'
-                                important
-                                sx={{ width: '100%' }}
-                                name='type'
-                                onSelectionChange={handleSelectionChangeProduct}
-                                control={control}
-                                options={products.map((item) => ({
-                                    _id: item._id,
-                                    name: item.name_vn
-                                }))}
-                                rules={{ required: 'Vui lòng chọn sản phẩm' }}
-                                searchable={true}
-                            />
-                        </Box>
-                            <QuoteManagementFormProductList product={filteredProducts} render={fetchProducts}/>
+                            <QuoteManagementFormProductList product={products} render={fetchProducts}/>
                             {id && (
                                 <QuoteManagementFormProductList product={quoteProducts} render={fetchProducts} id={id as string}/>
                             )}

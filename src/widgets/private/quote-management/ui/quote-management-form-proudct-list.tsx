@@ -16,15 +16,10 @@ import {
   Box,
   Dialog,
 } from '@mui/material';
-import { Cancel, Delete, Edit} from '@mui/icons-material';
-import { toast } from 'react-toastify';
+import { Cancel,  Edit} from '@mui/icons-material';
 import Image from 'next/image';
 import { QuoteFormProductList } from '@/features/quote/type/quoteType';
 import { QuoteManagementFormProductEdit } from './quote-management-form-product-edit';
-import { useAppDispatch } from '@/shared/hooks/useAppHook';
-import { removeItemQuoteProduct } from '@/features/user/store/userSlice';
-import { deleteProductQuote } from '@/features/quote/api/quoteApi';
-import { showModal } from '@/shared/store/appSlice';
 
 const headCells = [
   { id: 'code', label: 'Mã sản phẩm', sortable: true },
@@ -42,33 +37,11 @@ type SortOrder = 'asc' | 'desc';
 
 export const QuoteManagementFormProductList = ({product, render, id}: QuoteFormProductList) => {
     const [page, setPage] = useState(0);
-    const dispatch = useAppDispatch();
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [isEditProduct, setIsEditProduct] = useState<string | null>(null);
     const theme = useTheme();
-    // xóa sản phẩm theo trạng thái
-    const handleDelete = async(id: string) => {
-        if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
-          dispatch(removeItemQuoteProduct({
-            pid:id
-          }));
-          toast.success('Xóa sản phẩm thành công')
-      };
-    }
-    // Xóa sản phẩm trong dữ liệu
-    const handleDeleteById = async(pid: string) => {
-      if (window.confirm('Bạn có chắc muốn xóa sản phẩm không?')) {
-        dispatch(showModal({ isShowModal: true, modalType: 'loading' }));
-        const response = await deleteProductQuote(id as string, pid);
-        if(response.success) {
-          dispatch(showModal({ isShowModal: false, modalType: null }));
-          toast.success(response.message);
-          render();
-        };
-      };
-    }
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -223,14 +196,6 @@ return (
                                 onClick={() => setIsEditProduct(item._id)}
                             >
                                   <Edit/>
-                            </IconButton>
-                            <IconButton 
-                                onClick={id ? () => handleDeleteById(item._id) : () => handleDelete(item._id)} 
-                                color='error'
-                                aria-label={`Xóa ${item.name_vn}`}
-                                size='small'
-                            >
-                                <Delete />
                             </IconButton>
                       </TableCell>
                     </TableRow>

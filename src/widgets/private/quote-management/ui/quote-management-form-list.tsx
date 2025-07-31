@@ -33,11 +33,13 @@ import Image from 'next/image';
 import { Product } from '@/features/product/type/productType';
 import { getAllProduct } from '@/features/product/api/productApi';
 import { ExportToPDF } from '@/shared/components/ui/private/ExportToPdf';
+import moment from 'moment';
 
 const headCells = [
   { id: 'client', label: 'Thông tin khách hàng', sortable: true },
   { id: 'products', label: 'Số lượng sản phẩm', sortable: true },
   { id: 'quotation', label: 'Mã phiếu', sortable: true },
+  { id: 'createdAt', label: 'Ngày tạo', sortable: false },
   { id: 'actions', label: 'Thao tác', sortable: false },
 
 ];
@@ -572,6 +574,11 @@ return (
                       <TableCell sx={{ verticalAlign: 'middle' }}>
                         <Typography variant='body1'>
                           {item.quotation} 
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle' }}>
+                        <Typography variant='body1'>
+                          {moment(item.createdAt).format('DD/MM/YYYY HH:mm:ss')} 
                         </Typography>
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 300 }}>

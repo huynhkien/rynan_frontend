@@ -125,7 +125,6 @@ export interface UserState {
   isLoading: boolean;
   mes: string;
   cart: CartItem[];
-  quoteProduct: QuoteProductItem[];
   orderProduct: OrderProductItem[];
   materialReceipt: ReceiptMaterialData[];
   productReceipt: ReceiptProductData[];

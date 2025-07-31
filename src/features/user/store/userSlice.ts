@@ -1,4 +1,4 @@
-import { OrderProductItem, QuoteProductItem } from './../type/userTypes';
+import { OrderProductItem} from './../type/userTypes';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as actions from './asyncAction';
 import { CartItem, LoginPayload, UserData, UserState } from '../type/userTypes';
@@ -7,7 +7,6 @@ import { ReceiptMaterialData, ReceiptProductData } from '@/features/receipt/type
 
 // Khởi tạo trang thái giỏ hàng
 const initialCart: CartItem[] = getFromLocalStorage('cart', []);
-const initialProductQuote: QuoteProductItem[] = getFromLocalStorage('quote_product', []);
 const initialProductOrder: OrderProductItem[] = getFromLocalStorage('order_product', []);
 const initialMaterialReceipt: ReceiptMaterialData[] = getFromLocalStorage('material_receipt', []);
 const initialProductReceipt: ReceiptProductData[] = getFromLocalStorage('product_receipt', []);
@@ -19,7 +18,6 @@ const initialState: UserState = {
   isLoading: false,
   mes: '',
   cart: initialCart,
-  quoteProduct: initialProductQuote,
   orderProduct: initialProductOrder,
   materialReceipt: initialMaterialReceipt,
   productReceipt: initialProductReceipt
@@ -98,30 +96,6 @@ export const userSlice = createSlice({
     removeAllCart: (state) => {
       state.cart = [];
       removeToLocalStorage('cart');
-    },
-    // Xử lý thêm sản phâm trong danh sách báo giá
-    addProductToQuote: (state, action: PayloadAction<QuoteProductItem>) => {
-      const {pid} = action.payload;
-      const existingItem = state.quoteProduct.findIndex(
-        item => item.pid === pid
-      );
-      if(existingItem !== -1) {
-        alert('Sản phẩm đã tồn tại trong danh sách báo giá')
-      }else{
-        state.quoteProduct.push({pid});
-      }
-      setToLocalStorage('quote_product', state.quoteProduct);
-    },
-    removeItemQuoteProduct: (state, action) => {
-      const {pid} = action.payload;
-      state.quoteProduct = state.quoteProduct.filter(
-        item => !(item.pid === pid)
-      );
-      setToLocalStorage('quote_product', state.quoteProduct);
-    },
-    removeAllQuoteProduct: (state) => {
-      state.quoteProduct = [];
-      removeToLocalStorage('quote_product');
     },
     // Xử lý thêm sản phâm trong danh sách báo giá
     addProductToOrder: (state, action: PayloadAction<OrderProductItem>) => {
@@ -273,9 +247,6 @@ export const {
   updateQuantityCart,
   removeItemCart, 
   removeAllCart,
-  addProductToQuote,
-  removeAllQuoteProduct,
-  removeItemQuoteProduct,
   addProductToOrder,
   removeAllOrderProduct,
   removeItemOrderProduct,

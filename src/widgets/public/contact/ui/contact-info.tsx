@@ -67,8 +67,7 @@ export const ContactInfo = () => {
                                     fontWeight: theme.typography.fontWeightLight
                                     }}
                                 >
-                                        Khu CN Long Đức, xã Long Đức, Thành Phố Trà Vinh,
-                                    Tỉnh Trà Vinh
+                                        Khu CN Long Đức, phường Long Đức, Tỉnh Vĩnh Long
                                 </Typography>
                             </Box>
                         </Stack>

@@ -64,7 +64,7 @@ const useAutoRefreshToken = () => {
 
         intervalRef.current = setInterval(() => {
             handleRefreshToken();
-        }, 10 * 60 * 1000); 
+        }, 60 * 1000); 
         
         return () => {
             if (intervalRef.current) {

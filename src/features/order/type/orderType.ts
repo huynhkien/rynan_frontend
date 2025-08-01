@@ -77,5 +77,13 @@ export interface OrderProductProps {
     renderOrder?: () => void;
     action?: string
 }
+export interface VnPayRefundData extends Record<string, unknown>{
+    status: string;
+    _id: string;
+    transType: string;
+    amount: number;
+    user: string;
+}
 export type OrderFormInputProps = FormInputProps<OrderData>;
 export type OrderStatusFormInputProps = FormInputProps<OrderStatusData>;
+export type OrderRefundFormInputProps = FormInputProps<VnPayRefundData>

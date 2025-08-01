@@ -2,6 +2,7 @@ export const OrderEndpoints = {
     CREATE: '/order',
     CREATE_ORDER_VNPAY: '/order/create-order-vnp',
     RETURN_ORDER_VNPAY: '/order/return-order-vnp',
+    VNPAY_REFUND: '/order/refund-vnp',
     DELETE_ORDERS: '/order/delete-orders',
     GET_ALL: '/order',
     GET_BY_ID: (id: string | number) => `/order/${id}`,

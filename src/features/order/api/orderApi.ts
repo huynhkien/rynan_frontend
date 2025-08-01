@@ -1,6 +1,6 @@
 import axiosInstance from "@/shared/configs/axios";
 import { OrderEndpoints } from "./orderEndpoints";
-import { OrderData, OrderResponse, OrdersResponse, OrderStatusData } from "../type/orderType";
+import { OrderData, OrderResponse, OrdersResponse, OrderStatusData, VnPayRefundData } from "../type/orderType";
 import { OrderProductItem } from "@/features/user/type/userTypes";
 
 // Thêm đơn hàng
@@ -11,6 +11,11 @@ export const createOrder = async (data: OrderData): Promise<OrderResponse> =>
 // Thanh toán với vnapy
 export const createOrderVnPay = async(data: OrderData): Promise<OrderResponse> => 
   axiosInstance.post(OrderEndpoints.CREATE_ORDER_VNPAY, data, {
+    withCredentials: true,
+});
+// Hoàn tiền và hủy đơn hàng tạo với vnapy -> chỉ khi đơn hàng đã thanh toán
+export const vnPayRefund = async(data: VnPayRefundData): Promise<OrderResponse> => 
+  axiosInstance.post(OrderEndpoints.VNPAY_REFUND, data, {
     withCredentials: true,
 });
 // Trả về kết quả thành toán

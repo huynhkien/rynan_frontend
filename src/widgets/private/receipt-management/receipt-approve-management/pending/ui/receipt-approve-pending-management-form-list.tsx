@@ -372,7 +372,8 @@ return (
                     height: '50%',
                     maxWidth: '1000px',
                     position: 'relative',
-                    borderRadius: 0
+                    borderRadius: 0,
+                    background: theme.palette.text.secondary
                 },
         }}
       >
@@ -679,7 +680,8 @@ return (
                           height: '50%',
                           maxWidth: '1000px',
                           position: 'relative',
-                          borderRadius: 0
+                          borderRadius: 0,
+                          background: theme.palette.text.secondary
                       },
               }}
             >
@@ -997,7 +999,8 @@ return (
                           height: '50%',
                           maxWidth: '1000px',
                           position: 'relative',
-                          borderRadius: 0
+                          borderRadius: 0,
+                          background: theme.palette.text.secondary
                       },
               }}
             >

@@ -341,7 +341,7 @@ return (
                         </TableCell>
                         <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
                           <Typography variant='body1'>
-                            {item.total.toLocaleString()} VNĐ
+                            {item.total === 0 ? 'Chủ cửa hàng đã hoàn trả tiền vào tài khoản' : `${item.total.toLocaleString} VNĐ`} 
                           </Typography>
                         </TableCell>
                         <TableCell>

@@ -466,3 +466,14 @@ export const Role = [
 ] 
 // Hiển thị số bình luận
 export const INITIAL_DISPLAY_COUNT = 3;
+// Kiểu hoàn tiền
+export const TransType = [
+    {
+        _id: '02',
+        name: 'Hoàn toàn phần'
+    },
+    {
+        _id: '03',
+        name: 'Hoàn một phần'
+    }
+]

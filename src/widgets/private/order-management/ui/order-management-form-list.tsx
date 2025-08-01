@@ -22,7 +22,7 @@ import {
   Checkbox,
   Dialog,
 } from '@mui/material';
-import { Add,   Cancel,   Delete, Edit, LibraryAddCheck } from '@mui/icons-material';
+import { Add, Cancel,   Delete, Edit, LibraryAddCheck, Loop } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import {  OrderStatus, OrderType, PaymentMethods, PaymentStatuses } from '@/shared/constant/common';
@@ -37,6 +37,7 @@ import { OrderManagementFormEditStatus } from './order-management-form-edit-stat
 import { showModal } from '@/shared/store/appSlice';
 import { useAppDispatch } from '@/shared/hooks/useAppHook';
 import { OrderManagementFormExport } from './order-management-form-export';
+import { OrderManagementFormRefundVnPay } from './order-management-form-refund-vnpay';
 
 const headCells = [
   { id: 'code', label: 'Mã đơn hàng', sortable: true },
@@ -47,6 +48,7 @@ const headCells = [
   { id: 'paymentStatus', label: 'Trạng thái thanh toán', sortable: true },
   { id: 'paymentMethod', label: 'Hình thức thanh toán', sortable: true },
   { id: 'expectedDeliveryDate', label: 'Hạn thanh toán', sortable: true },
+  { id: 'total', label: 'Tổng tiền', sortable: true },
   { id: 'orderType', label: 'Loại đơn hàng', sortable: true },
   { id: 'actions', label: 'Thao tác', sortable: false },
 
@@ -65,6 +67,7 @@ export const OrderManagementFormList = () => {
     const [orderId, setOrderId] = useState<string | null>(null);
     const [quoteId, setQuoteId] = useState<string | null>(null);
     const [isShowUser, setIsShowUser] = useState<string | null>(null);
+    const [isShowRefund, setIsShowRefund] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState<string>('name');
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
@@ -237,6 +240,8 @@ export const OrderManagementFormList = () => {
             setIsShowUser(null);
         }else if(orderId){
           setOrderId(null)
+        }else if(isShowRefund){
+          setIsShowRefund(null);
         }else{
             setIsShowProduct(null);
         }
@@ -476,6 +481,11 @@ return (
                       </TableCell>
                       <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
                         <Typography variant='body1'>
+                          {item.total === 0 ? 'Đã hoàn trả' : `${item.total} VNĐ`} 
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ verticalAlign: 'middle', maxWidth: 250 }}>
+                        <Typography variant='body1'>
                           {OrderType.find(el => el._id === item.orderType)?.name}
                         </Typography>
                       </TableCell>
@@ -505,14 +515,26 @@ return (
                             }
                             {
                               item.orderType === 'CUSTOMER_ONLINE' &&
-                              <IconButton 
+                              <>
+                                <IconButton 
                                   color='success'
                                   aria-label={`Sửa ${item.name_vn}`}
                                   size='small'
                                   onClick={() => setOrderId(item._id as string)}
-                              >
-                                    <LibraryAddCheck/>
-                              </IconButton>
+                                >
+                                      <LibraryAddCheck/>
+                                </IconButton>
+                                {item.paymentMethod === 'BANK_TRANSFER' && item.paymentStatus === 'PAID' &&
+                                <IconButton 
+                                  color='error'
+                                  aria-label={`Sửa ${item.name_vn}`}
+                                  size='small'
+                                  onClick={() => setIsShowRefund(item._id as string)}
+                                >
+                                      <Loop/>
+                                </IconButton>
+                                }
+                              </>
                             }
                             
                       </TableCell>
@@ -538,7 +560,7 @@ return (
       </Paper>
       {/* Dialog hiển thị sản phẩm */}
       <Dialog
-        open={isShowProduct !==null || isShowUser !==null || orderId !==null}
+        open={isShowProduct !==null || isShowUser !==null || orderId !==null || isShowRefund !== null}
         onClose={handleCloseDialog}
         aria-labelledby="product-dialog-title"
         aria-describedby="product-dialog-description"
@@ -560,6 +582,7 @@ return (
           {isShowProduct && <OrderManagementFormListProduct orderProduct={order?.products as OrderProductItem[]} id={quoteId as string} action='show'/>}
           {isShowUser && <OrderManagementFormListUser user={user as UserData}/>}
           {orderId && <OrderManagementFormEditStatus orderId={orderId} render={fetchAllOrder}/>}
+          {isShowRefund && <OrderManagementFormRefundVnPay _id={isShowRefund}/>}
         </Box>
       </Dialog>
     </Box>
